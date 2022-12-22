@@ -1,0 +1,39 @@
+<aura:component implements="flexipage:availableForRecordHome" 
+                controller="CreateFacilitiesObjectsCtrl">
+    
+    <aura:attribute name="Suites" type="Suite__c[]" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+    <span style="background-color:#a1dee9;">
+	<lightning:layout multipleRows="false" >
+        <lightning:layoutItem size="1" class=" buildingHeader">
+            <b>Suites: </b> 
+        </lightning:layoutItem>
+        <lightning:layoutItem size="11" >
+           
+        </lightning:layoutItem>
+    </lightning:layout>
+        
+    <lightning:layout multipleRows="true" class="mySubrowHeader header-column">
+        
+         <!-- lightning:layoutItem class="header-column-one mySubrowHeader">&nbsp;</lightning:layoutItem>    -->
+		 <div style="width:40px;"></div>        
+         <lightning:layoutItem size="2" class="mySubrowHeader header-column">Suite Reference Number</lightning:layoutItem>
+         <lightning:layoutItem size="2" class="mySubrowHeader header-column">Building</lightning:layoutItem>
+         <lightning:layoutItem size="1" class="mySubrowHeader header-column">Suite Number</lightning:layoutItem>
+         <lightning:layoutItem size="2" class="mySubrowHeader header-column">Net Rentable Area</lightning:layoutItem>
+         <lightning:layoutItem size="1" class="mySubrowHeader header-column">Vacancy</lightning:layoutItem>
+         <lightning:layoutItem size="3" class="mySubrowHeader header-column">Vacancy Reason</lightning:layoutItem> 
+         
+     </lightning:layout>
+    </span>
+    
+    
+    <span >
+    <aura:iteration items="{!v.Suites}" var="b" indexVar="indx">
+        <c:Suite Suite="{!b}" propertyId="{!v.propertyId}"/>
+    </aura:iteration>
+    </span>
+    
+</aura:component>

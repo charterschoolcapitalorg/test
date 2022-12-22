@@ -1,0 +1,6 @@
+<aura:documentation>
+	<aura:description>Documentation</aura:description>
+	<aura:example name="CustomHeader" ref="standardHeader" label="Label">
+		Standard CSC header, subheading and banner.
+	</aura:example>
+</aura:documentation>

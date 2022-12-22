@@ -1,0 +1,146 @@
+<aura:component controller="PreFundingEstimator" implements="forceCommunity:availableForAllPageTypes,force:appHostable" 
+                access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="operatingState" type="State_Province__c" />
+    <aura:attribute name="opportunity" type="Opportunity" />
+    <aura:attribute name="lead" type="Lead" />    
+    <aura:attribute name="preFundingEstimate" type="Pre_Funding_Estimate__c" default="{'sobjectType': 'Pre_Funding_Estimate__c',}"/>
+    <aura:attribute name="installments" type="Pre_FE_Installment__c[]"/>
+    <aura:attribute name="calculated" type="Boolean" default="false"/>
+    <aura:attribute name="isLoan" type="Boolean" default="false"/>
+    <aura:attribute name="stateName" type="String"/>
+    <aura:attribute name="error" type="Boolean"/>
+    <aura:registerEvent name="getInstallments" type="c:PreFE_CalculationEvent"/>
+    
+    
+    <div class="slds-col slds-gutters_direct slds-wrap slds-theme_shade heading">
+        <lightning:card title="Pre-Funding Estimate - this is for internal purposes only" class="slds-text-title_caps heading">
+        </lightning:card>
+    </div>
+
+    <p class="slds-grid slds-gutters_direct slds-wrap slds-theme_shade">
+        <div class="slds-col slds-small-size_8-of-12 slds-medium-size_8-of-12 slds-large-size_6-of-12 slds-p-around_medium">
+            <lightning:card title="Pre-Funding Estimation Parameters">
+                <div class="slds-grid slds-card__body_inner">
+                    <div class="slds-col ">
+                        <lightning:select name="selectType" required="true" label="Transaction Type" value="{!v.preFundingEstimate.Transaction_Type__c}" onchange="{!c.changeType}">
+                            <!--option value="">choose one...</option-->
+                            <option value="Receivable Purchase">Receivable Purchase</option>
+                            <option value="Loan">Loan</option>
+                        </lightning:select>
+                    </div>
+                </div>
+                <div class="slds-grid slds-card__body_inner">
+                    <div class="slds-col slds-size_6-of-12">
+                        <lightning:input required="true" type="date" value="{!v.preFundingEstimate.Funding_Date__c}" label="Funding Date" onchange="{!c.changeGeneral}"/>
+                        <lightning:input required="true" type="number" value="{!v.preFundingEstimate.Student_Count__c}" label="Enrollment" onchange="{!c.changeGeneral}"/>
+                        <lightning:select name="selectI" required="true" label="Number of Installments" onchange="{!c.changeGeneral}" value="{!v.preFundingEstimate.Installments__c}" disabled="{!v.isLoan}">
+                            <option value="">choose one...</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </lightning:select>
+                    </div>
+                    <div class="slds-col slds-size_6-of-12 slds-card__body_inner">
+                        <lightning:select name="select" label="Program Fee" value="{!v.preFundingEstimate.Program_Fee_Rate__c}" onchange="{!c.changeGeneral}">
+                            <option value="">choose one...</option>
+                            <option value="0.0">0.0%</option>
+                            <option value="0.5">0.5%</option>
+                            <option value="1.0">1.0%</option>
+                            <option value="1.5">1.5%</option>
+                            <option value="2.0">2.0%</option>
+                        </lightning:select>
+                        <lightning:select name="select" label="Transaction Fee" value="{!v.preFundingEstimate.Transaction_Fee_Rate__c}" onchange="{!c.changeGeneral}">
+                            <option value="">choose one...</option>
+                            <option value="0.0">0.0%</option>
+                            <option value="0.5">0.5%</option>
+                            <option value="1.0">1.0%</option>
+                            <option value="1.5">1.5%</option>
+                            <option value="2.0">2.0%</option>
+                        </lightning:select>
+                        <lightning:select name="select" label="Target Effective Fee" value="{!v.preFundingEstimate.Target_Effective_Rate__c}" onchange="{!c.changeGeneral}">
+                            <option value="">choose one...</option>
+                            <option value="7.0">7.0%</option>
+                            <option value="7.5">7.5%</option>
+                            <option value="8.0">8.0%</option>
+                            <option value="8.5">8.5%</option>
+                            <option value="9.0">9.0%</option>
+                            <option value="9.5">9.5%</option>
+                            <option value="10.0">10.0%</option>
+                            <option value="10.5">10.5%</option>
+                            <option value="11.0">11.0%</option>
+                            <option value="11.5">11.5%</option>
+                            <option value="12.0">12.0%</option>
+                            <option value="12.5">12.5%</option>
+                            <option value="13.0">13.0%</option>
+                            <option value="13.5">13.5%</option>
+                            <option value="14.0">14.0%</option>
+                            <option value="14.5">14.5%</option>
+                            <option value="15.0">15.0%</option>
+                            <option value="15.5">15.5%</option>
+                            <option value="16.0">16.0%</option>
+                            <option value="16.6">16.5%</option>
+                        </lightning:select>
+                    </div>
+                </div>
+                <br/>
+                <div class="buttonPadding"></div>
+                <div class="slds-grid slds-card__body_inner">
+                    <div class="slds-col slds-size_4-of-12">
+                        <button class="slds-button slds-button_destructive slds-align_absolute-center" onclick="{! c.handleCancel }">Cancel</button>
+                    </div>
+                    <aura:if isTrue="{!v.error}">
+                        <div class="slds-col slds-size_4-of-12">
+                                <button class="slds-button slds-button_brand slds-align_absolute-center" disabled="true" onclick="{! c.calculate }">Calculate</button>
+                        </div>
+                        <aura:set attribute="else">
+                            <div class="slds-col slds-size_4-of-12">
+                                <button class="slds-button slds-button_brand slds-align_absolute-center" onclick="{! c.calculate }">Calculate</button>
+                            </div>
+                        </aura:set>
+                    </aura:if>                    
+                    <aura:if isTrue="{!v.calculated}">
+                        <div class="slds-col slds-size_4-of-12">
+                                <button class="slds-button slds-button_success slds-align_absolute-center" onclick="{! c.save }">Save</button>
+                        </div>
+                        <aura:set attribute="else">
+                            <div class="slds-col slds-size_4-of-12">
+                                <button class="slds-button slds-button_brand slds-align_absolute-center" disabled="true" onclick="{! c.save }">Save</button>
+                            </div>
+                        </aura:set>
+                    </aura:if>
+
+                </div>
+            </lightning:card>
+        </div>
+        <div class="slds-col slds-small-size_8-of-12 slds-medium-size_8-of-12 slds-large-size_6-of-12 slds-p-around_medium">    
+            <aura:renderIf isTrue="{!not(empty(v.installments))}">
+                <lightning:card title="Summary">
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_7-of-12 slds-p-left_large"><!--slds-p-around_medium"-->
+                            <c:PreFE_Summary installments="{!v.installments}"/>
+                        </div>
+                    </div>                   
+                </lightning:card>
+            </aura:renderIf>
+            <aura:renderIf isTrue="{!v.error}">
+                <lightning:card title="Warning">
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_8-of-12 slds-p-around_medium">
+                            <p style="color:red; font-size:18px">There has been an error, please contact your administrator!</p>
+                        </div>
+                    </div>                   
+                </lightning:card>
+            </aura:renderIf>
+        </div>
+    </p>
+    
+    <aura:renderIf isTrue="{!not(empty(v.installments))}">
+        <div class="slds-p-around_medium">
+            <div class="slds-col slds-small-size_1-of-1 slds-large-size_12-of-12">
+                <c:PreFE_Installments installments="{!v.installments}"/>
+            </div>
+        </div>
+    </aura:renderIf>
+    
+</aura:component>

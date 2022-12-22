@@ -1,0 +1,65 @@
+<aura:component >
+     <aura:html tag="style">
+         .slds-form-element__label {
+    		display: none;
+		}
+    </aura:html>
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <!-- aura:handler name="onRender" value="{!this}" action="{!c.onRender}"/> -->
+    <!-- ltng:require scripts="{!$Resource.Jquery_js}" afterScriptsLoaded="{!c.setScriptLoaded}"/> -->
+    
+    <aura:attribute name="cmoaccounts" type="CMOAccounts" />
+    <aura:attribute name="cmonames" type="string[]" />
+    <aura:attribute name="cmonamesmatch" type="Boolean[]" />
+    
+    <aura:attribute name="cmolist" type="String" />
+    <aura:attribute name="cmonamelist" type="String" />
+    <aura:attribute name="cmotemplist" type="String" />
+    <aura:attribute name="cmotempnamelist" type="String" />
+    
+    <aura:attribute name="origcmonamelist" type="String" />
+    <aura:attribute name="origcmolist" type="String" />
+    
+	<aura:registerEvent name="filterupdated" type="c:FilterUpdated"/>
+    
+    <lightning:layout multipleRows="true">
+        
+       		<aura:iteration var="a" items="{!v.cmoaccounts}" indexVar="indx">
+                <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column">
+                <ui:inputCheckbox class="myCheckbox" aura:id="checkbox" text="{!a.Id}" 
+                   value="{!a.Checked}"
+                  name="{!indx}" label="{!a.Name}" change="{!c.selectoptionvalue}"/>
+                </lightning:layoutItem>
+        	</aura:iteration>
+    		
+        
+			<!--        
+            <lightning:checkboxGroup name="Checkbox Group"
+                             label="Checkbox Group"
+                             options="{! v.options }"
+                             value="{! v.value }"
+                             onchange="{! c.handleChange }"/>
+        	-->
+        
+        <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column">
+            &nbsp;
+        </lightning:layoutItem>
+            
+        <lightning:layoutItem alignmentBump="right" size="12" mediumDeviceSize="12"  aura:id="myRow">
+            <span style="horizontal-align:right;text-align:right;float:right;">
+                
+                <lightning:button variant="neutral" label="Save" onclick="{!c.save}"/> 
+                &nbsp;&nbsp;
+                <lightning:button variant="neutral" label="Close" onclick="{!c.close}"/>
+            </span>
+        </lightning:layoutItem>
+        
+        </lightning:layout>
+    
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+</aura:component>

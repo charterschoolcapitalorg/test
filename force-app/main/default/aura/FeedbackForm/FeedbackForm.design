@@ -1,0 +1,4 @@
+<design:component label="Feedback Component">
+    <design:attribute name="compLabel" label="Component Label" description="Enter the label of the component" />
+    <design:attribute name="groups" label="Chatter Group" required="true" datasource="apex://ChatterGroupPicklist"/>
+</design:component>

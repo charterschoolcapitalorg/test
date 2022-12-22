@@ -1,0 +1,578 @@
+<apex:page standardController="FC_Form__c" extensions="FCApprovalsController" sidebar="false" action="{!refreshApprovals}" >
+<apex:pageMessages ></apex:pageMessages>
+
+
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" />
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<style>
+
+  a { 
+      color:#4B96D0 ;
+      text-decoration:underline;
+  }
+
+  #summary-tab {
+      background-color: #00558C;
+      color: white;
+  }
+
+  #fa-summary-tab {
+      background-color: #00558C;
+      color: white;
+  }
+
+  #charterinfo-tab {
+      //background-color: #717C7D;
+      background-color: #00558C;
+      color: white;
+  }
+
+  #underwriting-tab {
+      background-color: #CF7F00;
+      color: white;
+  }
+
+  #finance-tab {
+      background-color: #77C5D5;
+      color: white;
+  }
+
+  #servicing-tab {
+      background-color: #A8AD00;
+      color: white;
+  }
+
+  #chatter-tab {
+      background-color: #717C7D;
+      color: white;
+  }
+
+  .mainTitle {
+      width:700px;
+  }
+
+  .active > #summary-tab, .active>#charterinfo-tab,.active>#underwriting-tab,.active>#finance-tab,.active>#servicing-tab  {
+      font-weight: bold;
+  }
+
+  .zen-searchBox{
+    visibility: hidden;
+  }
+
+  .feedpage{
+    width: 800px !important;
+  }
+
+  .pageDescription{
+    height: 0px;
+  }
+
+</style>
+
+<script>
+    function updateStatusJS(updatedFCApprovalId){
+            updateStatus(updatedFCApprovalId);
+    }
+</script>
+
+
+
+<!-- <apex:sectionHeader title="FC Approvals" subtitle=" "/> -->
+<br/>
+<span>
+  <apex:image id="theImage" value="/img/icon/square32.png" alt="FC Charter Level" />
+  <h4>
+    FC Approvals -&nbsp;<apex:outputLink value="/{!FC_Form__c.Id}" id="theLink">{!FC_Form__c.Charter_Holder_Text__c} - {!FC_Form__c.Name}</apex:outputLink>
+  </h4>
+</span>
+<br/>
+<hr/>
+<chatter:feedWithFollowers entityId="{!FC_Form__c.Id}" />
+<hr/>
+<br/>
+
+<apex:form >
+<!-- <span style="padding: 40px"><apex:commandButton style="padding-left:20px;padding-right:20px;" action="{!Back}" value="Back" /></span>
+<hr/>
+<br/> -->
+
+  <!-- Menu options -->
+  <div class="tabbable tabs-left">
+
+    <apex:outputPanel rendered="{!NOT(isFacilities)}">
+        <ul class="nav nav-tabs">
+          <li class="active"><a id="summary-tab" href="#summary" data-toggle="tab">Summary</a></li>
+          <li><a id="charterinfo-tab" href="#charterinformation" data-toggle="tab">Charter Information</a></li>
+          <li><a id="underwriting-tab" href="#underwriting" data-toggle="tab">Underwriting</a></li>
+          <li><a id="finance-tab" href="#finance" data-toggle="tab">Finance</a></li>
+          <li><a id="servicing-tab" href="#servicing" data-toggle="tab">Servicing</a></li>
+          <!-- <li><a id="chatter-tab" href="#chatter" data-toggle="tab">Chat</a></li> -->
+        </ul>
+    </apex:outputPanel>
+    <apex:outputPanel rendered="{!isFacilities}">
+        <ul class="nav nav-tabs">
+          <li class="active"><a id="fa-summary-tab" href="#summary" data-toggle="tab">Summary</a></li>
+        </ul>
+    </apex:outputPanel>
+
+    <div class="tab-content">
+
+        <!-- Summary -->
+        <!-- non-Facilities -->
+        <div class="tab-pane active" id="summary" >
+            <apex:pageBlock id="pbsummary" title="Summary" rendered="{!NOT(isFacilities)}">
+            <apex:pageBlockSection columns="2" collapsible="true">   
+                    <apex:outputText label="Status" value="{!fcForm.Status__c}"/>  
+                    <apex:outputText label="Funding Date" value="{0,date,MM/dd/yyyy}"> <apex:param value="{!fcForm.Funding_Date__c}"/> </apex:outputText>
+            </apex:pageBlockSection>         
+            
+            <apex:pageBlockSection id="pbapprovals" columns="1" collapsible="true" title="Approvals">
+                <apex:actionFunction action="{!refreshApprovals}" name="refreshApprovals"/>
+                <apex:actionFunction action="{!updateStatus}" name="updateStatus" reRender="pbapprovalsList">
+                    <apex:param name="updatedFCApprovalId" value="" assignTo="{!updatedFCApprovalId}"/>
+                </apex:actionFunction>              
+                        
+                <!--<apex:selectList value="{!selectedType}" size="1" label="Filter by:" rendered="{!isAnyFCApprovals}">-->
+                <apex:selectList value="{!selectedType}" size="1" label="Filter by:" >
+                    <apex:selectOptions value="{!typeOptions}"/>
+                    <apex:actionSupport event="onchange" action="{!refreshApprovals}" rerender="pbapprovalsList" />          
+                </apex:selectList> 
+                
+                <div></div>
+                
+                <apex:pageBlockTable value="{!fcApprovalWrapperList}" var="a" width="200px" id="pbapprovalsList">
+                    <apex:column headervalue="">
+                        <apex:outputText rendered="{!a.isCurrentUser}">             
+                            <apex:commandLink value="Update" style="color:#4B96D0;text-decoration:underline;" onclick="updateStatusJS('{!a.fcApproval.Id}');return false;"  rendered="{!NOT(a.isRejected)}"/>
+                        </apex:outputText>
+                    </apex:column>              
+                    <apex:column headervalue="Approver" style="width:8%" value="{!a.fcApproval.Approver__r.Name}"/> 
+                    <apex:column headervalue="Type" style="width:8%" value="{!a.fcApproval.Type__c}"/>   
+                    <apex:column headervalue="Status" style="width:8%" value="{!a.fcApproval.Status__c}" />
+                    <apex:column headervalue="Contingencies" style="width:38%" value="{!a.fcApproval.Contingencies__c}"/> 
+                    <apex:column headervalue="Comments" style="width:38%" value="{!a.fcApproval.Comments__c}"/> 
+                </apex:pageBlockTable> 
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Pre-FC Approvals">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Summary_Pre_FC}" var="f">
+                    <apex:outputField label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!summaryPreFCFields[f]}" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputField label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!summaryPreFCFields[f]}"/> </apex:outputField>
+                    <apex:outputField label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!summaryPreFCFields[f]}"/> </apex:outputField>
+                    <apex:outputField label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!summaryPreFCFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>
+                </apex:repeat>        
+            </apex:pageBlockSection>  
+        
+            <apex:pageBlockSection title="Account Information" columns="2">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Summary_AccountInfo}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!summaryAccountInfoFields[f]}" escape="false" style="white-space:pre-wrap;" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!summaryAccountInfoFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!summaryAccountInfoFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!summaryAccountInfoFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat>        
+            </apex:pageBlockSection>      
+
+            <apex:pageBlockSection title="Opportunity Team">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Summary_OpportunityTeam}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!summaryOpportunityTeamFields[f]}" escape="false" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!summaryOpportunityTeamFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!summaryOpportunityTeamFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!summaryOpportunityTeamFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat>        
+            </apex:pageBlockSection>      
+            
+            <apex:pageBlockSection title="Department Summary">
+                    <apex:outputText label="Underwriting Review Comments" value="{!underwritingOppReviewFields['Underwriting_Review_Section_Comments__c']}" escape="false" />
+                    <apex:outputText label="Financial Review Comments" value="{!financeReviewFields['Financial_Review_Comments__c']}" escape="false" />
+                    <apex:outputText label="Underwriting Risks and Mitigants" value="{!underwritingOppReviewFields['Underwriting_Comments__c']}" escape="false" />       
+                    <apex:outputText label="Funding Plan" value="{!financeReviewFields['Funding_Plan__c']}" escape="false" />
+                    <apex:outputText label="Outstanding Info Needed for Funding - UW" value="{!underwritingReviewFields['Outstanding_Info_Needed_for_Funding__c']}" escape="false" />
+                    <apex:outputText label="Outstanding Info Needed for Funding - FIN" value="{!financeReviewFields['Outstanding_Info_Needed_to_Fund_FIN__c']}" escape="false" />
+                    <apex:outputText label="Funding Exposure Comments" value="{!servicingFields['Funding_Exposure_Comments__c']}" escape="false" />
+                    <!--<apex:outputText label="Finance Comments" value="{!financeCommentsForSummary}" escape="false" />-->
+            </apex:pageBlockSection>      
+
+            <apex:pageBlockSection columns="1" collapsible="false" title="Attachments">
+                <apex:outputText label="View Attachments">
+                    <a href="/ui/content/ViewAllNotesPage?id={!fcForm.Id}&retURL=/apex/FCApprovals?id={!fcForm.Id}" target="_blank">All attachments ({!summaryAttachmentCount})</a> 
+                </apex:outputText>    
+            </apex:pageBlockSection>  
+
+
+            </apex:pageBlock>
+        </div>
+
+        <!-- Facilities -->
+        <div class="tab-pane active" id="FAsummary" >
+            <apex:pageBlock id="pbFAsummary" title="Summary" rendered="{!isFacilities}">
+            <apex:pageBlockSection columns="2" collapsible="true">   
+                <apex:outputText label="Status" value="{!fcForm.Status__c}"/>  
+                <apex:outputText label="Funding Date" value="{0,date,MM/dd/yyyy}"> <apex:param value="{!fcForm.Funding_Date__c}"/> </apex:outputText>
+            </apex:pageBlockSection>         
+            
+            <apex:pageBlockSection id="pbFAapprovals" columns="1" collapsible="true" title="Approvals">
+                <apex:actionFunction action="{!refreshApprovals}" name="refreshApprovals"/>
+                <apex:actionFunction action="{!updateStatus}" name="updateStatus" reRender="pbFAapprovalsList">
+                    <apex:param name="updatedFCApprovalId" value="" assignTo="{!updatedFCApprovalId}"/>
+                </apex:actionFunction>   
+                        
+                <!--<apex:selectList value="{!selectedType}" size="1" label="Filter by:" rendered="{!isAnyFCApprovals}">-->
+                <apex:selectList value="{!selectedType}" size="1" label="Filter by:" >
+                    <apex:selectOptions value="{!typeOptions}"/>
+                    <apex:actionSupport event="onchange" action="{!refreshApprovals}" rerender="pbFAapprovalsList" />          
+                </apex:selectList> 
+                
+                <div></div>
+                
+                <apex:pageBlockTable value="{!fcApprovalWrapperList}" var="a" width="200px" id="pbFAapprovalsList">
+                    <apex:column headervalue="">
+                        <apex:outputText rendered="{!a.isCurrentUser}">             
+                            <apex:commandLink value="Update" style="color:#4B96D0;text-decoration:underline;" onclick="updateStatusJS('{!a.fcApproval.Id}');return false;"  rendered="{!NOT(a.isRejected)}"/>
+                        </apex:outputText></apex:column>              
+                    <apex:column headervalue="Approver" style="width:8%" value="{!a.fcApproval.Approver__r.Name}"/> 
+                    <apex:column headervalue="Type" style="width:8%" value="{!a.fcApproval.Type__c}"/>   
+                    <apex:column headervalue="Status" style="width:8%" value="{!a.fcApproval.Status__c}" />
+                    <apex:column headervalue="Contingencies" style="width:38%" value="{!a.fcApproval.Contingencies__c}"/> 
+                    <apex:column headervalue="Comments" style="width:38%" value="{!a.fcApproval.Comments__c}"/> 
+                </apex:pageBlockTable> 
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Facilities Request">
+                    <apex:outputField value="{!FC_Form__c.Pre_FC_Approval_Write_Up__c}" />       
+            </apex:pageBlockSection>   
+
+            <apex:pageBlockSection title="Opportunity Team">
+                    <apex:outputField value="{!FC_Form__c.Prepared_By_FAC__c}" /> 
+                    <apex:outputField value="{!FC_Form__c.Date_Prepared_FAC__c}" /> 
+            </apex:pageBlockSection>       
+
+            <apex:pageBlockSection columns="1" collapsible="false" title="Attachments">
+                <apex:outputText label="View Attachments">
+                    <a href="/ui/content/ViewAllNotesPage?id={!fcForm.Id}&retURL=/apex/FCApprovals?id={!fcForm.Id}" target="_blank">All attachments ({!summaryAttachmentCount})</a> 
+                </apex:outputText>    
+            </apex:pageBlockSection>  
+
+
+            </apex:pageBlock>
+        </div>
+     
+      <!-- Charter Information -->
+      <div class="tab-pane" id="charterinformation"  style="white-space:pre-wrap;">
+         <apex:pageBlock id="pbcharterinfo-underwriting" title="Charter Information - Underwriting" rendered="{!NOT(isFacilities)}" >
+            <apex:pageBlockSection columns="1" collapsible="true" title="Underwriting Detail">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Underwriting}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!underwritingFields[f]}" escape="false" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!underwritingFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!underwritingFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!underwritingFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat> 
+                <apex:outputText label="Prepared by - UW" value="{!FCForm.Prepared_By_UW_Link__c}" escape="false"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" collapsible="true" title="School Profile">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Underwriting_SchoolProfile}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!underwritingSchoolProfileFields[f]}" escape="false" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!underwritingSchoolProfileFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!underwritingSchoolProfileFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!underwritingSchoolProfileFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat>         
+            </apex:pageBlockSection> 
+            <apex:pageBlockSection columns="1" collapsible="true" title="Underwriting Review">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Underwriting_Review}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!underwritingReviewFields[f]}" escape="false" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!underwritingReviewFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!underwritingReviewFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!underwritingReviewFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat>         
+            </apex:pageBlockSection>             
+            <apex:pageBlockSection columns="1" collapsible="true" title="Underwriting Opportunity Review">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Underwriting_OppReview}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!underwritingOppReviewFields[f]}" escape="false" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!underwritingOppReviewFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!underwritingOppReviewFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!underwritingOppReviewFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat>         
+            </apex:pageBlockSection>             
+         </apex:pageBlock>  
+         
+         <apex:pageBlock id="pbcharterinfo-finance" title="Charter Information - Finance" rendered="{!NOT(isFacilities)}">
+            <apex:pageBlockSection columns="1" collapsible="true" title="Finance Detail">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Finance}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!financeFields[f]}" escape="false" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!financeFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!financeFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!financeFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat>
+                <apex:outputText label="Prepared by - FIN" value="{!FCForm.Prepared_By_Fin_Link__c}" escape="false"/>
+                <!--<apex:outputText label="Finance Comments" value="{!financeCommentsForSummary}" escape="false" />-->
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" collapsible="true" title="RPA Utilization/Current Funding">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Finance_RPA}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!financeRPAFields[f]}" escape="false" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!financeRPAFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!financeRPAFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!financeRPAFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat>
+            </apex:pageBlockSection>  
+            <apex:pageBlockSection columns="1" collapsible="true" title="Financial Review">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Finance_Review}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!financeReviewFields[f]}" escape="false" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!financeReviewFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!financeReviewFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!financeReviewFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat>
+            </apex:pageBlockSection>  
+         </apex:pageBlock>
+         
+         <apex:pageBlock id="pbcharterinfo-servicing" title="Charter Information - Servicing" rendered="{!NOT(isFacilities)}">
+            <apex:pageBlockSection columns="1" collapsible="true" title="Servicing Detail">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Servicing}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!servicingFields[f]}" escape="false" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!servicingFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!servicingFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!servicingFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat>
+                <apex:outputText label="Prepared by - SVC" value="{!FCForm.Prepared_By_SVC_Link__c}" escape="false"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection columns="1" collapsible="true" title="Funding Exposure">
+                <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.FC_Approvals_Servicing_FundingExposure}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!servicingFundingExposureFields[f]}" escape="false" rendered="{!AND($ObjectType.FC_Form__c.Fields[f].type!='date', $ObjectType.FC_Form__c.Fields[f].type!='currency', $ObjectType.FC_Form__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='date'}"> <apex:param value="{!servicingFundingExposureFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='currency'}"> <apex:param value="{!servicingFundingExposureFields[f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!servicingFundingExposureFields[f]}%" rendered="{!$ObjectType.FC_Form__c.Fields[f].type='percent'}"/>              
+                </apex:repeat>
+            </apex:pageBlockSection>     
+         </apex:pageBlock>       
+      </div>
+     
+      <!-- Underwriting -->
+      <div class="tab-pane" id="underwriting">
+         <apex:pageBlock id="pbunderwriting" title="Underwriting: {!currentSchoolName}: {!FCForm.Opportunity__r.Account.Name}" rendered="{!AND(totalSchools>0, NOT(isFacilities))}">
+            <br/>      
+            <apex:commandButton value="< Previous" action="{!previous}" disabled="{!currentIndex == 0}" rerender="pbfinance,pbunderwriting,pbservicing" status="status" oncomplete="applyColors();"/>
+            &nbsp;&nbsp;&nbsp;
+            <apex:actionStatus id="status">
+                  <apex:facet name="start">
+                    <apex:outputText value=" loading... "  />
+                  </apex:facet>
+                  <apex:facet name="stop">
+                    <apex:outputText value="{!currentIndex+1} of {!totalSchools}" /> 
+                  </apex:facet>            
+            </apex:actionStatus>
+            &nbsp;&nbsp;&nbsp;
+            <apex:commandButton value="Next >" action="{!next}" disabled="{!currentIndex == totalSchools-1}" rerender="pbfinance,pbunderwriting,pbservicing" status="status" oncomplete="applyColors();"/>
+            <br/><br/>
+
+
+            <div style="white-space:pre-wrap!important;">
+            <apex:pageBlockSection columns="1" collapsible="false" title="School Profile">
+                <apex:repeat value="{!$ObjectType.FC_Details__c.FieldSets.UW_School_Profile}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!uwSchoolProfileFieldsMap[currentSchoolName][f]}" escape="false" rendered="{!AND($ObjectType.FC_Details__c.Fields[f].type!='date', $ObjectType.FC_Details__c.Fields[f].type!='currency', $ObjectType.FC_Details__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='date'}"> <apex:param value="{!uwSchoolProfileFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='currency'}"> <apex:param value="{!uwSchoolProfileFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!uwSchoolProfileFieldsMap[currentSchoolName][f]}%" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='percent'}"/>              
+                </apex:repeat> 
+            </apex:pageBlockSection>       
+
+            <apex:pageBlockSection columns="1" collapsible="false" title="Underwriting Review">
+                <apex:repeat value="{!$ObjectType.FC_Details__c.FieldSets.UW_Review}" var="f">         
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!uwReviewFieldsMap[currentSchoolName][f]}" escape="false" rendered="{!AND($ObjectType.FC_Details__c.Fields[f].type!='date', $ObjectType.FC_Details__c.Fields[f].type!='currency', $ObjectType.FC_Details__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='date'}"> <apex:param value="{!uwReviewFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='currency'}"> <apex:param value="{!uwReviewFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!uwReviewFieldsMap[currentSchoolName][f]}%" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='percent'}"/>              
+                </apex:repeat> 
+            </apex:pageBlockSection>       
+
+            <apex:pageBlockSection columns="1" collapsible="false" title="EWS">
+                <apex:repeat value="{!$ObjectType.FC_Details__c.FieldSets.UW_EWS}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!uwEWSFieldsMap[currentSchoolName][f]}" escape="false" rendered="{!AND($ObjectType.FC_Details__c.Fields[f].type!='date', $ObjectType.FC_Details__c.Fields[f].type!='currency', $ObjectType.FC_Details__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='date'}"> <apex:param value="{!uwEWSFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='currency'}"> <apex:param value="{!uwEWSFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!uwEWSFieldsMap[currentSchoolName][f]}%" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='percent'}"/>              
+                </apex:repeat> 
+            </apex:pageBlockSection>       
+
+            <apex:pageBlockSection columns="1" collapsible="false" title="Attachments">
+                <apex:outputText label="View Attachments">
+                    <a href="/ui/content/ViewAllNotesPage?id={!schoolMap[currentSchoolName+':'+'Underwriting'].Id}&retURL=/apex/FCApprovals?id={!fcForm.Id}" target="_blank">All attachments ({!attachmentMap[currentSchoolName+':'+'Underwriting']})</a> 
+                </apex:outputText>    
+            </apex:pageBlockSection>  
+          </div>
+         </apex:pageBlock>
+      </div>
+
+      <!-- Finance -->
+      <div class="tab-pane" id="finance" >
+         <apex:pageBlock id="pbfinance" title="Finance: {!currentSchoolName}: {!FCForm.Opportunity__r.Account.Name}" rendered="{!AND(totalSchools>0, NOT(isFacilities))}">
+            <br/>      
+            <apex:commandButton value="< Previous" action="{!previous}" disabled="{!currentIndex == 0}" rerender="pbfinance,pbunderwriting,pbservicing" status="status" oncomplete="applyColors();"/>
+            &nbsp;&nbsp;&nbsp;
+            <apex:actionStatus id="status">
+                  <apex:facet name="start">
+                    <apex:outputText value=" loading... "  />
+                  </apex:facet>
+                  <apex:facet name="stop">
+                    <apex:outputText value="{!currentIndex+1} of {!totalSchools}" /> 
+                  </apex:facet>            
+            </apex:actionStatus>
+            &nbsp;&nbsp;&nbsp;
+            <apex:commandButton value="Next >" action="{!next}" disabled="{!currentIndex == totalSchools-1}" rerender="pbfinance,pbunderwriting,pbservicing" status="status" oncomplete="applyColors();"/>
+            <br/><br/>
+            
+            <div style="white-space:pre-wrap!important;">
+            <apex:pageBlockSection columns="1" collapsible="false" title="RPA Utilization/Current Funding">
+                <apex:repeat value="{!$ObjectType.FC_Details__c.FieldSets.Finance_RPA}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!financeRPAFieldsMap[currentSchoolName][f]}"  escape="false" rendered="{!AND($ObjectType.FC_Details__c.Fields[f].type!='date', $ObjectType.FC_Details__c.Fields[f].type!='currency', $ObjectType.FC_Details__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='date'}"> <apex:param value="{!financeRPAFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='currency'}"> <apex:param value="{!financeRPAFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!financeRPAFieldsMap[currentSchoolName][f]}%" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='percent'}"/>              
+                </apex:repeat> 
+            </apex:pageBlockSection>     
+
+            <apex:pageBlockSection columns="1" collapsible="false" title="Financial Review">
+                <apex:repeat value="{!$ObjectType.FC_Details__c.FieldSets.Finance_Review}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!financeReviewFieldsMap[currentSchoolName][f]}"  escape="false" rendered="{!AND($ObjectType.FC_Details__c.Fields[f].type!='date', $ObjectType.FC_Details__c.Fields[f].type!='currency', $ObjectType.FC_Details__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='date'}"> <apex:param value="{!financeReviewFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='currency'}"> <apex:param value="{!financeReviewFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!financeReviewFieldsMap[currentSchoolName][f]}%" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='percent'}"/>              
+                </apex:repeat> 
+            </apex:pageBlockSection>  
+            
+            <apex:pageBlockSection columns="1" collapsible="false" title="Funding EWS">
+                <apex:repeat value="{!$ObjectType.FC_Details__c.FieldSets.Finance_EWS}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!financeEWSFieldsMap[currentSchoolName][f]}"  escape="false" rendered="{!AND($ObjectType.FC_Details__c.Fields[f].type!='date', $ObjectType.FC_Details__c.Fields[f].type!='currency', $ObjectType.FC_Details__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='date'}"> <apex:param value="{!financeEWSFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='currency'}"> <apex:param value="{!financeEWSFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!financeEWSFieldsMap[currentSchoolName][f]}%" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='percent'}"/>              
+                </apex:repeat> 
+            </apex:pageBlockSection>  
+            
+            <!--<apex:pageBlockSection columns="1" collapsible="false" title="Funding Assessment">
+                <apex:repeat value="{!$ObjectType.FC_Details__c.FieldSets.Finance_Assessment}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!financeAssessmentFieldsMap[currentSchoolName][f]}"  escape="false" rendered="{!AND($ObjectType.FC_Details__c.Fields[f].type!='date', $ObjectType.FC_Details__c.Fields[f].type!='currency', $ObjectType.FC_Details__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='date'}"> <apex:param value="{!financeAssessmentFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='currency'}"> <apex:param value="{!financeAssessmentFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!financeAssessmentFieldsMap[currentSchoolName][f]}%" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='percent'}"/>              
+                </apex:repeat> 
+            </apex:pageBlockSection> -->                   
+
+            <apex:pageBlockSection columns="1" collapsible="false" title="Attachments">
+                <apex:outputText label="View Attachments">
+                    <a href="/ui/content/ViewAllNotesPage?id={!schoolMap[currentSchoolName+':'+'Finance'].Id}&retURL=/apex/FCApprovals?id={!fcForm.Id}" target="_blank">All attachments ({!attachmentMap[currentSchoolName+':'+'Finance']})</a> 
+                </apex:outputText>    
+            </apex:pageBlockSection>  
+            </div>  
+         </apex:pageBlock>
+      </div>
+
+      <!-- Services -->
+      <div class="tab-pane" id="servicing">
+         <apex:pageBlock id="pbservicing" title="Servicing: {!currentSchoolName}: {!FCForm.Opportunity__r.Account.Name}" rendered="{!AND(totalSchools>0, NOT(isFacilities))}">
+            <br/>      
+            <apex:commandButton value="< Previous" action="{!previous}" disabled="{!currentIndex == 0}" rerender="pbfinance,pbunderwriting,pbservicing" status="status" oncomplete="applyColors();"/>
+            &nbsp;&nbsp;&nbsp;
+            <apex:actionStatus id="status">
+                  <apex:facet name="start">
+                    <apex:outputText value=" loading... "  />
+                  </apex:facet>
+                  <apex:facet name="stop">
+                    <apex:outputText value="{!currentIndex+1} of {!totalSchools}" /> 
+                  </apex:facet>            
+            </apex:actionStatus>
+            &nbsp;&nbsp;&nbsp;
+            <apex:commandButton value="Next >" action="{!next}" disabled="{!currentIndex == totalSchools-1}" rerender="pbfinance,pbunderwriting,pbservicing" status="status" oncomplete="applyColors();"/>
+            <br/><br/>
+            
+            
+            <div style="white-space:pre-wrap!important;">
+            <apex:pageBlockSection columns="1" collapsible="false" title="Servicing">
+                <apex:repeat value="{!$ObjectType.FC_Details__c.FieldSets.Servicing}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!servicingFieldsMap[currentSchoolName][f]}" escape="false" rendered="{!AND($ObjectType.FC_Details__c.Fields[f].type!='date', $ObjectType.FC_Details__c.Fields[f].type!='currency', $ObjectType.FC_Details__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='date'}"> <apex:param value="{!servicingFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='currency'}"> <apex:param value="{!servicingFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!servicingFieldsMap[currentSchoolName][f]}%" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='percent'}"/>              
+                </apex:repeat> 
+            </apex:pageBlockSection>   
+
+            <apex:pageBlockSection columns="1" collapsible="false" title="Funding Exposure">
+                <apex:repeat value="{!$ObjectType.FC_Details__c.FieldSets.Servicing_Exposure}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!servicingExposureFieldsMap[currentSchoolName][f]}"  escape="false" rendered="{!AND($ObjectType.FC_Details__c.Fields[f].type!='date', $ObjectType.FC_Details__c.Fields[f].type!='currency', $ObjectType.FC_Details__c.Fields[f].type!='percent')}"/>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0,date,MM/dd/yyyy}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='date'}"> <apex:param value="{!servicingExposureFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{0, Number, Currency}" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='currency'}"> <apex:param value="{!servicingExposureFieldsMap[currentSchoolName][f]}"/> </apex:outputText>
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!servicingExposureFieldsMap[currentSchoolName][f]}%" rendered="{!$ObjectType.FC_Details__c.Fields[f].type='percent'}"/>              
+                </apex:repeat> 
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection columns="1" collapsible="false" title="Ratings">
+              <apex:repeat value="{!$ObjectType.FC_Details__c.FieldSets.Servicing_Ratings}" var="f">
+                    <apex:outputText label="{!$ObjectType.FC_Details__c.Fields[f].label}" value="{!servicingRatingsFieldsMap[currentSchoolName][f]}" escape="false" rendered="{!AND($ObjectType.FC_Details__c.Fields[f].type!='date', $ObjectType.FC_Details__c.Fields[f].type!='currency', $ObjectType.FC_Details__c.Fields[f].type!='percent')}"/>           
+              </apex:repeat> 
+            </apex:pageBlockSection>   
+                  
+            <apex:pageBlockSection columns="1" collapsible="false" title="Attachments">
+                <apex:outputText label="View Attachments">
+                    <a href="/ui/content/ViewAllNotesPage?id={!schoolMap[currentSchoolName+':'+'Servicing'].Id}&retURL=/apex/FCApprovals?id={!fcForm.Id}" target="_blank">All attachments ({!attachmentMap[currentSchoolName+':'+'Servicing']})</a> 
+                </apex:outputText>    
+            </apex:pageBlockSection>        
+            </div>    
+         </apex:pageBlock>
+      </div>
+
+      <!-- Chat - ->
+      <div class="tab-pane" id="chatter" >
+        <apex:pageBlock id="pbchatter" title="Chat: {!FC_Form__c.Name}" rendered="{!AND(totalSchools>0, NOT(isFacilities))}">
+          <chatter:feedWithFollowers entityId="{!FC_Form__c.Id}" showHeader="false"/>
+        </apex:pageBlock>
+      </div> -->
+     
+    </div>
+  </div>
+
+</apex:form>
+
+
+<script>
+
+  applyColors();
+  
+  function applyColors(){
+    $("[id$=pbsummary]").find(".pbHeader").css("background-color", "#00558C");
+    $("[id$=pbsummary]").find(".pbSubheader").css("background-color", "#00558C");
+    $("[id$=pbsummary]").find(".mainTitle").css("color", "white");
+
+    $("[id$=pbFAsummary]").find(".pbHeader").css("background-color", "#00558C");
+    $("[id$=pbFAsummary]").find(".pbSubheader").css("background-color", "#00558C");
+    $("[id$=pbFAsummary]").find(".mainTitle").css("color", "white");
+
+    $("[id$=pbcharterinfo-underwriting]").find(".pbHeader").css("background-color", "#CF7F00");
+    $("[id$=pbcharterinfo-underwriting]").find(".pbSubheader").css("background-color", "#CF7F00");
+    $("[id$=pbcharterinfo-underwriting]").find(".mainTitle").css("color", "white");
+    $("[id$=pbcharterinfo-finance]").find(".pbHeader").css("background-color", "#77C5D5");
+    $("[id$=pbcharterinfo-finance]").find(".pbSubheader").css("background-color", "#77C5D5");
+    $("[id$=pbcharterinfo-finance]").find(".mainTitle").css("color", "white");
+    $("[id$=pbcharterinfo-servicing]").find(".pbHeader").css("background-color", "#A8AD00");
+    $("[id$=pbcharterinfo-servicing]").find(".pbSubheader").css("background-color", "#A8AD00");
+    $("[id$=pbcharterinfo-servicing]").find(".mainTitle").css("color", "white");
+
+    $("[id$=pbunderwriting]").find(".pbHeader").css("background-color", "#CF7F00");
+    $("[id$=pbunderwriting]").find(".pbSubheader").css("background-color", "#CF7F00");
+    $("[id$=pbunderwriting]").find(".mainTitle").css("color", "white");
+
+    $("[id$=pbfinance]").find(".pbHeader").css("background-color", "#77C5D5");
+    $("[id$=pbfinance]").find(".pbSubheader").css("background-color", "#77C5D5");
+    $("[id$=pbfinance]").find(".mainTitle").css("color", "white");
+
+    $("[id$=pbservicing]").find(".pbHeader").css("background-color", "#A8AD00");
+    $("[id$=pbservicing]").find(".pbSubheader").css("background-color", "#A8AD00");
+    $("[id$=pbservicing]").find(".mainTitle").css("color", "white");
+
+    $("[id$=pbchatter]").find(".pbHeader").css("background-color", "#717C7D");
+    $("[id$=pbchatter]").find(".pbSubheader").css("background-color", "#717C7D");
+    $("[id$=pbchatter]").find(".mainTitle").css("color", "white");
+    
+  }
+
+
+</script>
+</apex:page>

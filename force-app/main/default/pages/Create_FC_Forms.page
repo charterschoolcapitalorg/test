@@ -1,0 +1,15 @@
+<apex:page standardController="Opportunity" extensions="Create_FC_Forms_Ctrl">
+
+
+<apex:pageMessages />
+	
+	<apex:form >
+	  	<apex:pageBlock >
+		     
+			    <apex:commandButton value="Create" action="{!create}" />
+			    <apex:commandButton value="Exit" action="{!back}" />
+     
+		</apex:pageBlock>
+	</apex:form>
+	
+</apex:page>

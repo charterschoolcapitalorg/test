@@ -1,0 +1,210 @@
+<apex:page standardController="Contact" extensions="SmartContactSearchExtension" sidebar="true" tabstyle="Contact" id="pg">
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>    
+    <apex:sectionHeader title="Contacts" subtitle="{!$Label.Smart_Contact_Search}"/>
+<style type="text/css">
+    .data_field{
+        padding-right:20px;
+     }
+     span#icon_clear{   
+            font-family:verdana;
+            cursor:pointer;
+            color:#38468F;
+            font-weight:bold;
+            position:relative;
+            height:20px;
+            left:-18px;
+     }
+     span#icon_clear:hover{
+            color:#ccc;
+     }
+</style>   
+<apex:form id="frm">
+        <script>
+          // Character limits of search contact for all fields
+          var searchCharacterLimit = 3; 
+        </script>
+                
+        <table class="list" width="100%">
+            <tr class="dataRow" onmouseout="javascript:hiOff(this)" onmouseover="javascript:hiOn(this)">
+                <td class="labelCol" colspan="1" style="width:200px;" ><h2 class="pageDescription">{!$Label.Smart_Contact_Search}</h2></td>
+                <td class="dataCell" colspan="4"><a href="javascript:void(0);" onclick="resetSearchStatus();"> {!$Label.Reset_Search}</a> </td>
+            </tr>   
+            <tr class="dataRow" onmouseout="javascript:hiOff(this)" onmouseover="javascript:hiOn(this)">
+                <td class="labelCol" style="width:200px;" > {!$Label.Search_by} </td>
+                <td class="dataCell" >{!$ObjectType.Contact.Fields.FirstName.Label}</td>
+                <td class="dataCell" >{!$ObjectType.Contact.Fields.LastName.Label}</td>
+                <td class="dataCell" >{!$ObjectType.Contact.Fields.Email.Label}</td>
+                <td class="dataCell" >Account Name</td>
+            </tr>   
+            <tr class="dataRow" onmouseout="javascript:hiOff(this)" onmouseover="javascript:hiOn(this)">
+                <td class="labelCol" style="width:200px;" > {!$Label.Search_criteria}: </td>
+                <td class="dataCell" >  
+                     <apex:outputPanel id="op1">                        
+                        <apex:inputText styleClass="data_field" title="Minimum two characters are required" value="{!contactFirstNameToSearch}" onblur="BlurEventFunction(this.id,event);" id="txtContactFName" style="width:100px;" />
+                        <span class="cross_icon" id="icon_clear">x</span>
+                    </apex:outputPanel> 
+                </td>
+                <td class="dataCell" >  
+                     <apex:outputPanel id="op2">
+                        <apex:inputText styleClass="data_field" title="Minimum two characters are required" value="{!contactLastNameToSearch}" onblur="BlurEventFunction(this.id,event);" id="txtContactLName" style="width:100px;" />
+                        <span class="cross_icon" id="icon_clear">x</span>
+                    </apex:outputPanel> 
+                </td>
+                
+                <td class="dataCell" >  
+                     <apex:outputPanel id="op3">
+                        <apex:inputText styleClass="data_field" title="Minimum two characters are required" value="{!contactEmail}" onblur="BlurEventFunction(this.id,event);" id="txtContactEmail" style="width:100px;" />
+                        <span class="cross_icon" id="icon_clear">x</span>
+                    </apex:outputPanel> 
+                </td>
+                
+                 <td class="dataCell" >  
+                     <apex:outputPanel id="op4">
+                        <apex:inputText styleClass="data_field" title="Minimum two characters are required" value="{!contactAccount}" onkeyup="BlurEventFunction(this.id,event);" id="txtContactAccount" style="width:100px;" />
+                        <span class="cross_icon" id="icon_clear">x</span>
+                    </apex:outputPanel> 
+                </td>       
+            </tr>   
+        </table>
+        
+        <input type="hidden" id="oldcontactFName" value="" />
+        <input type="hidden" id="oldcontactLName" value="" />
+        <input type="hidden" id="oldcntEmail" value="" />
+        <input type="hidden" id="oldcntAccount" value="" />
+        <input type="hidden" id="EnterKeyPressed" value="" />
+        
+<script>
+    //function setFocusOnLoad() {}
+     
+    $j=jQuery.noConflict();
+   
+    $j('.data_field').each(function() {
+        if ($j(this).val().length <= 0) {
+            $j(this).next().fadeOut(300);
+        }
+        else {
+            $j('.cross_icon').fadeIn(300);
+        }
+    });
+    
+    $j('.data_field').on('keyup', function() {
+        if ($j(this).val().length > 0) {
+            $j(this).next().fadeIn(300);
+            //$j('.cross_icon').fadeIn(300);
+        }
+        else {
+           // $j('.cross_icon').fadeOut(300);
+        }
+    });
+
+    $j('.cross_icon').on('click',function() {
+           if(this.parentElement.id == 'pg:frm:op1'){               
+              resetSearchStatus('1');
+          }
+          else if(this.parentElement.id == 'pg:frm:op2'){              
+              resetSearchStatus('2');
+          }
+          else if(this.parentElement.id == 'pg:frm:op3'){               
+              resetSearchStatus('3');
+          } 
+          else if(this.parentElement.id == 'pg:frm:op4'){               
+              resetSearchStatus('4');
+          }   
+    });    
+    
+    function validateForSearch(ctrl){   
+       setTimeout("validateForSearch2()",1000);
+    }
+    // function runs on on blur event
+    function BlurEventFunction(ctrl,e){
+      if(document.getElementById(ctrl).value==''){
+              return;
+          } 
+          var keycode = (e.keyCode ? e.keyCode : e.which); 
+           if(keycode == '13'){         
+            e.preventDefault();
+            return false;
+          }
+          else{      
+           setTimeout("validateForSearch2()",1000);
+            return false;
+          }  
+    }  
+    
+    //Function to trim string
+    function fncTrim(value) {
+        return value.replace(/^\s*/, "").replace(/\s*$/, "");
+    }
+ 
+    function validateForSearch2(){
+        try{
+            var txtContactFirstName = document.getElementById("pg:frm:txtContactFName").value;
+            var txtContactLastName = document.getElementById("pg:frm:txtContactLName").value;
+            var txtContactEmailToSearch = document.getElementById("pg:frm:txtContactEmail").value;
+           
+            var txtContactAccountToSearch = document.getElementById("pg:frm:txtContactAccount").value;
+            if(fncTrim(txtContactAccountToSearch ) != '' || fncTrim(txtContactFirstName) != '' || fncTrim(txtContactLastName) != '' || fncTrim(txtContactEmailToSearch) != ''){
+               
+                var oldcontactFirstName = document.getElementById('oldcontactFName').value;
+                var oldcontactLastName = document.getElementById('oldcontactLName').value;
+                var oldcontactEmail = document.getElementById('oldcntEmail').value; 
+                var oldcontactAcc = document.getElementById('oldcntAccount').value; 
+                
+                document.getElementById('oldcontactFName').value = oldcontactFirstName;
+                document.getElementById('oldcontactLName').value = oldcontactLastName;
+                document.getElementById('oldcntEmail').value = oldcontactEmail;
+                document.getElementById('oldcntAccount').value = txtContactAccountToSearch ;
+                 
+                var isChange = 'No';
+                       
+                if(fncTrim(txtContactFirstName).length >= searchCharacterLimit && txtContactFirstName != oldcontactFirstName){
+                   isChange = 'Yes';
+                }
+                if(fncTrim(txtContactLastName).length >= searchCharacterLimit && txtContactLastName != oldcontactLastName){
+                   isChange = 'Yes';
+                }
+                if(fncTrim(txtContactEmailToSearch).length >= searchCharacterLimit && txtContactEmailToSearch != oldcontactEmail){
+                   isChange = 'Yes';
+                }
+               
+                if(fncTrim(txtContactAccountToSearch ).length >= searchCharacterLimit){
+                   isChange = 'Yes';
+                }
+                
+                if(isChange == 'Yes' ){                     
+                    search(txtContactFirstName,txtContactLastName,txtContactEmailToSearch,txtContactAccountToSearch );
+            }    
+          }          
+        }
+        catch(e){         
+            alert(e);
+        }     
+    }
+    
+
+    //jazzyrocksr: Made the contact prefix dynamic with describe call in Apex
+    function goToBack(){                          
+        window.location.href = '/{!contactPrefix}/o';
+         return false; 
+        
+    }   
+</script>
+
+<apex:actionFunction action="{!performSearch}" name="search" reRender="resultBlock,resultBlockBrand,pnlDisplayMsg,leadSearchResult,contactSearchResult" status="status" >
+    <apex:param name="d1" value="" assignTo="{!contactFirstNameToSearch}" />
+    <apex:param name="d2" value="" assignTo="{!contactLastNameToSearch}" />
+    <apex:param name="d3" value="" assignTo="{!contactEmail}" />
+    <apex:param name="d4" value="" assignTo="{!contactAccount}" />
+</apex:actionFunction>
+
+<apex:actionFunction name="resetSearchStatus" action="{!resetSearchStatus}" reRender="frm" status="status" >
+    <apex:param name="txtobj" value="" assignTo="{!resetTextBoxName}" />
+</apex:actionFunction>  
+     <apex:outputPanel id="contactSearchResult">
+    <c:SmartContactSearchDisplay c="{!this}" />
+      </apex:outputPanel>  
+     <apex:outputPanel id="leadSearchResult">
+        <c:SmartLeadSearchDisplay l="{!leadSearch}" LeadPageCalling="true" />
+     </apex:outputPanel>       
+</apex:form>
+</apex:page>

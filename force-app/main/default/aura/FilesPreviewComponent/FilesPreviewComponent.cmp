@@ -1,0 +1,80 @@
+<aura:component controller="MyItemRowCtlr" >
+    <aura:html tag="style">         
+         .slds-modal__container{ 
+             vertical-align: middle;
+        	 height: 100%; 
+             max-height: 130vh; 
+			 width: 100%; 
+             max-width: 200vh;        
+           }
+    </aura:html>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+	<aura:attribute name="intakeItem" type="Intake_Item__c" />
+    <aura:attribute name="thisDocId" type="String" />
+    <aura:attribute name="thisUrl" type="String" />
+    <aura:attribute name="nextDocId" type="String" />
+    <aura:attribute name="prevDocId" type="String" />
+    <aura:attribute name="totalNumDocs" type="Integer" />
+    <aura:attribute name="docCount" type="Integer" default="1"/>
+    <aura:attribute name="hasApprove" type="Boolean" default="False"/>
+    <aura:attribute name="hasPrev" type="Boolean" default="False"/>
+    <aura:attribute name="hasNext" type="Boolean" default="False"/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+      
+  	<!--loading spinner start... style=Brand Medium (blue dots)-->
+     <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+           <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+             <span class="slds-assistive-text">Loading</span>
+             <div class="slds-spinner__dot-a"></div>
+             <div class="slds-spinner__dot-b"></div>
+           </div>
+        </div>
+     </aura:if>
+    
+     <lightning:layout horizontalAlign="center" multipleRows="true">
+			<i>Displaying Document <b>{!v.docCount}</b> of <b>{!v.totalNumDocs}</b> Total Document(s)</i>
+            
+            <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column">    
+                <!--//0680S0000006zPFQAY -->
+                <!--  -->
+                <iframe src='{!v.thisUrl}'
+                width="100%"
+                height="600"
+                scrolling="true"/>
+            </lightning:layoutItem>
+        
+        <br></br>
+        </lightning:layout>
+    	
+    	
+    	<div class="slds-grid">
+			
+            <div class="slds-col slds-text-align_center">
+            	<lightning:button disabled="{!v.docCount==1}" variant="neutral" label="Previous" iconName="utility:chevronleft" onclick="{!c.prev}"/> 
+        		&nbsp;&nbsp;
+                 <aura:if isTrue="{!v.hasApprove}"> 
+                     
+                      <lightning:button variant="neutral" label="Approve Item" onclick="{!c.approve}"/> 
+					
+                 </aura:if>
+            	&nbsp;&nbsp;
+            	<lightning:button iconPosition="right" disabled="{!v.docCount==v.totalNumDocs}" variant="neutral" 
+                          label="Next" iconName="utility:chevronright" onclick="{!c.next}"/>
+            </div>
+        	<div class="slds-col_bump-right">
+               <lightning:button variant="neutral" label="Close" onclick="{!c.close}"/> 
+            </div>
+    	</div>
+    
+    
+    
+         <!-- /lightning:layoutItem>    
+    </lightning:layout> -->
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+</aura:component>

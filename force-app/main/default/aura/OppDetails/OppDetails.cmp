@@ -1,0 +1,82 @@
+<aura:component controller="MyItemRowCtlr" >
+    <aura:html tag="style">         
+         .slds-modal__container{ 
+             vertical-align: middle;
+        	 height: 100%; 
+             max-height: 60vh; 
+			 width: 100%; 
+             max-width: 150vh;        
+           }
+    </aura:html>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="files" type="ContentDocument"/>
+	<aura:attribute name="numFiles" type="Integer"/>
+    <aura:attribute name="opp" type="Opportunity" />
+    
+        <lightning:messages />    
+        <lightning:layout multipleRows="true">
+        
+        <lightning:layoutItem size="6" mediumDeviceSize="6" class="data-column">
+            <b>Funded Date:<br/></b>
+            <ui:outputDate value="{!v.opp.CloseDate}" format="MMM d"/>
+            <br/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="6" mediumDeviceSize="6" class="data-column">
+            <b>Funded Amount:<br/></b>
+            <lightning:formattedNumber value="{!v.opp.Face_Value__c	}" style="currency" currencyCode="USD" /><br/>
+        </lightning:layoutItem>
+        
+        <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column">
+            &nbsp;
+        </lightning:layoutItem>
+        
+        </lightning:layout>
+    	
+    <aura:if isTrue="{!v.numFiles>0}">
+        <div class="slds-text-title_caps" style='color:white;font-size:13px;background-color:#77c5d5;'>
+            	 
+                    
+                	<lightning:layout multipleRows="false">
+                        <lightning:layoutItem size="4" mediumDeviceSize="4"><span style="padding-left:5px;">File Name</span></lightning:layoutItem>  
+                        <lightning:layoutItem size="4" mediumDeviceSize="4">Date Uploaded</lightning:layoutItem>  
+                        <lightning:layoutItem size="4" mediumDeviceSize="4">Download File</lightning:layoutItem>  
+                        
+            		</lightning:layout>
+               
+        </div>
+        
+        
+        <lightning:layout multipleRows="true">
+            <aura:iteration items="{!v.files}" var="f" >
+                
+                <lightning:layoutItem class="slds-truncate" size="4"><span style="padding-left:5px;vertical-align:middle;">{!f.Title}</span></lightning:layoutItem>  
+                <lightning:layoutItem size="4"><span style="vertical-align:middle;"><lightning:formattedDateTime value="{!f.CreatedDate}" month="short" day="2-digit"/></span></lightning:layoutItem>  
+                <lightning:layoutItem size="4"><span style="vertical-align:middle;"><a href="{!'/sfc/servlet.shepherd/document/download/'+f.Id}" target="_blank" style="color:#a8ad00;" class="wrapText">Download</a></span></lightning:layoutItem>  
+                
+             </aura:iteration>
+            
+        </lightning:layout>
+        
+    </aura:if>
+    
+        <div style="text-align: right;">
+        <lightning:layout multipleRows="true" horizontalAlign="right" verticalAlign="end"  >
+            <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column-instruction" aura:id="myRow">
+                &nbsp;
+            </lightning:layoutItem>
+                
+            <lightning:layoutItem size="4" mediumDeviceSize="4" class="data-column-instruction" aura:id="myRow">
+            </lightning:layoutItem>
+             
+            <lightning:layoutItem size="4" mediumDeviceSize="4" class="data-column-instruction" aura:id="myRow">
+            </lightning:layoutItem>
+            
+             <lightning:layoutItem size="4" mediumDeviceSize="4" class="data-column-instruction" aura:id="myRow">
+                <lightning:button variant="neutral" label="Close" onclick="{!c.close}"/> 
+             </lightning:layoutItem>
+                
+        </lightning:layout>
+    </div>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+</aura:component>

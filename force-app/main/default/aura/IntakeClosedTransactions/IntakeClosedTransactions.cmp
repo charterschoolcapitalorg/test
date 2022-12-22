@@ -1,0 +1,59 @@
+<aura:component description="IntakeClosedTransactions" controller="IntakeCommunityItemsCtrl" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="opps" type="Opportunity"/>
+    
+     <div class="tab">
+        <button class="tablinks" onclick="{!c.LoadOpenTxns}">Open Transactions</button>
+        <button class="tablinks" >Closed Transactions</button>
+  		<button class="tablinks" onclick="{!c.LoadBulkUpload}">Bulk Upload Documents</button>
+    </div>
+    <div id="Closed Transactions" class="tabcontent">
+    	<div class="slds-section slds-is-open">
+                <div aria-hidden="false" class="slds-section__content">
+                    <table class="slds-table slds-table_cell-buffer slds-table_fixed-layout"><!--slds-table_bordered slds-table_cell-buffer slds-table_fixed-layout"-->
+                        <thead>
+                        <tr class="slds-text-title_caps">
+                            <th scope="col" style="background-color:#77c5d5;" class="tableHeader">
+                                <div class="slds-truncate" title="Opportunity Name">Transaction Name</div>
+                            </th>
+                            <th scope="col" style="background-color:#77c5d5;" class="tableHeader">
+                                <div class="slds-truncate" title="Opportunity Link">Target Funded Date</div>
+                            </th>
+                            <th scope="col" style="background-color:#77c5d5;" class="tableHeader">
+                                <div class="slds-truncate" title="Documents">Amount Requested</div>
+                            </th>
+        
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!--Repeat-->
+                         
+                        <aura:iteration items="{!v.opps}" var="o" >
+                                <aura:if isTrue="{!o.IsWon}">              
+                                    <tr class="slds-text-title">
+                                        <td class="slds-cell-wrap" style="font-size:small;">
+                                            <a onclick="{!c.FireOppEvent}" id="{!o.Id}" target="_blank" style="color:#3ABEB6;">
+                                                {!o.Client_Facing_Opportunity_Name__c}
+                                            </a>
+                                        </td>
+                                        
+                                        <td class="slds-cell-wrap" style="font-size:small;">
+                                                <ui:outputDate value="{!o.Target_Wire_Date__c}" format="MMM d"/>
+                                        </td>
+                                        <td  class="slds-cell-wrap" style="font-size:small;">
+                                                <lightning:formattedNumber value="{!o.Reporting_Value__c}" style="currency" currencyCode="USD" />
+                                            
+                                        </td>
+                                        
+                                    </tr>
+                            	</aura:if>
+                            </aura:iteration>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>   
+	</div>
+    
+    
+</aura:component>

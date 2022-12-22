@@ -1,0 +1,121 @@
+<aura:component implements="force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader" 
+                controller="FinancialCtrl">
+	<ltng:require styles="{!$Resource.facilitiesui}" />
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <aura:attribute name="rowdata" type="FinancialCtrl.DataWrapper" />
+    <aura:attribute name="theindex" type="Integer" />
+    <aura:attribute name="val" type="String" />
+    <aura:attribute name="isNegativeFormula" type="Boolean" />
+    <aura:attribute name="commentval" type="String" />
+    <aura:attribute name="showcommentval" type="Boolean" default="False"/>
+    <aura:attribute name="fieldlabel" type="String" />
+    <aura:attribute name="commentfieldlabel" type="String" />
+    <aura:attribute name="column" type="String" />
+    <aura:attribute name="viewType" type="String"/>
+    <aura:attribute name="varianceSign" type="Integer"/>
+
+    
+    <div onkeyup="{!c.formPress}" style="text-align: center">
+    	
+        <c:SmallModalText theindex="{!v.theindex}" showcommentval="{!v.showcommentval}" rowdata="{!v.rowdata}" fieldlabel="{!v.fieldlabel}" 
+                        column="{!v.column}" commentfieldlabel="{!v.commentfieldlabel}" 
+                        content="{!(v.val!='null' &amp;&amp; v.val!=null &amp;&amp; v.rowdata.Name=='Analysis Summary') ? v.val :v.commentval}" type="{!v.rowdata.FieldType}"></c:SmallModalText>
+    
+        <aura:if isTrue="{!and(mod(v.theindex + 1, 4)==0, v.viewType=='BudgetvActual')}">
+            <aura:if isTrue="{!v.val=='Variance %'}">
+                <lightning:formattedText value="{!v.val}"/>
+                <aura:set attribute="else">
+                    <aura:if isTrue="{!lessthan(mult(v.val, v.varianceSign),0)}">
+                        <lightning:formattedNumber value="{!v.val}" style="percent" class="negative"/>
+                    </aura:if>
+                    <aura:if isTrue="{!greaterthanorequal(mult(v.val, v.varianceSign),0)}">
+                        <lightning:formattedNumber value="{!v.val}" style="percent" class="positive"/>
+                    </aura:if>
+                </aura:set>
+            </aura:if>      
+        
+            <aura:set attribute="else">
+                <aura:if isTrue="{!v.rowdata.FieldType=='CURRENCY'}">
+                    <aura:if isTrue="{!v.commentval!=null}">
+                        <a class="hascomment" onclick="{!c.openComment}"><lightning:formattedNumber minimumFractionDigits="0" maximumFractionDigits="0" class="hascomment"
+                        value="{!(v.val=='null' ? '' : v.val)}" style="currency" currencyCode="USD"/></a>
+                        <aura:set attribute="else">
+                            <lightning:formattedNumber  minimumFractionDigits="0" maximumFractionDigits="0" class="{!(v.rowdata.isFormula=='TRUE'? ((v.val!='null' &amp;&amp; v.val &lt; 0)? 'data-negative-formula' : 'data-formula') : ((v.val!='null' &amp;&amp; v.val &lt; 0)? 'data-negative' : 'data-normal'))}"
+                        value="{!(v.val=='null' ? '' : v.val)}" style="currency" currencyCode="USD"/>
+                        </aura:set>
+                    </aura:if>
+                
+                    <aura:set attribute="else">
+                        <aura:if isTrue="{!v.rowdata.FieldType=='DOUBLE'}">
+                            <aura:if isTrue="{!v.commentval!=null}">
+                                <a class="hascomment" onclick="{!c.openComment}"><lightning:formattedNumber minimumFractionDigits="0" maximumFractionDigits="0" class="hascomment"
+                                    value="{!(v.val=='null' ? '' : v.val)}" /></a>
+                                <aura:set attribute="else">
+                                    <lightning:formattedNumber minimumFractionDigits="0" maximumFractionDigits="2" class="{!(v.rowdata.isFormula=='TRUE'? ((v.val!='null' &amp;&amp; v.val &lt; 0)? 'data-negative-formula' : 'data-formula') : ((v.val!='null' &amp;&amp; v.val &lt; 0)? 'data-negative' : 'data-normal'))}"
+                                        value="{!(v.val=='null' ? '' : v.val)}" />
+                                </aura:set>
+                            </aura:if>
+                        
+                            <aura:set attribute="else">             
+                                <aura:if isTrue="{!v.rowdata.FieldType=='PERCENT'}">
+                                    <aura:if isTrue="{!v.commentval!=null}">
+                                        <a class="hascomment" onclick="{!c.openComment}"><lightning:formattedNumber class="hascomment"
+                                        value="{!(v.val=='null' ? '' : v.val)}" style="percent" minimumFractionDigits="1" maximumFractionDigits="1"/></a>
+                                        <aura:set attribute="else">
+                                            <lightning:formattedNumber class="{!(v.rowdata.isFormula=='TRUE'? ((v.val!='null' &amp;&amp; v.val &lt; 0)? 'data-negative-formula' : 'data-formula') : ((v.val!='null' &amp;&amp; v.val &lt; 0)? 'data-negative' : 'data-normal'))}"
+                                                value="{!(v.val=='null' ? '' : v.val)}" style="percent" minimumFractionDigits="1" maximumFractionDigits="1"/>
+                                        </aura:set>
+                                    </aura:if>
+
+                                    <aura:set attribute="else">
+                                        <aura:if isTrue="{!v.rowdata.FieldType=='BOOLEAN'}">
+                                            <aura:if isTrue="{!v.commentval!=null}">
+                                                <a class="hascomment" onclick="{!c.openComment}">
+                                                    <aura:if isTrue="{!v.val=='true'}">    
+                                                        <ui:outputCheckbox  value="True"/>
+                                                    </aura:if>
+                                                </a>
+                                                <aura:set attribute="else">
+                                                    <aura:if isTrue="{!v.val=='true'}">    
+                                                        <ui:outputCheckbox  value="True"/>
+                                                    </aura:if>
+                                                </aura:set>
+                                            </aura:if>
+                                            <aura:set attribute="else">
+                                                <aura:if isTrue="{!v.rowdata.FieldType=='TEXTAREA'}">
+                                                    <aura:if isTrue="{!(v.commentval!=null || (v.val!='null' &amp;&amp; v.val!=null &amp;&amp; v.rowdata.Name=='Analysis Summary'))}">
+                                                        <a class="hascomment" onclick="{!c.openComment}"><ui:outputRichText class="hascomment"
+                                                                                                                        value="{!(v.val!='null' &amp;&amp; v.val!=null &amp;&amp; v.rowdata.Name=='Analysis Summary' ? 'View Analysis' : (v.val=='null' ? '' : v.val))}" /></a>
+                                                        <aura:set attribute="else">                                            
+                                                            <ui:outputRichText class="{!(v.rowdata.isFormula=='TRUE'? ((v.val!='null' &amp;&amp; (v.val &lt; 0 || v.isNegativeFormula))? 'data-negative-formula' : 'data-formula') : ((v.val!='null' &amp;&amp; (v.val &lt; 0))? 'data-negative' : 'data-normal'))}"
+                                                                           value="{!(v.val!='null' &amp;&amp; v.val!=null &amp;&amp; v.rowdata.Name=='Analysis Summary' ? 'View Analysis' : (v.val=='null' ? '' : v.val))}" />
+                                                        </aura:set>
+                                                    </aura:if>
+                                                    <aura:set attribute="else">
+                                                        <aura:if isTrue="{!(v.commentval!=null || (v.val!='null' &amp;&amp; v.val!=null &amp;&amp; v.rowdata.Name=='Analysis Summary'))}">
+                                                            <a class="hascomment" onclick="{!c.openComment}"><ui:outputtext class="hascomment"
+                                                                                                                            value="{!(v.val!='null' &amp;&amp; v.val!=null &amp;&amp; v.rowdata.Name=='Analysis Summary' ? 'View Analysis' : (v.val=='null' ? '' : v.val))}" /></a>
+                                                            <aura:set attribute="else">                                            
+                                                                <ui:outputtext class="{!(v.rowdata.isFormula=='TRUE'? ((v.val!='null' &amp;&amp; (v.val &lt; 0 || v.isNegativeFormula))? 'data-negative-formula' : 'data-formula') : ((v.val!='null' &amp;&amp; (v.val &lt; 0))? 'data-negative' : 'data-normal'))}"
+                                                                               value="{!(v.val!='null' &amp;&amp; v.val!=null &amp;&amp; v.rowdata.Name=='Analysis Summary' ? 'View Analysis' : (v.val=='null' ? '' : v.val))}" />
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </aura:set>
+                                                </aura:if>
+                                            </aura:set>    
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </aura:set>
+
+    </aura:if> 
+
+    </div>
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+</aura:component>

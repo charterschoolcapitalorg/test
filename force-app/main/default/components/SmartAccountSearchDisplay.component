@@ -1,0 +1,107 @@
+<apex:component >
+    <apex:attribute name="a" type="SmartAccountSearchExtension" description="instance of class" />  
+    <apex:attribute name="OtherPageCalling" assignTo="{!OtherPageCalling}" type="String" description="instance of class" />
+    <Script>
+        function sortAccountDataJS(sortField) {
+            var txtAccountName ='{!a.accountNameToSearch}';//document.getElementById("pg:frm:txtAccountName").value;
+            
+            var isValid = 'No';
+               
+        if(fncTrim(txtAccountName).length >= searchCharacterLimit){
+           isValid = 'Yes';
+        }
+        
+        if(isValid == 'Yes') {
+            sortAccountData(sortField);
+        }
+    }
+    
+    
+    function createNewAccount(){
+        if({!a.isDuplicatePermission}==true){
+        var newName ='{!a.accountNameToSearch}'; //document.getElementById("pg:frm:txtAccountName").value;
+        newName     = encodeURIComponent(newName);
+        
+        //@jazzyrocksr: Made the URL dynamic using global variables and Account object prefix
+        window.location.href = '../{!a.accountPrefix}/e?retURL={!$Page.SmartAccountSearch}&nooverride=1&RecordType={!$CurrentPage.parameters.RecordType}&acc2=' + newName; 
+        return false;
+        }
+        else{
+        alert('You do not have rights to create duplicate Accounts,Please contact system administrator');
+        return false;
+        }
+        
+    }
+    </script>   
+<apex:actionFunction action="{!a.sortData}" name="sortAccountData" reRender="resultBlock,pnlDisplayMsg" status="status" >
+    <apex:param name="sortField" assignTo="{!a.sortField}" value="" />
+</apex:actionFunction>
+
+<apex:actionFunction name="nextAccountPage" action="{!a.nextAccountPage}" reRender="resultBlock,pnlDisplayMsg" status="status" />
+<apex:actionFunction name="previousAccountPage" action="{!a.previousAccountPage}" reRender="resultBlock,pnlDisplayMsg" status="status" />
+
+<apex:outputPanel id="pnlDisplayMsg">
+    <apex:pageMessages />
+</apex:outputPanel>
+<apex:pageBlock id="resultBlock" title="Account {!IF((a.searchCount==0 || a.searchCount>=a.limitRecords), '', ' [' + TEXT(a.searchCount) + ']')}">
+    <apex:pageBlockButtons rendered="{!a.showAllContactButton}" location="top" >
+            <apex:commandButton value="{!$Label.New_Account}" onclick="return createNewAccount();" disabled="{!IF(a.showAccountButton = true, false, true)}"/>
+            <apex:commandButton action="{!cancel}" value="{!$Label.Cancel}"  onclick="return goToBack();"/>
+        
+            <apex:actionStatus id="status">
+                <apex:facet name="start">
+                  <span style="color:red;">{!$Label.Loading}</span> <img src="/img/loading.gif" />
+                </apex:facet>
+            </apex:actionStatus>
+            
+    </apex:pageBlockButtons>
+    <apex:pageBlockTable value="{!a.accounts}" var="accObj">
+            <apex:repeat value="{!$ObjectType.Account.FieldSets.account_search_result}" var="item" >
+                <apex:column headerValue="{!$ObjectType.Account.Fields[item].label}" >
+                    <apex:variable value="{!$ObjectType.Account.Fields[item].Name}" var="fieldAPIName2"/>
+                    <apex:outputLink value="/{!accObj.Id}" target="_blank" rendered="{!IF(fieldAPIName2='Name',true,false)}">{!accObj.Name}</apex:outputLink>
+                    <apex:outputlabel value="{!accObj[item]}" rendered="{!IF(fieldAPIName2 <>'Name',true,false)}"/>
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                        <apex:variable value="{!$ObjectType.Account.Fields[item].Name}" var="fieldAPIName"/>
+                            <apex:outputLink value="javascript:void(0);" onclick="sortAccountDataJS('{!$ObjectType.Account.Fields[item].Name}');">{!$ObjectType.Account.Fields[item].label}
+                                <img src="{!IF(a.sortField = fieldAPIName,IF(a.isAsc = true,'/img/sort_asc_arrow.gif','/img/sort_desc_arrow.gif'),'/s.gif')}" />
+                            </apex:outputLink>                                                              
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:column>
+            </apex:repeat>
+            <apex:column headerValue="{!$ObjectType.Account.Fields.OwnerId.Label}">
+                    <apex:outputlabel value="{!accObj.Owner.Name}"/>
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:outputLink value="javascript:void(0);" onclick="sortAccountDataJS('Owner.Name');">{!$ObjectType.Account.Fields.OwnerId.Label}
+                                <img src="{!IF(a.sortField = 'Owner.Name',IF(a.isAsc = true,'/img/sort_asc_arrow.gif','/img/sort_desc_arrow.gif'),'/s.gif')}" />    
+                            </apex:outputLink>                                                              
+                        </apex:outputPanel>
+                    </apex:facet>
+            </apex:column>
+    </apex:pageBlockTable>
+    <apex:outputPanel id="errorBlock" rendered="{!(a.searchCount==0 || a.searchCount>=a.limitRecords)}"><span style="color:red;">{!a.searchStatus}</span></apex:outputPanel>
+     <apex:outputPanel rendered="{!NOT(a.searchCount==0)}">
+                 <hr/>
+                 <table width="100%" >
+                  <tr>
+                   <td align="left" width="33%">
+                        <div id="pagelinkblock" >
+                           <div id="curstate"> {!a.showingFrom}-{!a.showingTo} of {!a.totalResults} </div>
+                        </div>
+                   </td>
+                   <td align="center" width="33%" style="vertical-align:middle;">
+                       <apex:outputLink value="javascript:void(0);"  rendered="{!a.hasPrevious}" onclick="previousAccountPage();">&lt;&lt;{!$Label.Previous}</apex:outputLink>
+                       <span id="div_mid1" >&nbsp;<apex:outputLabel rendered="{!a.hasPrevious && a.hasNext}" value="|"  /> &nbsp;</span>
+                        <apex:outputLink value="javascript:void(0);" rendered="{!a.hasNext}" onclick="nextAccountPage();">{!$Label.Next}&gt;&gt;</apex:outputLink>
+                   </td>   
+                   <td align="right" width="33%" style="vertical-align:middle;">
+                        <div id="pagenumber"> {!$Label.Page} &nbsp;<apex:inputText value="{!a.requestedPage}" style="width:40px"/> of {!a.totalPage} <apex:commandButton value="Go" action="{!a.requestedAccountPage}" reRender="resultBlock,pnlDisplayMsg" status="status" /></div>
+                   </td>
+                 </tr>
+                </table> 
+    </apex:outputPanel>
+  </apex:pageBlock>
+</apex:component>

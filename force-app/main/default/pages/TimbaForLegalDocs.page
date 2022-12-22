@@ -1,0 +1,16 @@
+<apex:page standardStylesheets="false" standardController="Legal_Doc__c" sidebar="false" showheader="false"> 
+    <!-- TimbaBOX Container -->
+    <body>
+    <div id="timbaBox_Container"></div>
+    </body> 
+
+    <script>
+        var currentObjId = "{!Legal_Doc__c.id}";
+        var FirstName = "{!$User.FirstName}";
+        var LastName = "{!$User.LastName}"; 
+        var CompanyName = "{!$User.CompanyName}";
+        var sessionId = "{!$Api.Session_ID}";
+        var URL = "{!$CurrentPage.URL}";
+    </script>
+   <script language="javascript" src="https://timbaboxes-developer-edition.na10.force.com/resource/1337625267000/timbaboxes/js/inc.js"></script>
+</apex:page>

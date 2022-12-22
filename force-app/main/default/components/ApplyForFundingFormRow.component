@@ -1,0 +1,34 @@
+<apex:component id="formRow" layout="none" selfClosing="true">
+	<apex:attribute name="applicant" type="Applicant__c" description="The applicant record" />
+	<apex:attribute name="org" type="Organization__c" description="The org record" />
+	<apex:attribute name="firstField" type="string" description="The api name of the first field" />
+	<apex:attribute name="firstLabel" type="string" description="The label to display for the first field" />
+	<apex:attribute name="firstRequired" type="boolean" default="false" description="Indicates that the first field is required" />
+	<apex:attribute name="secondField" type="string" description="The api name of the second field" />
+	<apex:attribute name="secondLabel" type="string" description="The label to display for the second field" />
+	<apex:attribute name="secondRequired" type="boolean" default="false" description="Indicates that the second field is required" />
+	<apex:attribute name="note" type="string" description="The note to include" />
+	
+	<apex:variable var="record" value="{!IF(NOT(ISBLANK(applicant)), applicant, IF(NOT(ISBLANK(org)), org, null))}" />
+	<apex:variable var="objectType" value="{!IF(NOT(ISBLANK(applicant)), 'Applicant__c', IF(NOT(ISBLANK(org)), 'Organization__c', null))}" />
+	<apex:variable var="showFirstLabel" value="{!NOT(AND(ISBLANK(record), ISBLANK(firstField), ISBLANK(firstLabel)))}" />
+	<apex:variable var="firstLabelVal" value="{!IF(ISBLANK(firstLabel), $ObjectType[objectType].Fields[firstField].Label, firstLabel)}" />
+	<apex:variable var="showSecondLabel" value="{!NOT(AND(ISBLANK(record), ISBLANK(secondField), ISBLANK(secondLabel)))}" />
+	<apex:variable var="secondLabelVal" value="{!IF(ISBLANK(secondLabel), $ObjectType[objectType].Fields[secondField].Label, secondLabel)}" />
+	
+	<apex:outputPanel id="hiddenRowWrapper" layout="none" rendered="{!NOT(ISBLANK(record))}">
+		<tr class="labelRow">
+			<td class="first"><apex:outputLabel for="firstField" rendered="{!showFirstLabel}">{!firstLabelVal}&nbsp;<apex:outputPanel id="firstRequiredIndicator" layout="inline" rendered="{!firstRequired}" styleClass="requiredIndicator">*</apex:outputPanel></apex:outputLabel></td>
+			<td class="second"><apex:outputLabel for="secondField" rendered="{!showFirstLabel}">{!secondLabelVal}&nbsp;<apex:outputPanel id="secondRequiredIndicator" layout="inline" rendered="{!secondRequired}" styleClass="requiredIndicator">*</apex:outputPanel></apex:outputLabel></td>
+		</tr>
+		<tr>
+			<td class="first"><apex:inputField id="firstField" value="{!record[firstField]}" styleClass="{!IF(firstRequired, 'required', '')}" rendered="{!NOT(ISBLANK(firstField))}" /></td>
+			<td class="second"><apex:inputField id="secondField" value="{!record[secondField]}" styleClass="{!IF(secondRequired, 'required', '')}" rendered="{!NOT(ISBLANK(secondField))}" /></td>
+		</tr>
+		<apex:outputPanel id="noteRowWrapper" layout="none" rendered="{!NOT(ISBLANK(note))}">
+			<tr class="noteRow">
+				<td colspan="2" class="full"><div class="note">{!note}</div></td>
+			</tr>
+		</apex:outputPanel>
+	</apex:outputPanel>
+</apex:component>

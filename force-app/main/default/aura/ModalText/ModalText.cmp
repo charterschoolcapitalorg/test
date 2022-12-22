@@ -1,0 +1,9 @@
+<aura:component >
+	<aura:attribute name="content" type="String" />
+    <p class="slds-text-longform tile__title red-txt">
+    	<aura:unescapedHtml value="{!v.content}" />
+    </p>
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+</aura:component>

@@ -1,0 +1,35 @@
+<aura:component >
+	 <aura:attribute name="Parcel" type="Parcel__c" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+	<lightning:layout verticalAlign="center" class="slds-border_bottom header-data" multipleRows="true" >
+        <lightning:layoutItem flexibility="auto"  size="2" >
+                   <ui:inputSelect label="" aura:id='actionl' 
+                             class="select actionselect" >
+                        <option value="">Select An Action</option>
+                        <option value="proptax">New Property Tax</option>
+                    </ui:inputSelect>
+              
+                    <lightning:icon style="vertical-align:middle;" iconName="standard:output" alternativeText="Go" onclick="{!c.newPropertyTax}"/>
+                    &nbsp;&nbsp;<a onclick="{!c.editParcel}" styleClass="btn ">Edit</a>
+        </lightning:layoutItem>
+        
+         <lightning:layoutItem size="2" class="header-data">
+        	<a onclick="{!c.viewParcel}" styleClass="btn">{!v.Parcel.Name}</a>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="1" class="header-data">{!v.Parcel.Parcel_Number__c}</lightning:layoutItem>
+        <lightning:layoutItem size="1" class="header-data">{!v.Parcel.County__c}</lightning:layoutItem>
+        <!-- <lightning:layoutItem size="2" class="header-data">{!v.Parcel.Balance_for_tax_year__c}</lightning:layoutItem> -->
+        <lightning:layoutItem size="2" flexibility="auto" class="header-data">
+            <lightning:formattedNumber value="{!v.Parcel.Balance_for_tax_year__c}" style="currency" currencyCode="USD"/>
+        </lightning:layoutItem> 
+        <lightning:layoutItem size="2" flexibility="auto" class="header-data">
+            <ui:outputDate value="{!v.Parcel.Final_Due_Date_for_Tax_Year__c}" format="MM/dd/yyyy" />
+        </lightning:layoutItem> 
+        <lightning:layoutItem size="2" flexibility="auto" class="header-data">
+            <ui:outputDate value="{!v.Parcel.Next_Due_Date__c}" format="MM/dd/yyyy" />
+        </lightning:layoutItem> 
+        
+    </lightning:layout>
+</aura:component>

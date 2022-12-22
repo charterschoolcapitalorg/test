@@ -1,0 +1,14 @@
+<!--
+ - Created by Ivan Garcia on 4/18/2018.
+ -->
+
+<aura:component description="oppName" controller="IntakeCommunityItemsCtrl" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+    <aura:attribute name="idOpp" type="String" />
+    <aura:attribute name="nameOpp" type="Opportunity" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <span class="slds-cell-wrap" style="display:inline-block; width: 45%">{!v.nameOpp.Client_Facing_Opportunity_Name__c}</span>
+    <span style="display:inline-block; width: 25%">Target Funding Date:&nbsp;<ui:outputDate value="{!v.nameOpp.Target_Wire_Date__c}" format="MMM d"/></span>
+    <span style="display:inline-block; width: 25%">Amount Requested:&nbsp;<ui:outputCurrency format="$###,###,###,###" aura:id="curr" value="{!v.nameOpp.Reporting_Value__c}"/></span>
+
+
+</aura:component>

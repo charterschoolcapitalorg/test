@@ -1,0 +1,68 @@
+<template>
+  <lightning-card variant="Narrow"  title="AUM Academic Rating Report" icon-name="standard:account">
+    
+    <div class="slds-grid slds-gutters" >
+      <div class="slds-col slds-size_8-of-12" style="padding-top: 20px; padding-left: 30px;">
+        <lightning-accordion class="help-accordion"
+          onsectiontoggle={handleToggleSection}
+          active-section-name={accordianSection}
+          allow-multiple-sections-open>
+            <lightning-accordion-section name="A" label="Help">
+              <ul class="slds-list_dotted">
+                <li>This report displays the CSC Color Rating and Total Rating from the Current Yr, Previous Yr and Two Years Ago Academic Rating records.</li>
+                <li>Blank values indicate there is no AR data for that given school year!</li>
+              </ul>
+            </lightning-accordion-section>
+        </lightning-accordion>
+      </div>    
+
+      <lightning-layout horizontal-align="center" vertical-align="end">
+        <div class="slds-var-m-top_large slds-var-p-right_medium">
+            <lightning-layout-item size="5">
+              <lightning-combobox
+                name="filter"
+                label="Owner filter:"
+                value={value}
+                placeholder="All"
+                options={ownerFilter}
+                onchange={handleChange} >
+              </lightning-combobox>
+            </lightning-layout-item>
+          </div>
+        
+          <lightning-layout-item size="7">
+            <lightning-button label="Refresh data" title="Refresh underlying data" icon-name="utility:refresh" class="slds-var-m-left_x-small" onclick={handleRefresh}></lightning-button>
+          </lightning-layout-item>
+      </lightning-layout>
+
+
+
+    </div>
+  </lightning-card>
+
+  <div>
+    <br/>
+  </div>
+
+  <!-- sldsValidatorIgnoreNextLine -->
+  <lightning-datatable
+    key-field="id"
+    columns={columns}
+    data={filteredData}
+    hide-checkbox-column
+    sorted-direction={sortDirection}
+    sorted-by={sortedBy}
+    onrowaction={handleRowAction}
+    onsort={onHandleSort}>
+  </lightning-datatable>
+  <!-- following section to prevent cut off at utility bar -->
+  <div>
+    &nbsp;
+  </div>
+  <div>
+    &nbsp;
+  </div>
+  <div>
+    &nbsp;
+  </div> 
+</template>

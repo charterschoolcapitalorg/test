@@ -1,0 +1,134 @@
+<apex:page standardController="Account" extensions="SmartAccountSearchExtension" sidebar="true" tabstyle="Account" id="pg">
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>    
+    <apex:sectionHeader title="Account" subtitle="{!$Label.Smart_Account_Search}"/>
+<style type="text/css">
+    .data_field{
+        padding-right:20px;
+     }
+     span#icon_clear{   
+            font-family:verdana;
+            cursor:pointer;
+            color:#38468F;
+            font-weight:bold;
+            position:relative;
+            height:20px;
+            left:-18px;
+     }
+     span#icon_clear:hover{
+            color:#ccc;
+     }
+</style>    
+    <apex:form id="frm">
+        <script>
+          // Character limits of search Account for all fields
+            var searchCharacterLimit= 3;
+        </script>
+        
+        <table class="list" width="100%">
+
+            <tr class="dataRow" onmouseout="javascript:hiOff(this)" onmouseover="javascript:hiOn(this)">
+                <td class="labelCol" colspan="1" style="width:200px;" ><h2 class="pageDescription">{!$Label.Smart_Account_Search}</h2></td>
+                <td class="dataCell" colspan="4">
+                <!--<a href="javascript:void(0);" onclick="resetSearchStatus();"> {!$Label.Reset_Search}</a> -->
+                <!-- no longer required replace with x button -->
+                </td>
+            </tr>   
+            <tr class="dataRow" onmouseout="javascript:hiOff(this)" onmouseover="javascript:hiOn(this)">
+                <td class="labelCol" style="width:200px;" > {!$Label.Search_by}: </td>
+                <td class="dataCell" >{!$ObjectType.Account.Fields.Name.Label} </td>
+            </tr>   
+            <tr class="dataRow" onmouseout="javascript:hiOff(this)" onmouseover="javascript:hiOn(this)">
+                <td class="labelCol" style="width:200px;" > {!$Label.Search_criteria}: </td>
+                <td class="dataCell" >  
+                     <apex:outputPanel >
+                        <apex:inputText title="Minimum three characters are required" value="{!accountNameToSearch}" onkeyup="BlurEventFunction(this.id,event);"  onkeypress="BlurEventFunction(this.id,event);" id="txtAccountName" styleClass="data_field" style="width:100px;" />
+                        <span id="icon_clear">x</span>
+                    </apex:outputPanel> 
+                </td>
+            </tr>   
+        </table>
+        
+        <input type="hidden" id="oldAccountName" value="" />
+       
+<script>
+    $j=jQuery.noConflict();
+    $j('#icon_clear').fadeOut(300);
+    $j('.data_field').on('keyup', function() {
+        if ($j(this).val().length > 0) {
+            $j('#icon_clear').fadeIn(300);
+        }
+        else {
+            $j('#icon_clear').fadeOut(300);
+        }
+    });
+
+    $j('#icon_clear').on('click',function() {
+          resetSearchStatus();
+    });
+
+    function validateForSearch(ctrl){
+        setTimeout("validateForSearch2()",1000);
+    }
+    // function runs on on blur event
+    function BlurEventFunction(ctrl,e){
+      if(document.getElementById(ctrl).value==''){
+              return;
+          } 
+          var keycode = (e.keyCode ? e.keyCode : e.which); 
+           if(keycode == '13'){         
+            e.preventDefault();
+            return false;
+          }
+          else{      
+           setTimeout("validateForSearch2()",1000);
+            return false;
+          }  
+    }  
+    //Function to trim string
+    function fncTrim(value) {
+        return value.replace(/^\s*/, "").replace(/\s*$/, "");
+    }
+ 
+    function validateForSearch2(){
+        try{
+            var txtAccountName = document.getElementById("pg:frm:txtAccountName").value;
+            if(fncTrim(txtAccountName) != ''){
+                var oldAccountName = document.getElementById('oldAccountName').value;
+                document.getElementById('oldAccountName').value = txtAccountName;
+                var isChange = 'No';
+                if(fncTrim(txtAccountName).length >= searchCharacterLimit && txtAccountName != oldAccountName){
+                    isChange = 'Yes';
+                }
+                if(isChange == 'Yes' ){
+                    search(txtAccountName);
+                }    
+            } 
+        }
+        catch(e){
+            alert(e);
+        }     
+    }
+ 
+    function goToBack(){
+        window.location.href = '/{!accountPrefix}/o';
+        return false;
+    }
+    
+    
+</script>
+
+<apex:actionFunction action="{!performSearch}" name="search" reRender="accountSearchResult,leadSearchResult" status="status" >
+    <apex:param name="d" value="" assignTo="{!accountNameToSearch}" />
+</apex:actionFunction>
+
+<apex:actionFunction name="resetSearchStatus" action="{!resetSearchStatus}" reRender="frm" status="status" />
+
+        <apex:outputPanel id="accountSearchResult">
+        <c:SmartAccountSearchDisplay a="{!this}" />
+          </apex:outputPanel>  
+      <apex:outputPanel id="leadSearchResult">
+        <c:SmartLeadSearchDisplay l="{!leadSearch}" LeadPageCalling="true"/>
+     </apex:outputPanel>  
+        
+</apex:form>
+</apex:page>

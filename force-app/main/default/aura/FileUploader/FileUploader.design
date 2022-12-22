@@ -1,0 +1,5 @@
+<design:component >
+  <design:attribute name="relatedObjects" label="Related Objects" description="Enter a comma separated list of the api names of fields to link to, note the page record is automatically included." placeholder="Leave blank if no links required" />
+  <design:attribute required="true" name="relatedObjectDisplay" label="Related Object for User" description="Enter a friendly list of the records this will link to. Gives the user some visibility." placeholder="Enter text to display records being linked to" />
+  <design:attribute name="library" label="Library Name" description="Api name of field with the Library type." placeholder="Leave blank if no library to link to." />
+</design:component>

@@ -1,0 +1,92 @@
+<aura:component >
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <aura:attribute name="theindex" type="Integer" />
+	<aura:attribute name="content" type="String" />
+    <aura:attribute name="fieldlabel" type="String" />
+    <aura:attribute name="commentfieldlabel" type="String" />
+    <aura:attribute name="column" type="String" />
+    <aura:attribute name="fieldvalue" type="String" />
+    <aura:attribute name="type" type="String" />
+    <aura:attribute name="rowdata" type="FinancialCtrl.DataWrapper" />
+    
+    <aura:attribute name="showcommentval" type="Boolean" default="False"/>
+    
+    <aura:if isTrue="{!v.showcommentval}">
+
+    <div class="parent">    
+    
+      <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+        <div class="slds-modal__container">
+           <header class="slds-modal__header large">
+               <aura:if isTrue="{!v.fieldlabel=='Analysis Summary'}">
+                   Analysis
+                   <br/>{!v.column}
+                   <aura:set attribute="else">
+                       Comment For {!v.column}
+                       <br/>{!v.fieldlabel}:
+                   </aura:set>
+               </aura:if>
+                
+               <aura:if isTrue="{!v.fieldlabel!='Analysis Summary' &amp;&amp; v.type=='CURRENCY'}">
+                   <lightning:formattedNumber  minimumFractionDigits="0" maximumFractionDigits="0" 
+              		value="{!(v.fieldvalue=='null' ? '' : v.fieldvalue)}" style="currency" 
+                    currencyCode="USD"/>
+					
+               <aura:set attribute="else">
+                   <aura:if isTrue="{!v.fieldlabel!='Analysis Summary'}">
+                   
+        				<aura:if isTrue="{!v.rowdata.FieldType=='DOUBLE'}">
+                			<lightning:formattedNumber minimumFractionDigits="0" 
+                               maximumFractionDigits="0" 
+                               value="{!(v.fieldvalue=='null' ? '' : v.fieldvalue)}" />
+                        <aura:set attribute="else">
+                  
+                    		<aura:if isTrue="{!v.rowdata.FieldType=='PERCENT'}">
+                                <lightning:formattedNumber 
+                                   style="percent" minimumFractionDigits="1" maximumFractionDigits="1"
+                               	   value="{!(v.fieldvalue=='null' ? '' : v.fieldvalue)}" />
+                                
+                                <aura:set attribute="else">
+                                    <ui:outputtext 
+                               			value="{!(v.fieldvalue=='null' ? '' : v.fieldvalue)}" />
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                        </aura:if>
+                   </aura:if>
+               </aura:set>
+               </aura:if>
+               
+            </header>        
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                   <div>
+                    <p class="slds-text-longform tile__title red-txt">
+                        
+                        <ui:outputText value="{!v.content}"  />  
+                        <!-- aura:unescapedHtml value="{!v.content}" /> -->
+                       </p>
+                       
+                    </div>
+                    
+            </div>
+             
+                    <footer class="slds-modal__footer">
+                       
+                        <lightning:button variant="neutral" 
+                                          label="Close"
+                                          title="Close"
+                                          onclick="{! c.close }"/>
+                    </footer>
+            
+        </div>
+      </section>
+    </div>
+        
+    <div class="slds-backdrop slds-backdrop_open"></div>
+    
+    </aura:if>
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+</aura:component>

@@ -1,0 +1,210 @@
+<apex:page standardController="Lead" standardStylesheets="false" showHeader="false" sidebar="false" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>{!$Label.FE_IS_Title}</title>
+
+    <!-- Bootstrap core CSS -->
+
+    <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/bootstrap.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/main.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery, '/js/jquery-1.9.1.min.js')}"  />
+    <apex:includeScript value="{!URLFOR($Resource.JQueryTablesort, '/ts/jquery.tablesorter.min.js')}"  />
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" media='screen,print'/>
+    <link href="css/main.css" rel="stylesheet" media='screen,print'/>
+
+    <script >
+        $(document).ready(function()
+        {
+                $("[id$='accsTable']").tablesorter();
+                $("[id$='finTable']").tablesorter();
+        });
+    </script>
+    <script type="text/javascript" language="javascript">
+        if(jQuery) {
+            jQuery.noConflict();
+        }
+    </script>
+
+  </head>
+
+<body>
+        <div class= "container">
+
+            <div class="well col-xs-12 col-md-12 page-header ">
+                <h1>{!Lead.Name} - {!lead.Company}</h1>
+            </div>
+            
+            <div class="col-xs-12 sub-header">
+                <span class="heading">Facilities Lead Summary</span>
+            </div>
+            
+            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+            <div><p class="text-center"><sup><em>Charter School Capital Confidential.</em></sup></p></div> 
+            
+            <div class="col-md-6" id ="section">
+                <apex:outputText >Lead sourced by: {!lead.Owner.Name}</apex:outputText><br/>
+                <apex:outputText value="{0,date,MM/dd/YYYY}">Date sourced: <apex:param value="{!lead.CreatedDate}"/></apex:outputText>
+            </div>
+            <div class="col-md-6" id ="section">
+                <apex:outputText value="{0,date,MM/dd/YYYY}">Close Date: <apex:param value="{!lead.Close_Date__c}"/></apex:outputText><br/>
+                <apex:outputText >Notes: {!lead.Close_Date_Notes__c}</apex:outputText>
+            </div>
+            <div class="clearfix"></div>
+            <br/>
+            <strong>School Information</strong>
+            <br/>            
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText > Name: {!lead.Salutation} {!lead.Name}</apex:outputText>
+                    <apex:outputText > Email: {!lead.email}</apex:outputText>
+                    <apex:outputText > Phone: {!lead.Phone}</apex:outputText> 
+                    <apex:outputText rendered="{!(NOT(ISBLANK(lead.MobilePhone)))}" > Mobile: {!lead.MobilePhone}</apex:outputText>
+                    <apex:outputText > Current Client: {!IF((lead.Current_Client__c), "Yes", "No")}</apex:outputText>
+                </apex:panelGrid>
+                        
+            </div>
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText value="{!lead.Company}"/ >
+                    <apex:outputText value="{!lead.Street}"/>
+                    <apex:outputText value="{!lead.City}"/>
+                    <apex:outputText value="{!lead.State}"/>
+                    <apex:outputText >Grades: {!lead.Grades__c}</apex:outputText>
+                </apex:panelGrid>
+                        
+            </div>
+
+            <div class="clearfix"></div>
+            <hr/>
+
+            <strong>Management Organization Details </strong>
+            <br/>
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText > Management Corp: {!IF(ISBLANK(lead.Management_Organization__c), "-",lead.Management_Organization__c)} </apex:outputText>
+                    <apex:outputText > Contact: {!IF(ISBLANK(lead.Management_Org_Contact__c), "-",lead.Management_Org_Contact__c)} </apex:outputText>
+                </apex:panelGrid>
+                        
+            </div>
+
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText > Phone: {!IF(ISBLANK(lead.Management_Org_Contact_Phone__c), "-",lead.Management_Org_Contact_Phone__c)} </apex:outputText> 
+                    <apex:outputText > Email: {!IF(ISBLANK(lead.Management_Org_Contact_Email__c), "-",lead.Management_Org_Contact_Email__c)}</apex:outputText>
+                </apex:panelGrid>
+            </div>
+            <div class="clearfix"></div>
+            <hr/>
+            
+            <strong>New Site Details </strong>
+            <br/>
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputField label="Name" value="{!lead.Site_Address__c}"> </apex:outputField>
+                    <apex:outputText > Sales Price: <apex:outputText value="{0, number, $###,###}"><apex:param value="{!lead.Sales_Price__c}"/></apex:outputText></apex:outputText>
+                </apex:panelGrid>
+            </div>
+
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText > Current Occupier: {!IF(lead.Occupied_by_school__c, "Yes", "No")}</apex:outputText>
+                    <apex:outputText > Current Owner: {!lead.Building_Current_Owner__c}</apex:outputText>
+                </apex:panelGrid>
+            </div>
+            <div class="clearfix"></div>
+            <br/>
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText rendered="{!NOT(ISBLANK(lead.Current_Monthly_Rent__c))}"> Current Monthly Rent: <apex:outputText value="{0, number, $###,###}"><apex:param value="{!lead.Current_Monthly_Rent__c}"/></apex:outputText></apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISBLANK(lead.Existing_Site_Square_Footage__c))}"> Existing Sq. Footage: <apex:outputText value="{0, number, ###,###}"><apex:param value="{!lead.Existing_Site_Square_Footage__c}"/></apex:outputText></apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISBLANK(lead.Additional_Sq_Footage__c))}"> Additional Sq. Footage: <apex:outputText value="{0, number, ###,###}"><apex:param value="{!lead.Additional_Sq_Footage__c}"/></apex:outputText></apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISBLANK(lead.Cost_of_Improvement__c))}"> Cost of Improvement: <apex:outputText value="{0, number, $###,###}"><apex:param value="{!lead.Cost_of_Improvement__c}"/></apex:outputText></apex:outputText>
+                </apex:panelGrid>
+            </div>
+            
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText rendered="{!NOT(ISBLANK(lead.Expected_Improvements__c))}"> Expected Improvements: {!lead.Expected_Improvements__c} </apex:outputText>
+                </apex:panelGrid>
+            </div>
+            <div class="clearfix"></div>
+            <hr/>
+
+            <strong>Attendance/School Information </strong>
+            <br/>
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText > Authorizer: {!lead.Authorizer__c}</apex:outputText>
+                    <apex:outputText > Year Opened: {!lead.Year_Opened__c}</apex:outputText>
+                </apex:panelGrid>
+            </div>
+            
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText value="{0,date,MM/dd/YYYY}">Charter Renewal Date:<apex:param value="{!lead.Charter_Renewal_Date__c}"/></apex:outputText>
+                    <apex:outputText > School Type: {!lead.School_Type__c}</apex:outputText>
+                </apex:panelGrid>
+            </div>
+            <br/><br/><br/>
+            <!--Section for Attendance Summary-->
+            <div id ="section" class="col-xs-8">
+            <i>Attendance/Enrollment Overview </i>
+                        <apex:dataTable width="80%" value="{!Lead.Analyses__r}" var="a" id="accsTable" styleClass="tablesorter table-hover" headerClass="text-center" rowClasses="text-center" align="center" rules="all">
+                            <!--apex:column styleClass="tablesorter" headerValue="Name" > <apex:outputLink value="/{!a.Id}" target="_blank" >{!a.Name}</apex:outputLink></apex:column-->
+                            <apex:column styleClass="tablesorter " headerValue="Fiscal Year" value="{!a.Fiscal_Year__c}"/>
+                            <apex:column styleClass="tablesorter" headerValue="Enrollment" value="{!a.Total_Enrollment_Attendance__c}"/>
+                            <apex:column styleClass="tablesorter" headerValue="Waiting List" value="{!a.Waiting_List__c}"/>
+                        </apex:dataTable>            
+            </div>             
+
+
+            <div class="clearfix"></div>
+            <hr/>
+
+            <strong>Other Information (Overview) </strong>
+
+            <p>
+                <div class="col-md-12" id ="section">
+                        <apex:outputField title="Overview" value="{!lead.Overview__c}"></apex:outputField>
+    
+                            
+                </div>
+            </p>
+            
+            <div class="clearfix"></div>
+            
+            <br/>
+            <strong>Internal Review</strong>
+            <br/>
+            <div class="col-md-12" id ="section">
+                    <apex:outputText > Academic Performance: {!lead.Academic_Performance__c}</apex:outputText><br/>
+                    <apex:outputText > Corporate Standing &amp; UCC Search: {!lead.Corporate_Standing_UCC__c}</apex:outputText><br/>
+                    <apex:outputText > Google Search: {!lead.Google_Search__c}</apex:outputText><br/>                       
+            </div>            
+            
+            <hr/>
+
+        <!--Closing div-->
+        </div>
+        
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery-1.10.2.min.js" />
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery.formatCurrency-1.4.0.min.js" />
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/bootstrap.min.js" />
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery-ui-1.10.4.custom.min.js" />
+
+  </body>
+
+
+</apex:page>

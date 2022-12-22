@@ -1,0 +1,25 @@
+<aura:component >
+    <aura:attribute name="LeaseSuite" type="Lease_Suite__c" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+    
+	<lightning:layout verticalAlign="center" class="slds-border_bottom header-data" multipleRows="true" >
+        
+        <div style="width:40px;vertical-align:middle;text-align:right;" >
+            	<a onclick="{!c.editLeaseSuite}" styleClass="btn ">Edit</a>
+        </div> 
+        <lightning:layoutItem size="4" class="header-data">
+        	<a  onclick="{!c.viewLeaseSuite}" styleClass="btn">{!v.LeaseSuite.Name} </a>
+        </lightning:layoutItem> 
+        <lightning:layoutItem size="4" class="header-data">
+        	{!v.LeaseSuite.Lease__r.Name} 
+        </lightning:layoutItem>
+         <lightning:layoutItem size="3" class="header-data">
+             {!v.LeaseSuite.Suite__r.Name}
+        </lightning:layoutItem>
+         
+         
+        
+    </lightning:layout>
+</aura:component>

@@ -1,0 +1,7 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+    <aura:attribute name="disclaimer" type="String" default="Legal text"/>
+    <br/>
+    <div class="slds-m-around_small slds-text-align_left disclaimer">
+        {!v.disclaimer}
+    </div>
+</aura:component>

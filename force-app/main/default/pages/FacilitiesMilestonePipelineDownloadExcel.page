@@ -1,0 +1,90 @@
+<apex:page controller="FacilitiesMilestoneReportCtrl" contentType="application/vnd.ms-excel#SalesforceExport.xls" cache="true">
+    <apex:pageBlock title="Facilities Milestone Report">
+        <apex:pageBlockTable value="{!oppChannel}" var="opp" border="1px solid black">
+            <apex:column headerValue="Opportunity Channel" value="{!opp.opportunityChannel}"/>
+            <!--sourced-->
+            <apex:column headerValue="Sourced Count" value="{!opp.sourcedOppCount}"/>
+            <apex:column headerValue="Sourced Amount">
+                <apex:outputText value="{0, number, ###,##0}" id="sourcedOppAmount" >
+                    <apex:param value="{!opp.sourcedOppAmount}"/>
+                </apex:outputText>
+            </apex:column>
+
+            <!--proposed-->
+            <apex:column headerValue="Proposed Count" value="{!opp.proposedOppCount}"/>
+            <apex:column headerValue="Proposed Amount">
+                <apex:outputText value="{0, number, ###,##0}" id="proposedOppAmount" >
+                    <apex:param value="{!opp.proposedOppAmount}"/>
+                </apex:outputText>
+            </apex:column>
+
+            <!--converted-->
+            <apex:column headerValue="Converted Count" value="{!opp.convertedOppCount}"/>
+            <apex:column headerValue="Converted Amount">
+                <apex:outputText value="{0, number, ###,##0}" id="convertedOppAmount" >
+                    <apex:param value="{!opp.convertedOppAmount}"/>
+                </apex:outputText>
+            </apex:column>
+
+            <!--contracted-->
+            <apex:column headerValue="Contracted Count" value="{!opp.contractedOppCount}"/>
+            <apex:column headerValue="Contracted Amount">
+                <apex:outputText value="{0, number, ###,##0}" id="contractedOppAmount" >
+                    <apex:param value="{!opp.contractedOppAmount}"/>
+                </apex:outputText>
+            </apex:column>
+
+            <!--won-->
+            <apex:column headerValue="Won Count" value="{!opp.wonOppCount}"/>
+            <apex:column headerValue="Won Amount">
+                <apex:outputText value="{0, number, ###,##0}" id="wonOppAmount" >
+                    <apex:param value="{!opp.wonOppAmount}"/>
+                </apex:outputText>
+            </apex:column>
+
+        </apex:pageBlockTable>
+        <apex:pageBlockTable value="{!oppPipelineStage}" var="opp" border="1px solid black">
+            <apex:column value="{!opp.oppPipelineStageTotal}"/>
+            <!--sourced-->
+            <apex:column value="{!opp.sourcedOppCount}"/>
+            <apex:column >
+                <apex:outputText value="{0, number, ###,##0}" id="totalSourcedOppAmount" >
+                    <apex:param value="{!opp.sourcedOppAmount}"/>
+                </apex:outputText>
+            </apex:column>
+
+            <!--proposed-->
+            <apex:column value="{!opp.proposedOppCount}"/>
+            <apex:column >
+                <apex:outputText value="{0, number, ###,##0}" id="totalProposedOppAmount" >
+                    <apex:param value="{!opp.proposedOppAmount}"/>
+                </apex:outputText>
+            </apex:column>
+
+            <!--converted-->
+            <apex:column value="{!opp.convertedOppCount}"/>
+            <apex:column >
+                <apex:outputText value="{0, number, ###,##0}" id="totalConvertedOppAmount" >
+                    <apex:param value="{!opp.convertedOppAmount}"/>
+                </apex:outputText>
+            </apex:column>
+
+            <!--contracted-->
+            <apex:column value="{!opp.contractedOppCount}"/>
+            <apex:column >
+                <apex:outputText value="{0, number, ###,##0}" id="totalContractedOppAmount" >
+                    <apex:param value="{!opp.contractedOppAmount}"/>
+                </apex:outputText>
+            </apex:column>
+
+            <!--won-->
+            <apex:column value="{!opp.wonOppCount}"/>
+            <apex:column >
+                <apex:outputText value="{0, number, ###,##0}" id="totalWonOppAmount" >
+                    <apex:param value="{!opp.wonOppAmount}"/>
+                </apex:outputText>
+            </apex:column>
+
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+</apex:page>

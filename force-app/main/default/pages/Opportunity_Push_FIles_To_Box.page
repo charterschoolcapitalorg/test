@@ -1,0 +1,48 @@
+<apex:page id="Opportunity_Push_Files_To_Box" standardController="Opportunity" extensions="OpportunityPushFilesToBoxController" action="{!execute}" >
+    
+    
+    <style type="text/css">
+        .red { font-style: bold; color:red; margin-left;}
+        .bold { font-style: bold; margin-left;}
+        .grey { font-style: bold; color:#909497; margin-left;}
+    </style>
+    
+<apex:messages styleClass="red"/>
+    <apex:form id="filesForm">
+        
+    <apex:pageBlock >
+            <apex:commandButton value="Push To Box" id="clientDial"  action="{!pushToBox}"/>
+            <apex:commandButton value="Back"  action="{!back}"/>
+  	</apex:pageBlock> 
+  	
+	<apex:pageBlock id="files" > 
+	<apex:pageBlockTable value="{!files}" var="f" id="fileList"> 
+	   		
+	   		
+            <apex:column headerValue="Intake Item" style="{!IF(f.cv.Pushed_To_Box_Error__c=='Processing ....','background-color:blue',IF(f.cv.Pushed_To_Box_Error__c!=''&&f.cv.Pushed_To_Box_Error__c!='Success', 'background-color:red',''))}">
+            	<a href="../{!f.itemId}" target="_blank">{!f.itemName}</a>
+            </apex:column>
+	   		<apex:column headerValue="File Name" style="{!IF(f.cv.Pushed_To_Box_Error__c=='Processing ....','background-color:blue',IF(f.cv.Pushed_To_Box_Error__c!=''&&f.cv.Pushed_To_Box_Error__c!='Success', 'background-color:red',''))}">
+                <apex:outputField value="{!f.cv.Title}"/>
+            </apex:column>
+            <apex:column headerValue="Pushed To Box?" style="{!IF(f.cv.Pushed_To_Box_Error__c=='Processing ....','background-color:blue',IF(f.cv.Pushed_To_Box_Error__c!=''&&f.cv.Pushed_To_Box_Error__c!='Success', 'background-color:red',''))}">
+                <apex:outputField value="{!f.cv.Pushed_To_Box__c}"/>
+            </apex:column>
+            <apex:column headerValue="Status" style="{!IF(f.cv.Pushed_To_Box_Error__c=='Processing ....','background-color:blue',IF(f.cv.Pushed_To_Box_Error__c!=''&&f.cv.Pushed_To_Box_Error__c!='Success', 'background-color:red',''))}">
+                <apex:outputField value="{!f.cv.Pushed_To_Box_Error__c}"/>
+            </apex:column>
+       
+  	</apex:pageBlockTable>
+   
+	</apex:pageBlock>
+	<apex:pageBlock >
+            <apex:commandButton value="Push To Box" id="clientDial"  action="{!pushToBox}"/>
+            <apex:commandButton value="Back"  action="{!back}"/>
+  	</apex:pageBlock> 
+  	
+  	<apex:actionRegion >
+	            <apex:actionPoller action="{!refresh}" rerender="files, fileList, filesForm" interval="5"/>
+	   </apex:actionRegion>
+	   
+</apex:form>
+</apex:page>

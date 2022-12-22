@@ -1,0 +1,24 @@
+<apex:page standardController="FC_Form__c" extensions="FC_Form_Review_Ctrl" action="{!init}">
+
+
+	<apex:pageMessages />
+	
+	<apex:form >
+	  	<apex:pageBlock >
+		     	<apex:pageBlockSection id="submit" columns="1" collapsible="true" title="Submit">
+		     	
+		            <apex:selectList value="{!selectedUser}" size="1" label="Select Reviewer:" >
+		              <apex:selectOptions value="{!users}"/>    
+		           </apex:selectList> 
+		             
+			    </apex:pageBlockSection>
+			        
+			    <apex:pageBlockSection id="submitbtns" columns="2" collapsible="false" title="Submit">
+						<apex:commandButton value="Submit For Review" action="{!submitForReview}" rendered="{!cansubmit}"/>
+				    <apex:commandButton value="Exit" action="{!back}" />      
+			    </apex:pageBlockSection>
+			        
+		</apex:pageBlock>
+	</apex:form>
+	     
+</apex:page>

@@ -1,0 +1,34 @@
+<apex:page standardController="Opportunity" extensions="TestOppEditCtrl" id="thePage" >
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+<apex:form id="theForm">
+    <apex:messages style="font-size: 18px;color:red" />
+    
+    <apex:pageBlock id="theBlock" >  
+    	<apex:outputField value="{!Opp.StageName}"/>
+    	<apex:inputField value="{!Opp.Name}" id="name" />
+    </apex:pageBlock>
+    
+    <apex:commandButton value="Edit" action="{!getLock}" rendered="{!disabled}" />
+    <apex:commandButton value="Save" action="{!save}" rendered="{!!disabled}" />
+    <apex:commandButton value="Exit" action="{!back}" />
+    
+    <script>
+         function setReadOnly(){
+         		console.log('enabling/disabling');
+         		$("[id$=name]").prop("disabled",{!disabled});
+         		
+                //document.getElementById('thePage:theForm:theBlock:name').readOnly=true;
+         }
+         function setNotReadOnly(){
+         		console.log('enabling');
+         		$("[id$=name]").prop("disabled",{!disabled});
+         		
+                //document.getElementById('thePage:theForm:theBlock:name').readOnly=false;
+         }
+         window.onload = setReadOnly;
+    </script>
+ </apex:form> 
+ 
+</apex:page>

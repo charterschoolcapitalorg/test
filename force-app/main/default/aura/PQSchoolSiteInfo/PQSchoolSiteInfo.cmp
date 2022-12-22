@@ -1,0 +1,175 @@
+<aura:component description="PQSchoolSiteInfo" controller="PQSchoolSiteInfoCtrl" implements="forceCommunity:availableForAllPageTypes" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="loadedData" type="Account[]"/>
+    <aura:attribute name="accountId" type="string"/>
+    <aura:attribute name="intakeId" type="string"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="modalMessage" type="String"/>
+    <aura:attribute name="listToDelete" type="Account[]"/>
+    <aura:attribute name="billingStates" access="public" type="String[]"/>
+    <aura:method name="childmethod" action="{!c.handleSaveAndSubmit}">
+       <aura:attribute name="component" type="Object" default="{}" />
+  </aura:method>
+    
+	<aura:registerEvent name="navigatetoParent" type="c:FireParentPQEvent"/>
+
+    
+    <div class="slds-section slds-is-open">
+        
+        <div aria-hidden="false" class="slds-section__content">
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                <thead >
+                <tr class="slds-text-title_caps header_style">
+                    <th scope="col" class="header_style">
+                        <div style='width: 150px;' title="School Name">
+                            School Name
+                        </div>
+                    </th>
+                    <th scope="col" class="header_style">
+                        <div style='width: 100px;' title="Charter Number">
+                            Charter Number
+                        </div>
+                    </th>
+                    <th scope="col" class="header_style">
+                        <div style='width: 200px;' title="School Address">
+                            Address
+                        </div>
+                    </th>
+                    <th scope="col" class="header_style">
+                        <div style='width: 100px;' title="School City">
+                            City
+                        </div>
+                    </th>
+                    <th scope="col" class="header_style">
+                        <div style='width: 75px;' class="slds-truncate" title="School State">
+                            State
+                        </div>
+                    </th>
+                    <th scope="col" class="header_style">
+                        <div style='width: 75px;' title="School Zip">
+                            Zip
+                        </div>
+                    </th>
+                    <th scope="col" class="header_style">
+                        <div style='width: 110px;' title="Main Phone">
+                            Phone
+                        </div>
+                    </th>
+                    <th scope="col" class="header_style">
+                        <div style='width: 25px;'  title="Current Enrollment">
+                            Enrollment
+                        </div>
+                    </th>
+                    <th scope="col" class="header_style">
+                        <div class="slds-truncate" title="Delete">
+                            Delete
+                        </div>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <aura:iteration items="{!v.loadedData}" var="data">
+                    
+                        <tr>
+                            <td style='width: 200px;' data-label="School Name">
+                                <lightning:input aura:id="school" required="true"  label="School Name" type="text" 
+									value="{!data.Name}" pattern="[\s\S]{0,100}"  messageWhenPatternMismatch="Max 100 characters"/>
+                            </td>
+                            
+                            <td style='width: 200px;' data-label="Charter Number">
+                                <!-- class="slds-size1-of-2" -->
+                                <lightning:input aura:id="school" required="true"  label="Charter Number" type="text" 
+									value="{!data.Charter_Number__c}" pattern="[\s\S]{0,100}"  messageWhenPatternMismatch="Max 100 characters"/>
+                            </td>
+                            
+                            
+                            <td data-label="School Address">
+                                <lightning:input aura:id="school" required="true"  label="Mailing Street" type="text" 
+		value="{!data.BillingStreet}" pattern="[\s\S]{0,50}" 
+                         messageWhenPatternMismatch="Max 50 characters"/>
+                                
+                            </td>
+                            
+                            <td data-label="School City">
+                                <lightning:input aura:id="school" required="true"  label="Mailing City" type="text"  
+		value="{!data.BillingCity}" pattern="[\s\S]{0,50}" 
+                         messageWhenPatternMismatch="Max 50 characters"/>
+                            </td>
+                            
+                            <td data-label="School State">
+                                <lightning:select aura:id="school" value="{!data.BillingState}"
+               name="state_opt" label="State" required="true" >
+                            <option value=""></option>
+                            <aura:iteration items="{!v.billingStates}" var="st">
+                                <option value="{!st}" selected="{!st==v.pqForm.Mailing_State_Province__c}">{!st}</option>
+                            </aura:iteration>
+        						</lightning:select>
+                            </td>
+                            
+                            <th data-label="School Zip">
+                                <lightning:input aura:id="school" required="true" pattern="[0-9]{5}" 
+                         messageWhenPatternMismatch="Zip Code is not valid"
+                         label="Zip" type="text" value="{!data.BillingPostalCode}"/>
+		
+                            </th>
+                            
+                            <td data-label="Phone" >
+                                <lightning:input aura:id="school" required="true"  label="Phone" pattern="^[0-9_ ]{0,11}"
+         messageWhenPatternMismatch="Phone number is not valid" type="tel" 
+		value="{!data.Phone}"/>
+                            </td>
+                            
+                            <td data-label="Enrollment" >
+                                <lightning:input aura:id="school" required="true"  label="Enrollment" type="number"  pattern="[\s\S]{0,5}"  messageWhenPatternMismatch="Max 5 characters"
+		value="{!data.CMO_Total_Enrollment__c}"/>
+                            </td>
+                            
+                            <td data-label="Delete" >
+                                <br/>
+                                <button class="slds-button slds-button_destructive" id="{!data.School_Number_From_PQ__c}" onclick="{!c.deleteSchool}">X</button>
+                            </td>
+                        </tr>
+                    
+                </aura:iteration>
+                </tbody>
+            </table>
+        </div>
+        <br/>
+        <div class="slds-align_absolute-center">
+            <lightning:button class="slds-button_neutral" label="Add Another School" onclick="{!c.handleNewSchoolRecord}" />
+
+        </div>
+    </div>
+
+    <!-- lightning:button variant="brand" label="Return" onclick="{!c.handleReturn}"/> -->
+    <!-- lightning:button variant="brand" label="Save Schools" onclick="{!c.handleSaveAndSubmit}" /> -->
+
+    <!--Modal msg-->
+    <aura:if isTrue="{!v.isOpen}">
+
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium" align="center">
+                    <p>
+                        <b>
+                                {!v.modalMessage}
+                        </b>
+                    </p>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning:button variant="destructive" label="Close" onclick="{!c.closeModel}"/>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    <!--Modal msg-->
+
+
+</aura:component>

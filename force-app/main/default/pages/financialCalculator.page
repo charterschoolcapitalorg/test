@@ -1,0 +1,34 @@
+<apex:page standardController="Opportunity" extensions="FinancialCalcController" lightningStylesheets="true">
+  <apex:sectionHeader title="Calculate Receivable" subtitle="Financial Calculator"/>
+    <apex:pageMessages id="pageMess" />
+    <apex:form id="form1">
+        <apex:pageBlock >
+            <apex:pageBlockSection title="Funding Estimate - Calculated Receivables Preview" columns="1" collapsible="false">
+                 <apex:pageBlockTable value="{!receivableToInsert}" var="row">
+                    <apex:column value="{!row.Opp_School__r.School__r.Name}" />
+                    <apex:column value="{!row.Name}" />
+                    <apex:column value="{!row.GRV_Amount__c}" />
+                    <apex:column value="{!row.Expected_Pay_Date__c}" />
+                    <apex:column value="{!row.Initial_Purchase_Factor__c}" />
+                    <apex:column value="{!row.Already_Purchased__c}" /> 
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Quick Amortization Tool" columns="1" collapsible="false">
+                <apex:selectList id="amortOptions" label="Starting Receivable" value="{!startingPayDate}" size="1" title="amortOptions">
+                    <apex:selectOptions value="{!amortOptions}"></apex:selectOptions>
+                </apex:selectList>
+                <apex:inputText label="Starting IPF" value="{!startingIPF}" disabled="{!disableButtons}"/>
+                <apex:inputText label="Number of Receivables to Amortize" value="{!ipfDuration}" disabled="{!disableButtons}"/>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="" />
+                    <apex:commandButton action="{!applyAmortization}" rerender="form1,pageMess" value="Apply Amortization" disabled="{!disableButtons}"/>
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!saveReceivables}" value="Create Funding Estimate" tabindex="1" disabled="{!disableButtons}"/>
+                <apex:commandButton action="{!cancel}" value="Return to Opportunity" tabindex="1" disabled="{!disableButtons}"/>
+            </apex:pageBlockButtons> 
+            <apex:actionstatus id="savestatus" startText="saving..."/>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

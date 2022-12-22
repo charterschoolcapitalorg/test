@@ -1,0 +1,54 @@
+<!-- 2014.10.07 J Caughie - Added Face Value to the VF Page  -->
+
+<apex:page standardController="Opportunity" extensions="AddOppRelatedRecordsController" action="{!init}" docType="html-5.0">
+	<apex:includeScript value="{!URLFOR($Resource.CSC, 'js/jquery-1.9.1.min.js')}" />
+	<apex:includeScript value="{!URLFOR($Resource.CSC, 'js/addOppRelatedRecords.js')}" />
+	<apex:stylesheet value="{!URLFOR($Resource.CSC, 'css/addOppRelatedRecords.css')}" />
+	
+	<apex:pageMessages id="messages" />
+	<apex:form >
+		<apex:pageBlock title="Add Opportunity Related Records" mode="edit">
+			<apex:pageBlockButtons >
+				<apex:commandButton value="Save" action="{!save}" />
+				<apex:commandButton value="Cancel" action="{!cancel}" />
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection title="Opportunity Details" columns="2">
+				<apex:outputField value="{!Opportunity.Name}" />
+				<apex:outputField value="{!Opportunity.AccountId}" />
+			</apex:pageBlockSection>
+			<!--
+			<apex:pageBlockSection title="RPAs" columns="1">
+				<apex:inputHidden id="rpaId" value="{!Opportunity.RPA__c}" />
+				<apex:pageMessage severity="info" strength="3" title="No active RPA records were found." rendered="{!rpas.size == 0}" />
+				<apex:pageBlockTable value="{!rpas}" var="rpa" rendered="{!rpas.size > 0}">
+					<apex:column >
+						<input type="radio" name="rpaId" class="rpaRadio" value="{!rpa.Id}" data-hidden-field="{!$Component.rpaId}" />
+					</apex:column>
+					<apex:column value="{!rpa.Name}" />
+					<apex:column value="{!rpa.RPA_Date__c}" />
+					<apex:column value="{!rpa.RPA_Type__c}" />
+					<apex:column value="{!rpa.Status__c}" />
+				</apex:pageBlockTable>
+			</apex:pageBlockSection>
+			-->
+			<apex:pageBlockSection title="Terms Letters" columns="1">
+				<apex:inputHidden id="tlId" value="{!Opportunity.Terms_Letter__c}" />
+				<apex:pageMessage severity="info" strength="3" title="No active Terms Letter records were found." rendered="{!tls.size == 0}" />
+				<apex:pageBlockTable value="{!tls}" var="tl" rendered="{!tls.size > 0}">
+					<apex:column >
+						<input type="radio" name="tlId" class="tlRadio" value="{!tl.Id}" data-hidden-field="{!$Component.tlId}" />
+					</apex:column>
+					<apex:column value="{!tl.Name}" />
+					<apex:column value="{!tl.TL_Date__c}" />
+					<apex:column value="{!tl.Initial_Close_Date__c}" />
+					<apex:column value="{!tl.Termination_Date__c}" />
+					<apex:column value="{!tl.TL_Type__c}" />
+					<apex:column value="{!tl.RPA_Gross_Value__c}" />
+					<apex:column value="{!tl.RPA_Face_Value__c}" />						<!--2014.10.17 J Caughie - Addes as per SH request-->
+					<apex:column value="{!tl.Status__c}" />
+				</apex:pageBlockTable>
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+</apex:page>

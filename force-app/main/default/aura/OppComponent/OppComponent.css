@@ -1,0 +1,18 @@
+.THIS .data-column-one {
+    color:#a8ad00;
+    width:500px; 
+    height:50px;
+    vertical-align:middle;
+    line-height:50px;
+    padding-left:15px;
+    padding-right:20px;
+    background-color:#FFFFFF;
+}
+.THIS .data-column-two {
+    width:150px; 
+    height:50px;
+    vertical-align:middle;
+    line-height:50px;
+    padding-right:20px;
+    background-color:#FFFFFF;
+}

@@ -1,0 +1,122 @@
+<apex:component >
+ <apex:attribute name="l" type="SmartLeadSearchExtension" description="instance of class" />    
+ <apex:attribute name="LeadPageCalling" assignTo="{!LeadPageCalling}" type="String" description="This parameter to show buttons or not"/>
+<script>
+
+ 
+    function sortLeadDataJS(sortField) {
+            var txtLeadFirstName = '{!l.leadFirstNameToSearch}';//document.getElementById("pg:frm:txtLeadFName").value;
+            var txtLeadLastName = '{l.!leadLastNameToSearch}';//document.getElementById("pg:frm:txtLeadLName").value;
+            var txtLeadEmailToSearch = '{!l.leadEmail}';//document.getElementById("pg:frm:txtLeadEmail").value;
+            
+            var isValid = 'No';
+               
+        if(fncTrim(txtLeadFirstName).length >= searchCharacterLimit){
+           isValid = 'Yes';
+        }
+       
+        if(fncTrim(txtLeadLastName).length >= searchCharacterLimit){
+           isValid = 'Yes';
+        }
+        if(fncTrim(txtLeadEmailToSearch).length >= searchCharacterLimit){
+           isValid = 'Yes';
+        }
+        if(isValid == 'Yes') {
+            sortLeadData(sortField);
+        }
+    }
+    function createNewLead(){
+       if({!l.isDuplicatePermission}==true){         
+        var txtLeadFirstName     = encodeURIComponent('{!l.leadFirstNameToSearch}');
+        var txtLeadLastName      = encodeURIComponent('{!l.leadLastNameToSearch}');
+        var txtLeadEmailToSearch = encodeURIComponent('{!l.leadEmail}');
+        var txtLeadCompany = encodeURIComponent('{!l.leadCompany}');        
+        if(txtLeadFirstName != '' && txtLeadLastName != '' && txtLeadEmailToSearch != '' && txtLeadCompany != ''){
+        window.location.href = "../{!l.leadPrefix}/e?retURL={!$Page.SmartLeadSearch}&nooverride=1"
+                             + "&name_firstlea2=" + txtLeadFirstName
+                             + "&name_lastlea2="  + txtLeadLastName
+                             + "&lea11="          + txtLeadEmailToSearch
+                             + "&lea3="          + txtLeadCompany
+                             ;
+        }
+        return false;
+        }
+        else{
+            alert('You do not have rights to create duplicate Leads,Please contact system administrator');
+             return false;
+        }
+    }
+</script>
+<apex:actionFunction action="{!l.sortData}" name="sortLeadData" reRender="resultBlock,pnlDisplayMsg" status="status" >
+    <apex:param name="sortField" assignTo="{!l.sortField}" value="" />
+</apex:actionFunction>
+
+<apex:actionFunction name="nextLeadPage" action="{!l.nextLeadPage}" reRender="resultBlock,pnlDisplayMsg" status="status" />
+<apex:actionFunction name="previousLeadPage" action="{!l.previousLeadPage}" reRender="resultBlock,pnlDisplayMsg" status="status" />
+
+<apex:outputPanel id="pnlDisplayMsg">
+    <apex:pageMessages />
+</apex:outputPanel>
+
+<apex:pageBlock id="resultBlock" title="Leads {!IF((l.searchCount==0), '', ' [' + TEXT(l.searchCount) + ']')}">
+    <apex:pageBlockButtons rendered="{!l.ShowLeadButtons}" >
+            <apex:commandButton value="{!$Label.New_Lead}" onclick="return createNewLead();" disabled="{!IF(l.showLeadButton = true, false, true)}"/>
+        <apex:commandButton action="{!l.cancel}" value="{!$Label.Cancel}"  onclick="return goToBack();"/>        
+        <apex:actionStatus id="status">
+                <apex:facet name="start">
+                  <span style="color:red;">{!$Label.Loading}</span> <img src="/img/loading.gif" />
+                </apex:facet>
+            </apex:actionStatus>            
+    </apex:pageBlockButtons>
+    <apex:pageBlockTable value="{!l.leads}" var="leadObj">
+            <apex:repeat value="{!$ObjectType.Lead.FieldSets.lead_search_result}" var="item" >
+                <apex:column headerValue="{!$ObjectType.Lead.Fields[item].label}" >
+                    <apex:variable value="{!$ObjectType.Lead.Fields[item].Name}" var="fieldAPIName2"/>
+                    <apex:outputLink value="/{!leadObj.Id}" target="_blank" rendered="{!IF(fieldAPIName2='Name',true,false)}">{!leadObj.Name}</apex:outputLink>
+                    <apex:outputlabel value="{!leadObj[item]}" rendered="{!IF(fieldAPIName2 <>'Name',true,false)}"/>
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                        <apex:variable value="{!$ObjectType.Lead.Fields[item].Name}" var="fieldAPIName"/>
+                            <apex:outputLink value="javascript:void(0);" onclick="sortLeadDataJS('{!$ObjectType.Lead.Fields[item].Name}');">{!$ObjectType.Lead.Fields[item].label}
+                                <img src="{!IF(l.sortField = fieldAPIName,IF(l.isAsc = true,'/img/sort_asc_arrow.gif','/img/sort_desc_arrow.gif'),'/s.gif')}" />
+                            </apex:outputLink>                                                              
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:column>
+            </apex:repeat>
+            <apex:column headerValue="{!$ObjectType.Lead.Fields.OwnerId.Label}">
+                    <apex:outputlabel value="{!leadObj.Owner.Name}"/>
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:outputLink value="javascript:void(0);" onclick="sortLeadDataJS('Owner.Name');">{!$ObjectType.Lead.Fields.OwnerId.Label}
+                                <img src="{!IF(l.sortField = 'Owner.Name',IF(l.isAsc = true,'/img/sort_asc_arrow.gif','/img/sort_desc_arrow.gif'),'/s.gif')}" />    
+                            </apex:outputLink>                                                              
+                        </apex:outputPanel>
+                    </apex:facet>
+            </apex:column>
+    </apex:pageBlockTable>
+    
+    <apex:outputPanel id="errorBlock" rendered="{!(l.searchCount==0)}"><span style="color:red;">{!l.searchStatus}</span></apex:outputPanel>
+     <apex:outputPanel rendered="{!NOT(l.searchCount==0)}">
+                 <hr/>
+                 <table width="100%" >
+                  <tr>
+                   <td align="left" width="33%">
+                        <div id="pagelinkblock" >
+                           <div id="curstate"> {!l.showingFrom}-{!l.showingTo} of {!l.totalResults} </div>
+                        </div>
+                   </td>
+                   <td align="center" width="33%" style="vertical-align:middle;">
+                       <apex:outputLink value="javascript:void(0);"  rendered="{!l.hasPrevious}" onclick="previousLeadPage();">&lt;&lt;{!$Label.Previous}</apex:outputLink>
+                       <span id="div_mid1" >&nbsp;<apex:outputLabel rendered="{!l.hasPrevious && l.hasNext}" value="|"  /> &nbsp;</span>
+                        <apex:outputLink value="javascript:void(0);" rendered="{!l.hasNext}" onclick="nextLeadPage();">Next&gt;&gt;</apex:outputLink>
+                   </td>   
+                   <td align="right" width="33%" style="vertical-align:middle;">
+                        <div id="pagenumber"> {!$Label.Page} &nbsp;<apex:inputText value="{!l.requestedPage}" style="width:40px"/> of {!l.totalPage} <apex:commandButton value="Go" action="{!l.requestedLeadPage}" reRender="resultBlock,pnlDisplayMsg" status="status" /></div>
+                   </td>
+                 </tr>
+                </table> 
+    </apex:outputPanel>
+  </apex:pageBlock>
+
+</apex:component>

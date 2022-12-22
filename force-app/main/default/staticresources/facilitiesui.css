@@ -1,0 +1,62 @@
+.myBtn  {
+    width: 100px;
+    height: 10px;
+}
+.mySubrowHeader {
+    background-color:#00558C;
+    margin-top:5px;
+	margin-bottom:5px;
+	color:#FFFFFF;
+}
+.buildingHeader {
+    font-size: 15px; 
+	padding-left:12px;
+	vertical-align:middle;
+}
+.header-column-noleft {
+    vertical-align:middle;
+}
+.small {
+    vertical-align:middle;
+    width:125px;
+}
+.header-column-small {
+    vertical-align:middle;
+    width:125px;
+}
+
+.header-column-status {
+    vertical-align:middle;
+    width:175px;
+}
+
+.header-column-comments {
+    vertical-align:middle;
+    width:250px;
+}
+.header-column {
+    vertical-align:middle;
+    padding-left:12px;
+}
+.header-column-one {
+    vertical-align:middle;
+    padding-left:12px;
+	width:200px;
+}
+.header-data {
+    padding-left:12px;
+    background-color:#FFFFFF;
+	vertical-align:middle;
+}
+.myPLShort  {
+    width: 130px;
+    font-size: 12px;
+    text-align: center;
+}
+.myBtnShort  {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+    text-align: center;
+}
+

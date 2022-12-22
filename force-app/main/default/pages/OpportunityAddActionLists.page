@@ -1,0 +1,5 @@
+<!-- VF Page for button to add all Sales Process checklist automatically -->
+
+<apex:page standardController="Opportunity" extensions="OpportunityAddActionLists" action="{!addActionLists}">
+
+</apex:page>

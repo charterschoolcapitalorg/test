@@ -1,0 +1,105 @@
+<apex:page standardController="FC_Details__c" extensions="FCFormHeaderController" showHeader="false" >
+<apex:form >
+
+           <apex:outputText value="Other FC Details for Opportunity <b>{!currentOpportunity}</b>:" escape="false"/>&nbsp;&nbsp;
+           <apex:selectList value="{!selectedOtherFCDetails}" size="1" onchange="window.open('/' + this.value, '_target').focus();">    
+              <apex:selectOptions value="{!otherFCDetailsOptions}"/>
+           </apex:selectList>
+           
+           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <br/><br/> 
+           <apex:outputText value="Other FC Details for School <b>{!currentSchool}</b>:" escape="false" rendered="{!showPreviousFCDetailsSelectlist}"/>&nbsp;&nbsp;
+           <apex:selectList value="{!selectedPreviousFCDetails}" size="1" onchange="window.open('/' + this.value, '_target').focus();" rendered="{!showPreviousFCDetailsSelectlist}">    
+              <apex:selectOptions value="{!previousFCDetailsOptions}"/>
+           </apex:selectList>           
+           <br/><br/> 
+
+
+     <apex:pageMessages />
+
+     <!--  View Mode  -->   
+     <apex:pageBlock title="{!fcDetails.FC_Form__r.Name}" rendered="{!NOT(isEditMode)}">
+
+      <apex:pageBlockButtons >
+         <apex:commandButton action="{!edit}" value="Edit" style="width:50px;" />
+      </apex:pageBlockButtons>
+
+      <apex:pageBlockSection columns="2" collapsible="false" title="Summary" rendered="{!recordTypeName='Summary'}">
+          <apex:outputText label="Name" value="{!summaryFCForm.Name}" /> 
+          <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.Summary_Header}" var="f">
+              <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!summaryFCForm[f]}" escape="false"/>
+          </apex:repeat>
+      </apex:pageBlockSection>
+          
+
+      <apex:pageBlockSection columns="2" collapsible="false" title="Finance" rendered="{!recordTypeName='Finance'}">
+          <apex:outputText label="Name" value="{!financeFCForm.Name}" /> 
+          <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.Finance_Header}" var="f">
+              <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!financeFCForm[f]}" escape="false"/>
+          </apex:repeat>
+      </apex:pageBlockSection>
+
+      <apex:pageBlockSection columns="2" collapsible="false" title="Underwriting" rendered="{!recordTypeName='Underwriting'}">
+          <apex:outputText label="Name" value="{!underwritingFCForm.Name}" />      
+          <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.UW_Header}" var="f">
+              <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!underwritingFCForm[f]}" escape="false"/>
+          </apex:repeat>
+      </apex:pageBlockSection>
+
+
+      <apex:pageBlockSection columns="2" collapsible="false" title="Servicing" rendered="{!recordTypeName='Servicing'}">
+          <apex:outputText label="Name" value="{!servicingFCForm.Name}" />      
+          <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.Servicing_Header}" var="f">
+              <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!servicingFCForm[f]}" escape="false"/>
+          </apex:repeat>
+      </apex:pageBlockSection>
+
+
+     </apex:pageBlock> 
+     
+     <!--  Edit Mode  -->   
+     <apex:pageBlock title="{!fcDetails.FC_Form__r.Name}" rendered="{!isEditMode}">
+
+      <apex:pageBlockButtons >
+         <apex:commandButton action="{!save}" value="Save" style="width:50px;" />
+         <apex:commandButton action="{!cancel}" value="Cancel" style="width:50px;" />
+      </apex:pageBlockButtons>
+
+      <apex:pageBlockSection columns="2" collapsible="false" title="Summary" rendered="{!recordTypeName='Summary'}">
+          <apex:outputText label="Name" value="{!summaryFCForm.Name}" /> 
+          <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.Summary_Header}" var="f">
+              <apex:inputField label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!summaryFCForm[f]}" />
+          </apex:repeat>
+      </apex:pageBlockSection>
+          
+
+      <apex:pageBlockSection columns="2" collapsible="false" title="Finance" rendered="{!recordTypeName='Finance'}">
+          <apex:outputText label="Name" value="{!financeFCForm.Name}" /> 
+          <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.Finance_Header}" var="f">
+              <apex:inputField label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!financeFCForm[f]}" />
+          </apex:repeat>
+      </apex:pageBlockSection>
+
+      <apex:pageBlockSection columns="2" collapsible="false" title="Underwriting" rendered="{!recordTypeName='Underwriting'}">
+          <apex:outputText label="Name" value="{!underwritingFCForm.Name}" />      
+          <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.UW_Header}" var="f">
+              <apex:inputField label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!underwritingFCForm[f]}" />
+          </apex:repeat>
+      </apex:pageBlockSection>
+
+
+      <apex:pageBlockSection columns="2" collapsible="false" title="Servicing" rendered="{!recordTypeName='Servicing'}">
+          <apex:outputText label="Name" value="{!servicingFCForm.Name}" />      
+          <apex:repeat value="{!$ObjectType.FC_Form__c.FieldSets.Servicing_Header}" var="f">
+              <apex:outputText label="{!$ObjectType.FC_Form__c.Fields[f].label}" value="{!servicingFCForm[f]}" />
+          </apex:repeat>
+      </apex:pageBlockSection>
+
+
+     </apex:pageBlock>      
+     
+     
+     
+     
+</apex:form>     
+</apex:page>

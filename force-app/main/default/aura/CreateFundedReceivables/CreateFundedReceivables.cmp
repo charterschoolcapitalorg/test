@@ -1,0 +1,22 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="CreateFundedReceivablesCtrl">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="fundingEstimate" type="Funding_Estimates__c" />
+    <aura:attribute name="oppId" type="String" />
+    <aura:attribute name="step" type="string" default="0"/>
+    <aura:attribute name="buttonDisabled" type="Boolean" default="false"/>
+    
+    <lightning:notificationsLibrary aura:id="notificationsLibrary"/>
+    <!-- <lightning:flow aura:id="flowData" onstatuschange="{!c.handleStatusChange}" /> -->
+    <aura:if isTrue="{!v.step=='1'}">
+        <div>
+            <p><h1 sytle="font-size:18pt;">{!v.fundingEstimate.Opportunity__r.Name}</h1></p>
+            <br/>
+            <p>Do you wish to purchase the receivables for this funding estimate?</p>
+        </div>
+        <div class="slds-m-top_large slds-float--left" aura:id="buttons">
+            <lightning:button class="slds-m-top_small" variant="Destructive" label="No" onclick="{!c.handleOnCancel}" disabled="{!v.buttonDisabled}"/>
+            <lightning:button class="slds-m-top_small" variant="Success" label="Yes" onclick="{!c.handleOnProceed}" disabled="{!v.buttonDisabled}"/>
+        </div>
+    </aura:if>
+</aura:component>

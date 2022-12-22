@@ -1,0 +1,15 @@
+<aura:component controller="CreateFacilitiesObjectsCtrl">
+    <aura:attribute name="LeaseCompliance" type="Lease_Compliance__c" default="{'sobjectType':'Lease_Compliance__c','Type__c': ''}"/>
+    <aura:attribute name="Lease" type="Lease__c" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:attribute name="recTypeId" type="Id" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="LCT" type="Lease_Compliance_Template__c" />
+    
+    Please select the Lease Compliance Type:
+    <force:inputField aura:id="lt" value="{!v.LeaseCompliance.Type__c}"/>
+	
+    <lightning:button label="Go"  onclick="{!c.newLeaseCompliance}"/> 
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+</aura:component>

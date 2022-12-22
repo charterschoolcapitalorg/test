@@ -1,0 +1,57 @@
+<apex:page standardController="Account" >
+    <style>
+	#bPageBlock {
+        outline: none;
+		border-top: 0px;
+        border: none;
+        z-index:-1;
+     	background-color: yellow;
+	}
+        .cuf-scroller-outside {
+            background-color: yellow;
+        	!important; 
+        }
+		.cuf-content {
+            padding: 0 0rem !important;
+        }
+    #LightningComponentid {
+
+	}
+</style>
+
+  <div id="LightningComponentid" >
+  </div>
+    
+ <apex:includeLightning />
+ <apex:includeScript value="/lightning/lightning.out.js" />
+ 
+    
+    <script>
+    console.log('in VF page');
+    //var size = window.screen.availHeight;
+    var size = window.innerHeight;
+    console.log('height: ' + size);
+    var elem =document.getElementById("LightningComponentid");
+    console.log('elem: ' + elem.style.height);
+    elem.style.height = (size-10)+"px";
+    //elem.style.height = (size-228)+"px";
+    //elem.style.height = "100%";
+    
+    console.log('elem after: ' + elem.style.height);
+    
+    $Lightning.use("c:FinancialUIApp", function() {
+        var theme = "{!$User.UITheme}";
+        console.log('uitheme - ' + theme);
+        $Lightning.createComponent("c:FinancialUI",
+          { 
+            recordId :"{!$CurrentPage.Parameters.id}",
+            theme : theme
+          },
+          "LightningComponentid",
+          function(cmp) {
+             console.log('Display Lightning component in visualforce page');
+          });
+    });
+    </script>
+    
+</apex:page>

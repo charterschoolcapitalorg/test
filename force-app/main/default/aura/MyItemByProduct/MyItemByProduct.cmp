@@ -1,0 +1,165 @@
+<aura:component controller="UploadTableCtlr" implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+    <ltng:require styles="{! $Resource.Bootstrap4_1 + '/css/bootstrap.min.css'}" 
+      scripts="{!join(',', 
+        $Resource.jQuery172 )
+      }" afterScriptsLoaded="{!c.scriptsLoaded}"/>
+    
+    <ltng:require styles="{! $Resource.select2 + '/select2-4.0.3/dist/css/select2.min.css'}" 
+      scripts="{! $Resource.select2 + '/select2-4.0.3/dist/js/select2.js'}" 
+      afterScriptsLoaded="{!c.scriptsLoaded2}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="showList" type="Boolean" default="false"/>
+    <aura:attribute name="iName" type="String" />
+    <aura:attribute name="status" type="String" /> 
+    <aura:attribute name="iRecType" type="String" />
+    <aura:attribute name="hasChildren" type="Boolean" />
+    <aura:attribute name="iAction" type="String" />
+    <aura:attribute name="isDocument" type="Boolean" />
+    <aura:attribute name="intakeItems" type="Intake_Item__c[]"/>
+    <aura:attribute name="selectedIds" type="String" default=""/>
+    <aura:attribute name="fileNames" type="String" default="" />
+    <aura:attribute name="firstId" type="String" default="" />
+    <aura:attribute name="bulkDisable" type="Boolean" default="false" />
+    <aura:attribute name="itemHasRedFlag" type="Boolean" default="false" />
+    <aura:attribute name="currDateValue" type="String" default=""/>
+    <aura:attribute name="rowcount" type="String" />            
+    <aura:attribute name="fundRectType" type="Id" />
+    <aura:attribute name="facRecType" type="Id" />
+    <aura:attribute name="isParentChecked" type="Boolean" default="false" />
+    
+    <aura:attribute name="cmoids" type="String[]" />
+    <aura:attribute name="statusfilter" type="String" />  
+    
+    <aura:registerEvent name="selectChecked" type="c:SelectAllChecked"/>
+    <aura:registerEvent name="selectUnChecked" type="c:SelectAllUnChecked"/>
+    
+    <aura:handler name="rowEvent" event="c:UploadTableRowEvent" action="{!c.setSelectedIds}"/>
+    <aura:handler name="docUploaded" event="c:FireDocUpload" action="{!c.handleDocUploaded}"/>
+    <aura:handler name="hasredflag" event="c:FireRedFlagEvent" action="{!c.handleRedFlag}"/>
+    
+    <aura:attribute name="childChecked" default="false" type="Boolean"/>    
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    
+    
+  	<!--loading spinner start... style=Brand Medium (blue dots)-->
+     <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+           <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+             <span class="slds-assistive-text">Loading</span>
+             <div class="slds-spinner__dot-a"></div>
+             <div class="slds-spinner__dot-b"></div>
+           </div>
+        </div>
+     </aura:if>
+    
+    <div style="margin-left:15px;">
+        
+        <div class="mySubrowHeader" style="background-color:#77C5D5;">
+          	<section class="slds-clearfix " >    <!-- margin-top:10px;  -->  
+                <lightning:layout multipleRows="false" class="mySubrowHeaderTotal">
+                	<lightning:layoutItem  size="12" mediumDeviceSize="12" class="mySubrowHeaderName" >
+                        
+                        <div class="slds-float--left" style="width:25px;margin-top:-3px;">
+                            <lightning:button  variant="base" class="opener" aura:id="opener"  iconName="utility:add" iconPosition="left" onclick="{!c.toggleSection}" /> 
+                        </div>
+                        <!-- style="margin-top:1px;vertical-align:middle;" -->
+                        <div aura:id="myRow" class="slds-text-title_caps" style="margin-top:7px;" >
+                            <!-- padding: 5px 0; -->
+                            
+                            <div style="">
+                                        {!v.iName}                             
+                            </div>
+                        </div>
+                    </lightning:layoutItem>
+                    
+                    <lightning:layoutItem  size="12" mediumDeviceSize="12" class="mySubrowHeaderStatus" >
+                        <div  class="slds-text-title_caps" style="margin-top:2px;" >
+                            <div style="padding: 5px 0;">
+                                 <div class="slds-text-title_caps " style="text-align:left;" >
+                                            {!(v.status=='Pending' ? 'Action Required' : v.status)}&nbsp;&nbsp;
+                                 </div>
+                            </div>
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                            
+          	</section>
+        </div>
+        
+        <div style="margin-left:20px;margin-top:10px;" >
+            <aura:if isTrue="{!v.showList == true}">
+                	
+                	<lightning:layout multipleRows="false" class="mySubrowHeader2">
+                       
+                        <lightning:layoutItem size="12"  class="header-column-small">
+                            <span style="vertical-align:middle;">
+                                 
+                            	<lightning:input type="checkbox" value="{!v.intakeItem.Id}" checked="{!v.isParentChecked}" onchange="{!c.handleCheck}"/>
+                            </span>
+                            
+                        </lightning:layoutItem>  
+                        
+                        <lightning:layoutItem size="12"  class="header-column-two"><span style="vertical-align:middle;">PROJECT</span></lightning:layoutItem>
+                        <lightning:layoutItem size="12"  class="header-column-due"><span style="vertical-align:middle;">DUE DATE</span></lightning:layoutItem>
+                        <lightning:layoutItem size="12" class="header-column"><span style="vertical-align:middle;">STATUS</span></lightning:layoutItem>
+                        <aura:if isTrue="{!or(v.isDocument,and(v.iAction!=null,v.iAction=='Custom Form'))}">
+                            
+                        	<lightning:layoutItem size="12" class="header-column-comments"><span style="vertical-align:middle;">CLIENT COMMENTS</span></lightning:layoutItem>    
+                        	<aura:set attribute="else">
+                                
+                                <lightning:layoutItem size="12" class="header-column-comments-large"><span style="vertical-align:middle;">CLIENT COMMENTS</span></lightning:layoutItem>    
+                            </aura:set>
+                        </aura:if>
+                        
+                        <aura:if isTrue="{!or(v.isDocument,and(v.iAction!=null,v.iAction=='Custom Form'))}">
+                        	<lightning:layoutItem size="12" class="header-column-action"><span style="vertical-align:middle;padding-left:15px;">ACTION</span></lightning:layoutItem>	
+                        </aura:if>
+                        <lightning:layoutItem size="12" class="header-column-preview"><span style="vertical-align:middle;=">REVIEW FILE</span></lightning:layoutItem>
+                		<lightning:layoutItem size="12" class="header-column-assigned"><span style="vertical-align:middle;=">ASSIGNED TO</span></lightning:layoutItem>
+                        
+                    </lightning:layout>
+                    
+
+                    <aura:iteration items="{!v.intakeItems}" var="i" indexVar="idx">
+                        <aura:if isTrue="{!!v.hasChildren}">
+                        		<c:MyOppsByItem   fundRectType="{!v.fundRectType}" facRecType="{!v.facRecType}" idx="{!idx}" intakeItem="{!i}" hasChildren="{v.hasChildren}"/>
+                        </aura:if>
+                	</aura:iteration>
+             
+                	<br/>
+                
+                		<lightning:layout multipleRows="false" >
+                            <lightning:layoutItem size="12" class="blank-header-column" mediumDeviceSize="12" >
+                                <span style="vertical-align:left;">
+                                <aura:if isTrue="{!and(v.iAction=='Edit Item Details',!v.isDocument)}">
+                                        
+                                    	<lightning:button disabled="{!v.bulkDisable}" label="Approve Selected" variant="neutral" onclick="{!c.approveSelected}" />
+                                    	<lightning:button disabled="{!v.bulkDisable}" label="Download Selected" variant="neutral" onclick="{!c.downloadSelected}" />
+                                    <aura:set attribute="else">
+                                        
+                                        <aura:if isTrue="{!(v.isDocument)}">
+                                        <lightning:fileUpload  name="fileUploader"
+                                                       label="UPLOAD TO SELECTED"
+                                                       class="uploadAll"                                                                       
+                                                       multiple="false"
+                                                       accept="{!v.accept}"
+                                                       disabled="{!v.bulkDisable}"
+                                                       recordId="{!v.firstId}"
+                                                       onuploadfinished="{! c.handleBulkUploadFinished }"/>
+                                        </aura:if>
+                                    </aura:set>
+                                </aura:if>
+                                                            
+                                
+                                    </span>
+                            </lightning:layoutItem>	
+                              
+                        </lightning:layout>
+                	
+                
+            </aura:if>
+        </div>
+    </div>
+    
+</aura:component>

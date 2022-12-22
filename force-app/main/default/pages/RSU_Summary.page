@@ -1,0 +1,62 @@
+<apex:page standardController="Account" extensions="RSUSummaryController" recordSetVar="accounts" lightningStylesheets="true">
+<apex:form id="form">
+    <!-- <apex:actionFunction name="updateBalance" action="{!updateBalance}" onComplete="onCompleteUpdateBalance()" rerender="form"/> -->
+    <!-- <apex:actionFunction name="createRSUSummary" action="{!createRSUSummary}" onComplete="onCompleteCreateRSU(); return false;" /> -->
+    <apex:sectionHeader title="RSU Summary"/>
+    <apex:pageMessages />
+    <apex:PageBlock >
+        <apex:pageblockButtons location="bottom">
+            <!-- <apex:commandButton value="Update Balance" onClick="validateUpdateBalance(); return false;"/> -->
+            <!-- <apex:commandButton value="Create RSU Summary Report" styleClass="btnDisabled rsu" onClick="validateCreate(this);return false;" rerender="form"/>  -->
+            <apex:commandButton value="Create RSU Summary Report" action="{!rsuGeneration}"/> 
+        </apex:pageblockButtons>
+        <apex:pageBlockSection title="Enter Start and End Date" collapsible="false">
+            <apex:inputField value="{!rsuDateSetting.Start_Date__c}" showDatePicker="true" required="true"/>
+            <apex:inputField value="{!rsuDateSetting.End_Date__c}" showDatePicker="true" required="true"/>
+        </apex:pageBlockSection>
+    </apex:PageBlock>
+</apex:form>
+
+<!-- <script src="{!URLFOR($Resource.JQuery, 'js/jquery-1.9.1.min.js')}"/> -->
+<!-- <script> -->
+    <!-- var j$ = jQuery.noConflict(); -->
+
+    <!-- var validateCreate = function(button){
+        if(!j$(button).hasClass("btnDisabled")){
+            createRSUSummary();
+        }
+    } -->
+
+    <!-- var validateUpdateBalance = function(){
+        var isValid = true;
+        j$(".inputDate").each(function(){
+            if(j$(this).val() == ''){
+                isValid = false;
+            }
+        });
+
+        if(isValid){
+            updateBalance();
+        }else{
+            alert('Both Start and End Dates are required to initiate the process.');
+        }
+    } -->
+
+    <!-- var disableCreateRSU = function(){
+        j$(".rsu").removeClass("btn");
+        j$(".rsu").addClass("btnDisabled");
+
+    } -->
+
+    <!-- var onCompleteUpdateBalance = function(){
+        j$(".rsu").addClass("btn");
+        j$(".rsu").removeClass("btnDisabled");
+
+    } -->
+
+    <!-- var onCompleteCreateRSU = function(){
+        alert('RSU Summary report for selected Charter Holder Accounts has been generated and attached to respective Accounts.');
+        return false;
+    } -->
+<!-- </script> -->
+</apex:page>

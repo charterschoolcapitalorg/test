@@ -1,0 +1,22 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global" >
+    <div class="slds-text-align_center footer">
+        
+        <div class="copyright">
+            <br/>
+            Copyright © 2019 Charter School Capital, Inc. All Rights Reserved.
+            <br />
+            CHARTER SCHOOL CAPITAL And Related Logos Are Trademarks Of Charter School Capital, Inc. 
+            <br/>
+            <br/>
+        </div>
+        <!-- display footer menu -->
+            <div class="menu-footer">
+
+                        <a href="https://charterschoolcapital.com/terms-of-use/">Terms of Use </a>
+						|
+                        <a href="https://charterschoolcapital.com/privacy-policy/"> Privacy Policy</a>
+
+            </div>                
+        <br />
+    </div>
+</aura:component>

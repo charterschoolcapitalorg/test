@@ -1,0 +1,20 @@
+<aura:component controller="IntakeCommunityItemsCtrl" implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <aura:attribute name="rectypelist" type="ItemsByOppRecType" />
+    <aura:attribute name="cmoaccounts" type="CMOAccounts[]" default="[]" />
+    <aura:attribute name="statusfilter" type="String" default="Pending" />
+    <aura:attribute name="cmoIdsSelected" type="String[]" default="[]" />
+
+    <aura:handler action="{!c.handleFilterChange}" event="c:ItemFilterChange" name="filterChange"/>
+
+    <c:ItemFilter cmoaccounts="{!v.cmoaccounts}" statusfilter="{!v.statusfilter}" />
+
+    <br/>
+
+    <aura:iteration items="{!v.rectypelist}" var="o">	
+        <c:MyProduct recordType="{!o}" cmoids="{!v.cmoIdsSelected}" statusfilter="{!v.statusfilter}"/> 
+    </aura:iteration>  
+
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+</aura:component>

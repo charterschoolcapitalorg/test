@@ -1,0 +1,16 @@
+.THIS .background {
+    background-color:#00558C;
+    color:#ffffff;
+}
+.THIS .large {
+    font-size:18px;
+}
+.THIS .center {
+    text-align: center;
+    text-decoration:underline;  
+    color:blue;
+}
+.THIS .centernolink {
+    text-align: center;
+    color:blue;
+}

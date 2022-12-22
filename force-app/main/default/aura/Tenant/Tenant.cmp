@@ -1,0 +1,22 @@
+<aura:component >
+    <aura:attribute name="Tenant" type="Tenant__c" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+	<lightning:layout verticalAlign="center" class="slds-border_bottom header-data" multipleRows="true" >
+        	
+            <div style="width:40px;vertical-align:middle;text-align:right;" >
+                    <a onclick="{!c.editTenant}" styleClass="btn ">Edit</a>
+            </div>
+            <lightning:layoutItem class="header-data"  size="3" >
+                <a  onclick="{!c.viewTenant}" styleClass="btn">{!v.Tenant.Name}</a>
+                </lightning:layoutItem>
+            <lightning:layoutItem class="header-data"  size="3" >
+                <a  onclick="{!c.editTenantAcct}" styleClass="btn">{!v.Tenant.Tenant__r.Name}</a>
+            </lightning:layoutItem>
+            <lightning:layoutItem class="header-data"  size="3" >
+                <lightning:formattedNumber value="{!v.Tenant.Management_Fee_as_of_School_Revenue__c/100}" style="percent"/>
+                </lightning:layoutItem>
+            <lightning:layoutItem class="header-data"  size="2" >{!v.Tenant.Primary_Tenant__r.Name}</lightning:layoutItem>
+        </lightning:layout>
+</aura:component>

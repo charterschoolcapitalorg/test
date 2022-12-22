@@ -1,0 +1,19 @@
+<template>
+  <lightning-card title="Funding Estimate Receivables" icon-name="custom:custom63">
+      <div class="slds-m-around_medium">
+          <template if:true={receivables.data}>
+              <lightning-datatable
+                  key-field="Id"
+                  data={receivables.data}
+                  columns={columns}
+                  onsave={handleSave}
+                  draft-values={draftValues}
+                  min-column-width="100">
+              </lightning-datatable>
+          </template>
+          <template if:true={receivables.error}>
+            An error occurred, please contact your Salesforce Admin.
+          </template>
+      </div>
+  </lightning-card>
+</template>

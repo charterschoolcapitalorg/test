@@ -1,0 +1,72 @@
+<aura:component controller="UploadTableCtlr" >
+	<aura:attribute name="intakeItem" type="Intake_Item__c" />
+    <aura:attribute name="accept" type="List" default="['.txt', '.rtf', '.pdf', '.jpg', '.png', '.xls', '.xlsx', '.docx', '.doc', '.zip']"/>
+    <aura:attribute name="selectedId" type="String" default=""/>
+    <aura:registerEvent name="rowEvent" type="c:UploadTableRowEvent"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="today" type="Date" />
+    <aura:registerEvent name="docUploaded" type="c:FireDocUpload"/>
+    <aura:registerEvent name="docUploadedToTop" type="c:FireDocUploadedToTop"/>
+    <aura:registerEvent name="hasredflag" type="c:FireRedFlagEvent"/>
+    
+    <lightning:layout multipleRows="true">
+        
+    <lightning:layoutItem size="3" mediumDeviceSize="1" class="small">  
+        
+    	<lightning:input type="checkbox" value="{!v.intakeItem.Id}" checked="false" onchange="{!c.handleCheck}"/>  	
+		
+    </lightning:layoutItem>
+    
+    
+    <lightning:layoutItem  size="6" mediumDeviceSize="3" class="data-column">
+        
+        <a onclick="{!c.FireOppEvent}" id="{!v.intakeItem.Id}" target="_blank" style="color:#a8ad00;">
+                              {!v.intakeItem.Opportunity__r.Client_Facing_Opportunity_Name__c}
+        </a>
+        <aura:if isTrue="{!v.intakeItem.Red_Flag_Instructions_For_Client__c}">
+			&nbsp;<img src="{!$Resource.RedFlag}" width="20" height="20"/>            
+        </aura:if>
+     </lightning:layoutItem>
+    
+    <lightning:layoutItem size="3" mediumDeviceSize="1" class="middle">
+        <span style="text-align:middle;">
+            <p>
+                <aura:if isTrue="{!v.intakeItem.Client_Due__c}"> 
+                	<ui:outputDate class="overdue" aura:id="dateColumn" value="{!v.intakeItem.Due_Date__c}" format="MMM d"/>
+                	<aura:set attribute="else">
+                        <ui:outputDate class="notoverdue" aura:id="dateColumn" value="{!v.intakeItem.Due_Date__c}" format="MMM d"/>
+                    </aura:set>
+                </aura:if>
+        	</p>
+        </span>    
+    </lightning:layoutItem>
+        
+    <lightning:layoutItem size="3" mediumDeviceSize="1" class="data-column">{!v.intakeItem.Status__c}</lightning:layoutItem>
+    <lightning:layoutItem size="3" mediumDeviceSize="3" class="data-column slds-truncate" title="{!v.intakeItem.Status_Reason__c}">{!v.intakeItem.Status_Reason__c}
+     |
+     <!-- a onclick="{!c.reviewfile}" styleClass="btn">Review</a>    -->
+        </lightning:layoutItem>
+        
+
+        
+    <lightning:layoutItem size="3" mediumDeviceSize="2" class="data-column">
+    	<lightning:fileUpload  name="fileUploader"
+                           class="uploader"                                                                       
+                           multiple="false"
+                           accept="{!v.accept}"
+                           disabled="false"
+                           recordId="{!v.intakeItem.Id}"
+                           onuploadfinished="{! c.handleSingleUploadFinished }"
+                           aura:id="singleFileUpload"/>
+        
+    </lightning:layoutItem>
+    <lightning:layoutItem size="3" mediumDeviceSize="1" class="data-column-instruction" aura:id="myRow">
+                    <span style="vertical-align:middle;">
+                    	<img src="{!$Resource.InfoDotGreen}" title="{!v.intakeItem.Comments__c}" width="30" height="30"/>
+                    </span>
+    </lightning:layoutItem> 
+        
+    
+    </lightning:layout>
+    
+</aura:component>

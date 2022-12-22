@@ -1,0 +1,4 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+	<aura:attribute name="header_text" type="String"/>
+    <div class="slds-m-around_medium text" style="margin-bottom:0px;">{!v.header_text}</div>
+</aura:component>

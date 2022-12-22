@@ -1,0 +1,61 @@
+.THIS .blank-header-column {
+   text-align:left;
+   font-size:1em;
+   height:30px;  
+   margin-bottom:10px;    
+}
+
+.THIS .blank-header-column-small {
+   
+   width:50px;  
+   text-align:left;
+   font-size:1em;
+   height:30px;
+   margin-bottom:10px; 
+   
+}
+.THIS .header-column {
+   text-align:left;
+   background-color:#77c5d5;
+   color:#FFFFFF;
+   font-size:1em;
+   height:30px;
+   margin-bottom:10px;       
+}
+
+.THIS .header-column-small {
+   
+   width:50px;  
+   text-align:left;
+   background-color:#77c5d5;
+   color:#FFFFFF;
+   font-size:1em;
+   height:30px;
+   margin-bottom:10px; 
+   
+}
+.THIS .uploadAll {
+    text-align:right;
+}
+.THIS .datelist {
+    margin-bottom:10px;  
+}
+.THIS .closeButton {
+    background-color:#870500;
+    color:#FFFFFF;
+}
+.THIS .mySubrowHeader {
+    background-color:#a1dee9;
+    color:#FFFFFF;
+}
+.THIS .slds-file-selector__dropzone .slds-file-selector__button{
+    font-size: 0;
+}
+.THIS .slds-file-selector__dropzone .slds-file-selector__text{
+    display: none;
+}
+.THIS .slds-file-selector__dropzone .slds-file-selector__button:after{
+    content: 'Upload files';
+    font-size: .8125rem;
+    
+}

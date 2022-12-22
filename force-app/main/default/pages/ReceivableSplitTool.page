@@ -1,0 +1,217 @@
+<!--
+/**=====================================================================
+ * Appirio, Inc
+ * Page Name: ReceivableSplitTool
+ * Description: [Task T-272509 : Receivable Split VF Page - Jaipur first spec]
+ * Created Date: [04/16/2014]
+ * Created By: [Manisha Gupta] (Appirio)
+ *
+ * Date Modified                Modified By                  Description of the update
+ * [MON DD, YYYY]             	[FirstName LastName]		 [Short description for changes]
+ =====================================================================*/
+ -->
+<apex:page StandardController="Payout_Date__c" extensions="ReceivableSplitToolController" id="page">
+<apex:pageMessages id="pageMessage"/>
+	<script src="{!URLFOR($Resource.JQuery, 'js/jquery-1.9.1.min.js')}"/>
+
+	<style>
+		ul#tabsHeader {
+			list-style-type: none ;
+			margin: 30px 0 0 0 ;
+			padding: 0 0 0.3em 0 ; }
+		ul#tabsHeader li { display: inline; margin: 1px .2em 0 0 !important; }
+		ul#tabsHeader li span { color: #42454a ; background-color: #dedbde ; border: 1px solid #c9c3ba ; border-bottom: none ; padding: 0.3em ; text-decoration: none ; }
+		ul#tabsHeader li span.selected { color: #000 ; background-color: #f1f0ee ; padding: 0.7em 0.3em 0.38em 0.3em ; }
+		div.tabContent { border: 1px solid #c9c3ba ; padding: 0.5em ; background-color: #f1f0ee ; }
+		div.tabContent.hide { display: none ; }
+		.table{border: 1px solid gray;}
+		.columnTable{border: 1px solid gray;}
+		.tableHeaderRow{background-color:lightgrey;}
+	</style>
+
+	<apex:form id="form">
+		<!-- Page contents -->
+		<apex:pageblock >
+			<div id="tabs" >
+				<ul id="tabsHeader">
+			    	<li id="tab1"><span class="selected" >Select Receivables</span></li>
+			    	<li id="tab2"><span>Split Receivables</span></li>
+			  	</ul>
+			  	<div id="tabs-1" class="tabContent">
+			  		<apex:pageblockTable value="{!listWrapperTab1}" var="wrapper">
+			  			<apex:column >
+			  				<apex:facet name="header"> <apex:inputCheckBox id="checkAllDone" onClick="checkAll(this);"/></apex:facet>
+			  				<apex:inputCheckBox value="{!wrapper.isSelected}" id="checkedone" onClick="uncheckAll();"/>
+		  				</apex:column>
+			  			<apex:column value="{!wrapper.rec.School__c}"/>
+			  			<apex:column value="{!wrapper.rec.Name}"/>
+			  			<apex:column value="{!wrapper.rec.Expected_Pay_Date__c}"/>
+			  			<apex:column value="{!wrapper.rec.GRV_Amount__c}" headerValue="Face Value"/>
+			  		</apex:pageblockTable>
+			  		<apex:commandButton value="Split Selected Receivables" onClick="validateSplitSelectedReceivables(); return false;"
+			  				style="float:right; position:relative;top:30px;"/>
+	  				<apex:commandButton value="Cancel" onClick="window.open('/{!payOutDateId}', '_self'); return false;"
+	  						style="float:left; position:relative;top:30px;"/>
+			  	</div>
+			  	<div id="tabs-2" class="tabContent">
+			  			<apex:pageblock id="pbSplitPercent">
+			  				<apex:outputLabel value="Split Percent: " style="font-weight:bold"/> &nbsp;&nbsp;
+				  			<apex:inputText value="{!splitPercent}" id="splitPercent" required="true" />%&nbsp;&nbsp;
+				  			<apex:commandButton value="Calculate Splits" action="{!calculateSplits}" reRender="pbCalculatedSplits, NewRecValues" />
+							<apex:outputpanel id="NewRecValues">
+								<br />
+					  			<apex:outputLabel value="Split-off Receivable Name: " style="font-weight:bold"
+											 rendered="{!listWrapperTab2.size > 0}"/>
+					  			<apex:inputField value="{!dummyReceivable.Name}" id="recName"
+					  						 rendered="{!listWrapperTab2.size > 0}" />
+					  			<br />
+					  			<apex:outputLabel value="Split-off Expected Pay Date: " style="font-weight:bold"
+					  						rendered="{!listWrapperTab2.size > 0}"/>
+					  			<apex:inputField value="{!dummyReceivable.Expected_Pay_Date__c}" id="expectedPayDate"
+					  						rendered="{!listWrapperTab2.size > 0}" />
+					  			<br />
+					  			<apex:outputLabel value="Split-off Distribution Date: " style="font-weight:bold"
+					  						rendered="{!listWrapperTab2.size > 0}"/>
+					  			<apex:inputField value="{!dummyReceivable.Distribution_Date__c}" id="distributionDate"
+					  						rendered="{!listWrapperTab2.size > 0}" />
+							</apex:outputpanel>
+			  			</apex:pageblock>
+						<apex:outputPanel id="pbCalculatedSplits">
+
+				  			<apex:pageBlock rendered="{!listWrapperTab2.size > 0}">
+
+					  				<apex:pageblockTable value="{!listWrapperTab2}" var="wrapper" >
+					  					<apex:column value="{!wrapper.rec.School__c}"/>
+					  					<apex:column value="{!wrapper.rec.Name}"/>
+					  					<apex:column value="{!wrapper.rec.Expected_Pay_Date__c}"/>
+					  					<apex:column value="{!wrapper.rec.GRV_Amount__c}" headerValue="Original GRV Amount"/>
+					  					<apex:column headerValue="New GRV Value">
+					  						<apex:outputText value="${0, number,###,###.00}" >
+				  								<apex:param value="{!wrapper.newValue}" />
+				  							</apex:outputText>
+			  							</apex:column>
+					  					<apex:column headerValue="Split-off Value">
+					  						<apex:outputText value="${0, number,###,###.00}" >
+				  								<apex:param value="{!wrapper.splitValue}" />
+				  							</apex:outputText>
+			  							</apex:column>
+					  				</apex:pageblockTable>
+					  				<apex:commandButton value="Apply Splits" action="{!applySplits}" reRender="pageMessage"
+					  					style="float:right; position:relative;top:50px;" onComplete="confirmApplySplits();return false;"/>
+				  					<apex:commandButton value="Cancel" onClick="window.open('/{!payOutDateId}', '_self');  return false;"
+	  									style="float:left; position:relative;top:50px;"/>
+				  					<apex:commandButton value="Previous" onClick="showTab('tabs-1', 'tab1'); return false;"
+				  						style="float:left; position:relative;top:50px;"/>
+
+				  			</apex:pageBlock>
+			  			</apex:outputPanel>
+			  	</div>
+		  	</div>
+	  	</apex:pageblock>
+	</apex:form>
+<script>
+		var j$ = jQuery.noConflict();
+
+		function checkAll(cb)
+        {
+            var inputElem = document.getElementsByTagName("input");
+            for(var i=0; i<inputElem.length; i++)
+            {
+                if(inputElem[i].id.indexOf("checkedone")!=-1)
+                inputElem[i].checked = cb.checked;
+            }
+        }
+        /* Uncheck CheckAll checkbox if any one of checkboxes are unchecked*/
+        function uncheckAll(){
+          var inputElem = document.getElementsByTagName("input");
+          var flag = true;
+          var checkAll;
+            for(var i=0; i<inputElem.length; i++)
+            {
+            if(inputElem[i].id.indexOf("checkAllDone") != -1){
+              checkAll = inputElem[i];
+             }
+                if(inputElem[i].id.indexOf("checkedone") != -1 && !inputElem[i].checked){
+                  flag = false;
+                  break;
+                }
+            }
+            checkAll.checked = flag;
+        }
+    	var contentDivs = new Array();
+
+    	function initTab() {
+    		var div = document.getElementById("tabs");
+			var i = 0;
+			j$("div[id|='tabs']", div).each(function(){
+				if(i > 0){
+					j$(this).attr('class', 'tabContent hide');
+				}
+				contentDivs[i] = j$(this);
+
+				i++;
+			});
+			console.log('contentDivs: '+ contentDivs);
+		}
+
+		function showTab(tabId, liId) {
+      		var selectedId = tabId;
+			//console.log('tabId: '+ tabId);
+	      	for(var i=0; i<contentDivs.length; i++){
+	      		//console.log("j$(contentDivs[i]).attr('id'): "+ j$(contentDivs[i]).attr('id'));
+	      		if(j$(contentDivs[i]).attr('id') == tabId){
+	      			j$(contentDivs[i]).attr('class', 'tabContent');
+	      			//console.log('in');
+	      		}else{
+	      			j$(contentDivs[i]).attr('class', 'tabContent hide');
+
+	      			//console.log('in -hide');
+	      		}
+	      	}
+	      	j$('#tabsHeader').each(function(){
+
+      			j$("li", this).each(function(){
+      				if(j$(this).attr('id') == liId){
+      					j$("span", this).attr('class', 'selected');
+      				}else{
+      					j$("span", this).attr('class', '');
+      				}
+      			})
+      		});
+      		window.scrollTo(0,0);
+    	}
+
+    	j$(document).ready(function() {
+			initTab();
+			uncheckAll();
+        });
+
+        function validateSplitSelectedReceivables(){
+        	var isValid = false;
+        	var inputElem = document.getElementsByTagName("input");
+            for(var i=0; i<inputElem.length; i++)
+            {
+                if(inputElem[i].id.indexOf("checkedone")!=-1 && inputElem[i].checked){
+                	isValid = true;
+                }
+            }
+            if(!isValid){
+            	alert('At least one receivable must be selected to split receivables');
+            }else{
+            	showTab('tabs-2', 'tab2');
+            }
+        }
+
+        var confirmApplySplits = function(){
+        	if(j$("span[id$='pageMessage']").html() == ''){
+	        	alert('Splits have been applied successfully');
+	        	window.open('/{!payOutDateId}', '_self');
+        	}
+        }
+
+
+
+
+
+	</script>
+</apex:page>

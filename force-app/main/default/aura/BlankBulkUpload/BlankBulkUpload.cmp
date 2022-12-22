@@ -1,0 +1,4 @@
+<aura:component description="BlankBulkUpload" controller="IntakeCommunityItemsCtrl" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+	
+    
+</aura:component>

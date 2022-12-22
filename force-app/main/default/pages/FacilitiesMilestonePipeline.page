@@ -1,0 +1,377 @@
+<!--
+    /**=====================================================================
+     * CSC
+     * Name: FacilitiesMilestonePipeline
+     * Description: FacilitiesMilestoneReport addition
+     * Created Date: [9/30/2022]
+     * Created By: [Slava Krel] (CSC)
+     *
+     * Date Modified                Modified By                  Description of the update
+    
+     =====================================================================*/
+    -->
+    <apex:page controller="FacilitiesMilestoneReportCtrl" title="Facilities Milestone Pipeline"
+        id="page" sidebar="false" showHeader="false" standardStyleSheets="false">
+
+        <html lang="en">
+    
+        <head>
+            <meta charset="utf-8" />
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta name="description" content="" />
+            <meta name="author" content="" />
+            <title>FacilitiesMilestonePipeline</title>
+            
+                <!-- Bootstrap core CSS -->
+            <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/bootstrap.min.css')}"/>
+            <link href="https://fonts.googleapis.com/css?family=Lato:400,700,900" rel="stylesheet" type="text/css" />
+
+            <!-- Production Stylesheet -->
+            <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/main.css')}" />
+        
+            <style>
+                .corner-ribbon{
+                    width: 200px;
+                    background: #EF9221;
+                    position: absolute;
+                    top: 25px;
+                    left: -50px;
+                    text-align: center;
+                    line-height: 30px;
+                    letter-spacing: 1px;
+                    color: #f0f0f0;
+                    transform: rotate(-45deg);
+                    -webkit-transform: rotate(-45deg);
+                }
+                .corner-ribbon.sticky{
+                    position: fixed;
+                }
+                .corner-ribbon.shadow{
+                    box-shadow: 0 0 3px rgba(0,0,0,.3);
+                }
+                .corner-ribbon.top-left{
+                    top: 25px;
+                    left: -50px;
+                    transform: rotate(-45deg);
+                    -webkit-transform: rotate(-45deg);
+                }
+                .link-bar {
+                    width: 100%;
+                    background-color: #fff;
+                    overflow: auto;
+                }
+                .link-bar a {
+                    float: left;
+                    width: 20%;
+                    text-align: center;
+                    padding: 12px 0;
+                }
+                .link-bar input {
+                    float: left;
+                    width: 40%;
+                    text-align: center;
+                    padding: 12px 0;
+                }
+                .topnav a {
+                    float: right;
+                    display: block;
+                    color: black;
+                    text-align: center;
+                    padding: 8px 16px;
+                    text-decoration: none;
+                    /*font-family: 'Nova Square';*/
+                    font-size: 16px;
+                    border-bottom: 3px solid transparent;
+                    min-width: 100px;
+                }
+                .topnav a:hover {
+                    border-bottom: 3px solid rgb(255, 0, 195);
+                }
+                .topnav input {
+                    float: right;
+                    display: block;
+                    color: black;
+                    text-align: center;
+                    padding: 8px 16px;
+                    text-decoration: none;
+                    /*font-family: 'Nova Square';*/
+                    font-size: 16px;
+                    border-bottom: 3px solid transparent;
+                    border-top: none;
+                    border-right: none;
+                    border-left: none;
+                    background-color: transparent;
+                    /* width: 100px; */
+                    min-width: 180px;
+                }
+                .topnav input:hover {
+                    border-bottom: 3px solid rgb(255, 0, 195);
+                }
+                .empty-block {
+                    width: 100%;
+                    height: 50%;
+                }
+                .vl {
+                    border-left: 2px solid green;
+                    height: 20px;
+                }
+            </style>
+        
+        </head>
+    
+        <body>
+
+            <div class="corner-ribbon top-left sticky red shadow" style="font-weight: bold; font-size:14px;">CSC</div>
+            <apex:PageMessages />
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 page-header">
+                        <div class="col-xs-12 col-md-6 left-header">
+                            <h1>Facilities Milestone Report Pipeline</h1> 
+                        </div>
+                        <div class="col-xs-12 col-md-6 right-header">
+                            <p >Open Aquisitions Opps: 000
+                            </p>
+                            <p>Total Estimated Project Cost: 000,000,000
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- copy table content -->
+            <!-- <script>
+                function selectElementContents(el) {
+                    var body = document.body,
+                        range, sel;
+                    if (document.createRange && window.getSelection) {
+                        range = document.createRange();
+                        sel = window.getSelection();
+                        sel.removeAllRanges();
+                        range.selectNodeContents(el);
+                        sel.addRange(range);
+                    }
+                    document.execCommand("Copy");
+                }
+            </script> -->
+            <!-- copy table content -->
+
+            <!--Table header with opp channel name-->
+            <apex:outputPanel id="panel2">
+                <div class="container tab" id="step2" >
+                    <!-- phase 1 -->
+                    <div class="row top-margin">
+
+                        <!--navbar-->
+                        <!--===========Navbar===========-->
+                        <div class="topnav">
+                            <!--<a href="#portfolio">Resume</a>-->
+                            <a href="https://charterschoolcapital--c.vf.force.com/apex/FacilitiesMilestonePipelineDownloadExcel">Download</a>
+                            <!-- <input type="button" onclick="selectElementContents( document.getElementById('signature_container') );" value="Copy To Clipboard"></input> -->
+                            <a href="https://charterschoolcapital.lightning.force.com/analytics/dashboard/0FK4u000000PBe3GAG">Charts</a></div>
+                            <br />
+                            <div class="empty-block"><p><br /></p></div>
+                            
+                        <!--navbar-->
+
+
+                        <table class="table" >
+                            <thead>
+                                <tr>
+                                    <th class="col1" rowspan="2" style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef"></th>
+                                    <th class="col1" colspan="2" style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">Sourced</th>
+                                    <th class="col2" colspan="2" style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">Proposed</th>
+                                    <th class="col3" colspan="2" style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">Converted</th>
+                                    <th class="col4" colspan="2" style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">Contracted</th>
+                                    <th class="col5" colspan="2" style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">Won</th>
+                                </tr>
+                                <tr>
+                                    
+                                    <th style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">#</th>
+                                    <th style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">$</th>
+
+                                    <th style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">#</th>
+                                    <th style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">$</th>
+
+                                    <th style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">#</th>
+                                    <th style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">$</th>
+
+                                    <th style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">#</th>
+                                    <th style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">$</th>
+
+                                    <th style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">#</th>
+                                    <th style="font-weight: bold; font-size:14px; text-align:center; background-color:#efefef">$</th>
+
+                                </tr>
+                            </thead>
+                            <tbody id="signature_container">
+                                <apex:repeat value="{!oppChannel}" var="oppWrapper" >
+                                    <tr>
+                                        <td style="text-align:center; background-color:#efefef">{!oppWrapper.opportunityChannel}</td>
+
+                                        <td style="text-align:center">&nbsp;&nbsp;&nbsp;&nbsp;{!oppWrapper.sourcedOppCount}&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                        <td style="text-align:center">
+                                            <apex:outputText value="{0, number, ###,##0}" id="sourcedAmount" >
+                                                <apex:param value="{!oppWrapper.sourcedOppAmount}"/>
+                                            </apex:outputText>
+                                        </td>
+
+                                        <td style="text-align:center">&nbsp;&nbsp;&nbsp;&nbsp;{!oppWrapper.proposedOppCount}&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                        <td style="text-align:center">
+                                            <apex:outputText value="{0, number, ###,##0}" id="proposedAmount" >
+                                                <apex:param value="{!oppWrapper.proposedOppAmount}"/>
+                                            </apex:outputText>
+                                        </td>
+
+                                        <td style="text-align:center">&nbsp;&nbsp;&nbsp;&nbsp;{!oppWrapper.convertedOppCount}&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                        <td style="text-align:center">
+                                            <apex:outputText value="{0, number, ###,##0}" id="convertedAmount" >
+                                                <apex:param value="{!oppWrapper.convertedOppAmount}"/>
+                                            </apex:outputText>
+                                        </td>
+
+                                        <td style="text-align:center">&nbsp;&nbsp;&nbsp;&nbsp;{!oppWrapper.contractedOppCount}&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                        <td style="text-align:center">
+                                            <apex:outputText value="{0, number, ###,##0}" id="contractedAmount" >
+                                                <apex:param value="{!oppWrapper.contractedOppAmount}"/>
+                                            </apex:outputText>
+                                        </td>
+
+                                        <td style="text-align:center">&nbsp;&nbsp;&nbsp;&nbsp;{!oppWrapper.wonOppCount}&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                                        <td style="text-align:center">
+                                            <apex:outputText value="{0, number, ###,##0}" id="wonAmount" >
+                                                <apex:param value="{!oppWrapper.wonOppAmount}"/>
+                                            </apex:outputText>
+                                        </td>
+
+                                    </tr>
+                                </apex:repeat>
+                            </tbody>
+                            <tfoot>
+                                <apex:repeat value="{!oppPipelineStage}" var="oppWrapper">
+                                    <tr>
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">{!oppWrapper.oppPipelineStageTotal}</td>
+
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">{!oppWrapper.sourcedOppCount}</td>
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">
+                                            <apex:outputText value="{0, number, ###,##0}" id="totalSourcedAmount" >
+                                                <apex:param value="{!oppWrapper.sourcedOppAmount}"/>
+                                            </apex:outputText>
+                                        </td>
+
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">{!oppWrapper.proposedOppCount}</td>
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">
+                                            <apex:outputText value="{0, number, ###,##0}" id="totalProposedAmount" >
+                                                <apex:param value="{!oppWrapper.proposedOppAmount}"/>
+                                            </apex:outputText>
+                                        </td>
+                                        
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">{!oppWrapper.convertedOppCount}</td>
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">
+                                            <apex:outputText value="{0, number, ###,##0}" id="totalConvertedAmount" >
+                                                <apex:param value="{!oppWrapper.convertedOppAmount}"/>
+                                            </apex:outputText>
+                                        </td>
+                                        
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">{!oppWrapper.contractedOppCount}</td>
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">
+                                            <apex:outputText value="{0, number, ###,##0}" id="totalContractedAmount" >
+                                                <apex:param value="{!oppWrapper.contractedOppAmount}"/>
+                                            </apex:outputText>
+                                        </td>
+                                        
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">{!oppWrapper.wonOppCount}</td>
+                                        <td style="text-align:center; font-weight: bold; background-color:#efefef">
+                                            <apex:outputText value="{0, number, ###,##0}" id="totalWonAmount" >
+                                                <apex:param value="{!oppWrapper.wonOppAmount}"/>
+                                            </apex:outputText>
+                                        </td>
+                                    </tr>
+                                </apex:repeat>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <!-- phase 1 -->
+                    
+                    <!-- phase 2 -->
+                    <div class="row">
+                        <apex:repeat value="{!oppChannel}" var="oppWrapper">
+                            <div class="col-xs-12 table-responsive">
+
+                                <!--Table start-->
+                                <table class="table" >
+                                    <thead>
+                                        <tr>
+                                            <th class="col1" style="font-weight: bold; font-size:14px; text-align:center">{!oppWrapper.opportunityChannel}</th>
+                                            <th class="col1" style="font-weight: bold; font-size:14px; text-align:center">Sourced</th>
+                                            <th class="col2" style="font-weight: bold; font-size:14px; text-align:center">Proposed</th>
+                                            <th class="col3" style="font-weight: bold; font-size:14px; text-align:center">Converted</th>
+                                            <th class="col4" style="font-weight: bold; font-size:14px; text-align:center">Contracted</th>
+                                            <th class="col5" style="font-weight: bold; font-size:14px; text-align:center">Won</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center; line-height: 30px !important">Open</td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align:center; line-height: 30px !important">Closed Won</td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="text-align:center; line-height: 30px !important">Closed Lost</td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: bold; text-align:center; line-height: 30px !important">TOTAL</td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="font-weight: bold; text-align:center; line-height: 30px !important">CONVERSION RATE</td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                            <td style="text-align:center; line-height: 30px !important"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </apex:repeat>
+                    </div>
+                    <!-- phase 2 -->
+    
+                    <!--Button Deck-->
+                    <!-- <div class="row">
+                        <div class="col-xs-12 pull-right">
+                            <button id="go-to-charts" class="btn btn-primary pull-right" style="padding: 3px" onClick="location.href='https://charterschoolcapital--cscfull--c.sandbox.vf.force.com/apex/FacilitiesMilestonePipelineCharts'"> Charts </button>
+                            <button id="go-to-charts" class="btn btn-primary pull-right" style="padding: 3px" onClick="">Refresh</button>
+                            <button id="go-to-charts" class="btn btn-primary pull-right" style="padding: 3px" onClick="">Export</button>
+                        </div>
+                    </div> -->
+                    <!--Button Deck-->
+    
+                </div>
+            </apex:outputPanel>
+        </body>
+    
+        </html>
+    </apex:page>

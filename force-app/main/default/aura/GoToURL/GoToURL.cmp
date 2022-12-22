@@ -1,0 +1,6 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,lightning:availableForFlowScreens" access="global" >
+    <aura:attribute name="urlId" type="String" />
+    <aura:attribute name="recId" type="String" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+</aura:component>

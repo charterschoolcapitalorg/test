@@ -1,0 +1,112 @@
+.THIS .blank-header-column {
+    width:1350px;
+}
+.THIS .header-column {
+    width:120px;
+}
+.THIS .header-column-due {
+    width:90px;
+}
+
+.THIS .header-column-one {
+    width:330px;
+}
+.THIS .header-column-two {
+    width:330px;
+    padding-left:12px;
+}
+.THIS .header-column-preview {
+    width:160px;
+}
+.THIS .header-column-assigned {
+    width:110px;
+    padding-left:15px;
+}
+.THIS .header-column-action {
+    width:170px;
+    padding-right:20px;
+    
+}
+.THIS .header-column-comments {
+    width:290px;
+    padding-left:15px;
+}
+.THIS .header-column-comments-large {
+    width:460px;
+    padding-left:15px;
+    padding-right:20px;
+}
+.THIS .header-column-small {
+    width:55px;
+    padding-left:5px;
+}
+.THIS .header-column-instruction {
+    width:30px;
+    background-color:#ff0000;
+}
+.THIS .myItem {
+    margin-left:2px;
+}
+.THIS .evenRow {
+    background-color:#77c5d5;
+}
+.THIS .oddRow {
+    /*background-color:#FFFACD;*/
+    background-color: #535758;
+}
+
+.THIS .myWhiteBackground {
+    color:#FFFFFF;
+}
+
+.THIS .slds-text-title_caps{
+    color:white;
+    font-size:13px;
+    vertical-align:middle;
+}
+
+.THIS .opener{
+    color:white !important;
+}
+
+.THIS .mySubrowHeader {
+    background-color:#a1dee9;
+    color:#FFFFFF;
+    width:1370px;
+}
+.THIS .mySubrowHeaderName {
+    width:1220px;
+}
+.THIS .mySubrowHeaderStatus {
+    width:150px;
+    
+}
+.THIS .mySubrowHeaderTotal {
+    width:1350px;
+    margin-top:10px;
+}
+
+.THIS .mySubrowHeader2 {
+    background-color:#a1dee9;
+    color:#FFFFFF;
+    width:1350px;
+}
+.THIS .slds-file-selector__dropzone{ 
+    border: none;
+}
+.THIS .slds-file-selector__dropzone .slds-file-selector__button{
+    font-size: 0;
+}
+.THIS .slds-file-selector__dropzone .slds-file-selector__text{
+    display: none;
+}
+.THIS .slds-file-selector__dropzone .slds-file-selector__button:after{
+    content: 'Upload files';
+    font-size: .8125rem;
+}
+.THIS .uploader {
+    position:relative;
+    top:-20px;
+    left:10px;
+    
+}

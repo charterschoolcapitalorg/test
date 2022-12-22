@@ -1,0 +1,43 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >
+    
+    <aura:handler name="docUploaded" event="c:FireDocUpload" action="{!c.handleDocUploaded}"/>
+    <aura:handler name="docUploadedToTop" event="c:FireDocUploadedToTop" action="{!c.handleDocUploaded}"/>
+    <aura:handler name="filterupdated" event="c:FilterUpdated" action="{!c.toggleSection}"/>
+    
+    <aura:attribute name="showList" type="Boolean" default="true"/>
+    <aura:attribute name="recordType" type="ItemsByOppRecType" />	 
+    <aura:attribute name="cmoids" type="String[]" />
+    <aura:attribute name="statusfilter" type="String" />  
+	
+    
+    <div class=" ">
+        
+        <div class="slds-page-header slds-text-title_caps" style="background-color:#00558C;width:1390px;">
+            <section class="slds-clearfix " >                
+                <div class="slds-float--left" style="margin-top:-10px;width:25px;">
+                    <lightning:button  variant="base" class="opener" aura:id="opener"  iconName="utility:dash" iconPosition="left" onclick="{!c.toggleSection}" /> 
+                </div>
+                <div class="slds-text-title_caps" style="width:1290px;">
+                    <div style="width:1200px;">
+                    {!v.recordType.recordtypename}	
+                    </div>
+                    
+                </div>                
+            </section>
+        </div>
+        
+        <div style="margin-left:5px;">
+            <aura:if isTrue="{!v.showList == true}">
+               <aura:iteration items="{!v.recordType.itemList}" var="i" indexVar="indx">
+                   
+                   	<c:MyItemByProduct status="{!i.status}" cmoids="{!v.cmoids}" statusfilter="{!v.statusfilter}" rowcount="{!indx}" hasChildren="{!i.hasChildren}" iRecType="{!v.recordType.recordtypename}" iName="{!i.name}" iAction="{!i.action}" isDocument="{!i.isDocument}"/>
+                   
+               </aura:iteration>
+                
+            </aura:if>
+        </div>
+    </div>
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+</aura:component>

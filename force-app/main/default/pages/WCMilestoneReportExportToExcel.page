@@ -1,0 +1,25 @@
+<apex:page controller="OperationsReporting" contentType="application/vnd.ms-excel#SalesforceExport.xls" cache="true">
+    <apex:pageBlock title="WC Milestone Report">
+        <apex:pageBlockTable value="{!oppsToExport}" var="opp" border="1px solid black">
+            <apex:column headerValue="Close" value="{!opp.opp.CloseDate}"/>
+            <apex:column headerValue="Days" value="{!opp.businessDaysToClose}"/>
+            <apex:column headerValue="Type" value="{!opp.opp.RecordType.Name}"/>
+            <apex:column headerValue="Account Name" value="{!opp.opp.Account.Name}"/>
+            <apex:column headerValue="State" value="{!opp.opp.STATE__c}"/>
+            <apex:column headerValue="Amount" value="{!opp.opp.NET_Amount_Requested__c}"/>
+            <apex:column headerValue="FE Prep?" value="{!opp.fePrepared}"/>
+            <apex:column headerValue="CP Open" value="{!opp.cpOpen}"/>
+            <apex:column headerValue="FE Apprv?" value="{!opp.feApproved}"/>
+            <apex:column headerValue="OILS Rcvd" value="{!opp.oilsReceived}"/>
+            <apex:column headerValue="Submitted pre-Appro" value="{!opp.paSubmitted}"/>
+            <apex:column headerValue="FC Sent?" value="{!opp.fcSent}"/>
+            <apex:column headerValue="FC Apprv?" value="{!opp.fcApproval}"/>
+            <apex:column headerValue="Sig Pages?" value="{!opp.sigPages}"/>
+            <apex:column headerValue="Email Sent?" value="{!opp.emailSent}"/>
+            <apex:column headerValue="Commit?" value="{!opp.opp.Receivables_Purchased__c}"/>
+            <apex:column headerValue="Owner" value="{!opp.opp.Owner.LastName}"/>
+            <apex:column headerValue="Paralegal" value="{!opp.opp.Paralegal__r.LastName}"/>
+            <apex:column headerValue="Analyst" value="{!opp.opp.Financial_Review__r.LastName}"/>
+        </apex:pageBlockTable>
+    </apex:pageBlock>
+</apex:page>

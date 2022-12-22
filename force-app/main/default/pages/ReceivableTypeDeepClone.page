@@ -1,0 +1,42 @@
+<!--
+/**=====================================================================
+ * Appirio, Inc
+ * Page Name: ReceivableTypeDeepClone
+ * Description: [Task T-278593 : Receivable Type "Full Clone" tool
+ * Created Date: [05/14/2014]
+ * Created By: [Manisha Gupta] (Appirio)
+ *
+ * Date Modified                Modified By                  Description of the update
+ * [MON DD, YYYY]             	[FirstName LastName]		 [Short description for changes]
+ =====================================================================*/
+-->
+<apex:page standardController="Receivable_Type__c" extensions="ReceivableTypeDeepCloneController">
+<apex:sectionHeader title="Deep Clone"/>
+<apex:form >
+<apex:pageMessages id="pageMessage"/>
+<apex:pageBlock >
+	<apex:pageblockSection >
+		<apex:pageblockSectionItem >
+			<apex:outputlabel value="New Receivable Type Name:"/>
+			<apex:inputField value="{!clonedReceivableType.Name}" required="true"/>
+		</apex:pageblockSectionItem>
+		<apex:pageblockSectionItem >
+			<apex:outputlabel value="New Fiscal Year:" />
+			<apex:inputField value="{!clonedReceivableType.Fiscal_Year__c}" required="true"/>
+		</apex:pageblockSectionItem>
+		<apex:pageblockSectionItem >
+			<apex:outputlabel value="Increment Payout Date Years"/>
+			<apex:inputText value="{!incrementPayoutDateYears}"/>
+		</apex:pageblockSectionItem>
+		<apex:pageblockSectionItem >
+			<apex:outputlabel value="Set Clone As Deduction From Original? (IADA?)"/>
+			<apex:inputCheckbox value="{!parentAsDeduction}"/>
+		</apex:pageblockSectionItem>
+	</apex:pageblockSection>
+	<apex:pageblockButtons location="bottom">
+		<apex:commandButton value="Execute Deep Clone" action="{!executeDeepClone}" rerender="pageMessage"/>
+		<apex:commandButton value="Cancel" onClick="window.close();return false;"/>
+	</apex:pageblockButtons>
+</apex:pageBlock>
+</apex:form>
+</apex:page>

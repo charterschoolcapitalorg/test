@@ -1,0 +1,127 @@
+<!--
+/**=====================================================================
+ * Appirio, Inc
+ * Name: ADHOCPayments
+ * Description: I-118039 : Modify Ad Hoc Payment Logic (ADHOCPayments VF Page for the ADHOC Payments functionality)
+ * Created Date: [06/16/2014]
+ * Created By: [Rajeev Arya] (Appirio)
+ *
+ * Date Modified            Modified By                 Description of the update
+ * [06/24/2014]            [Rajeev Arya]              [I-117859 - Modify Redemption UI]
+ * [06/26/2014]            [Rajeev Arya]              [T-286165 - Modify Draw Note Borrow Value Display
+ =====================================================================*/
+-->
+<apex:page Controller="ADHOCPaymentsController" sidebar="false" id="ADHOCPaymentsPage">
+   <apex:form id="form">
+    <script src="{!URLFOR($Resource.JQuery, 'js/jquery-1.9.1.min.js')}"/>
+    <script type="text/javascript">
+    function DisableButton(Button){
+    	Button.disabled = 'disabled';
+    }
+    function CurrencyFormatted(amount)
+	{
+		var i = parseFloat(amount);
+		if(isNaN(i)) { i = 0.00; }
+		var minus = '';
+		if(i < 0) { minus = '-'; }
+		i = Math.abs(i);
+		i = parseInt((i + .005) * 100);
+		i = i / 100;
+		s = new String(i);
+		if(s.indexOf('.') < 0) { s += '.00'; }
+		if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+		s = minus + s;
+		return s;
+	}
+    function validateAmount(amount){
+    	//alert(amount.value);
+        var due = '{!OriginalPrincipalDue}';
+        //alert(due);
+        //alert('123' + payAmount);
+        //alert(isNaN(amount.value));
+        if(isNaN(amount.value)){
+        	alert('Please enter only a valid amount');
+        	document.getElementById('{!$Component.DrawNoteSection.DrawBlock.AmountPaid}').value = '';
+        	//alert(due);
+        	//alert('{!OriginalPrincipalDue}');
+        	due = '$' + due.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            document.getElementById('ADHOCPaymentsPage:form:DrawNoteSection:DrawBlock:PrincipalDue').innerHTML = '{!OriginalPrincipalDue}';
+        }
+        
+        else{
+        //alert(isNaN(amount.value));
+	        if(amount.value == ''){
+	        	payAmount = '';
+	        }
+	        else{
+	        	payAmount = parseFloat(amount.value);
+	        	//alert('1234'+amount.value);
+	        	//alert('123' + payAmount);
+	        }
+	        
+	        //alert(due);
+	        
+	        if(payAmount <= 0.00 || payAmount == null || payAmount == ''){
+	            alert('The amount entered cannot be 0, or null, or negative');
+	            document.getElementById('{!$Component.DrawNoteSection.DrawBlock.AmountPaid}').value = '';
+	            due = '{!OriginalPrincipalDue}';
+	            //due = '$' + due.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+	            //alert(due);
+	            document.getElementById('ADHOCPaymentsPage:form:DrawNoteSection:DrawBlock:PrincipalDue').innerHTML = due;
+	        }
+	        
+	    	else{
+	    		due = due - payAmount;
+	    		due = '$' + due.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+	    		//alert(due);
+	    		//alert(document.getElementById('{!$Component.DrawNoteSection.DrawBlock.PrincipalDue}'));
+	    		//alert(document.getElementById('ADHOCPaymentsPage:form:DrawNoteSection:DrawBlock:PrincipalDue').innerHTML);
+	    		document.getElementById('ADHOCPaymentsPage:form:DrawNoteSection:DrawBlock:PrincipalDue').innerHTML = due; 
+	    		//alert(document.getElementById('{!$Component.DrawNoteSection.DrawBlock.PrincipalDue}').innerHTML);
+	    	}
+    	}
+    }
+    
+    </script>
+        <apex:pageBlock id="DrawNoteSection">
+        <apex:pageMessages />
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton value="Save ADHOC Payment" onclick="DisableButton(this);" status="mySaveStatus" action="{!SaveADHOCPayment}" 
+                disabled="{!Button}" rerender="DrawNoteSection"/>
+                <apex:actionStatus id="mySaveStatus">
+					<apex:facet name="start"> 
+						<div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+				       	height: 120%;opacity:0.65;width:100%;">
+				       		<div class="waitingHolder" style="top: 74.2px; width: 91px;">
+				       			<img class="waitingImage" src="/img/loading.gif" title="Saving ..." />
+				       			<span class="waitingDescription">Saving ...</span>
+				       		</div>
+				      	</div>
+					</apex:facet>
+				</apex:actionStatus>
+            </apex:pageBlockButtons>
+            <apex:pageblockSection columns="2" id="DrawBlock">
+				<apex:facet name="header">
+         			<apex:outputPanel style="color:brown;font-size:15px;font-weight:bold;">{!$Label.Draw_Note} &nbsp;
+         				<apex:outputLink target="_blank" value="/{!draw.Id}" style="color:brown;">{!draw.Name}</apex:outputLink>
+         			</apex:outputPanel>
+     			</apex:facet>
+				<apex:outputText label="{!$Label.Investor_ID}" value="{!acc.accountnumber}"/>
+				<apex:outputField value="{!draw.Note_Description__c}"/>
+				<apex:outputText label="{!$Label.Investor_Name}" value="{!acc.name}"/>
+				<apex:pageblocksectionitem ></apex:pageblocksectionitem>
+				<apex:outputField value="{!draw.Status__c}"/>
+				<apex:outputField value="{!draw.Operating_State__c}"/> 
+				<apex:outputText label="{!$Label.Draw_Total_Amount_Borrowed}" value="{0,number,$#,##0.00}"> <apex:param value="{!TotalAmountBorrowed}" /> </apex:outputText>
+				<apex:outputField value="{!draw.Note_Rate__c}"/>
+				<apex:outputText label="Principal Due" id="PrincipalDue" value="{0,number,$#,##0.00}" > 
+					<apex:param value="{!PrincipalDue}" /> 
+				</apex:outputText>
+				<apex:pageblocksectionitem ></apex:pageblocksectionitem>
+				<apex:inputText label="Amount Paid" value="{!AmountPaid}" id="AmountPaid" required="true" 
+				onchange="validateAmount(this);" disabled="{!Button}"/>    
+				<apex:inputfield value="{!draw.Last_Pay_Date__c}" required="true" label="Paid On" rendered="{!NOT(Button)}"/>
+			</apex:pageblockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

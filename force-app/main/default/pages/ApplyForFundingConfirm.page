@@ -1,0 +1,7 @@
+<apex:page controller="ApplyForFundingController" action="{!init}" docType="html-5.0" showHeader="false" sidebar="false" standardStylesheets="false" title="Apply For Funding">
+	<apex:composition template="PortalTemplate">
+		<apex:define name="body">
+			Thanks
+		</apex:define>
+	</apex:composition>
+</apex:page>

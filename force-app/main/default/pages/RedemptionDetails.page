@@ -1,0 +1,862 @@
+<!--
+/**=====================================================================
+ * Appirio, Inc
+ * Name: VF Page RedemptionDetails
+ * Description: T-271502 : Create Redemption VF page to allocate Receivables to a Redemption
+ * Created Date: [04/27/2014]
+ * Created By: [Rajeev Arya] (Appirio)
+ *
+ * Date Modified                Modified By                  Description of the update
+ * [05/12/2014]               [Noopur Sundriyal]         [T-277642 - Create custom labels]
+ * [05/25/2014]               [Rajeev Arya]              [T-280412 - Create Program Fee Allocation]
+ * [05/26/2014]               [Rajeev Arya]              [T-280413 - Create OTHER Allocation]
+ * [06/23/2014]               [Rajeev Arya]              [I-117958 - Allow Redemption of Unassigned Receivables]
+ * [06/24/2014]               [Rajeev Arya]              [I-118991 - Show INVESTOR Name on Redemption UI]
+ * [06/24/2014]               [Rajeev Arya]              [I-117859 - Modify Redemption UI]
+ * [06/27/2014]               [Rajeev Arya]              [I-119371 - Add DATE PAID override]
+ * [06/27/2014]               [Rajeev Arya]              [I-118987 - Adding, changes and removing fields on Redemption UI]
+ * [06/27/2014]               [Rajeev Arya]              [I-119342 - Save Allocations creates multiple entries]
+ * [07/21/2014]               [Rajeev Arya]              [I-121973 - RedemptionID link is not updated]
+ * [04/22/2016]               [John Caughie]             [Added DBI checkbox]
+ * [09/20/2016]               [John Caughie]             [Logic for interest payment on Loans]
+ * [03/21/2017]               [John Caughie]             [State aid splits]
+ * [03/27/2017]               [John Caughie]             [Added validation to check for over-allocations]
+=======================================================================*/
+-->
+
+<apex:page Controller="RedemptionDetailsController" sidebar="false" id="RedemptionAllocationPage" >
+    
+    <apex:form id="theForm">
+        <style>
+            .panelWrapper .pbHeader {
+            background-color: green !important;
+            color:white !important;
+            padding: 30px 0 20px 40px !important;
+            }
+        </style>
+        
+        <style>
+            ul li,ol li {
+                margin-left: 0px;
+                padding-left: 0;
+            }
+            
+            .pagination {
+                font-size: 80%;
+            }
+            
+            .pagination a,.pagination span {
+                display: block;
+                float: left;
+                padding: 0.3em 0.5em;
+                margin-right: 5px;
+                margin-bottom: 5px;
+            }
+            
+            .pagination .current {
+                color: #e0262b;
+            }
+            
+            .pagination .current:hover {
+                color: #e0262b;
+            }
+            
+            .pagination .notPrevious,.pagination .notNext {
+                color: #999;
+                border-color: #999;
+                background: #fff;
+                text-decoration: none;
+            }
+            
+            .headerRow {
+                background-color: #e3e3e3;
+            }
+            
+            .odd {
+                background-color: #ffffff;
+                padding: 7px 0;
+                line-height: 16px;
+                font-size: 13px;
+                font-weight: normal;
+            }
+            
+            .even {
+                background-color: #efefef;
+                padding: 7px 0;
+                line-height: 16px;
+                font-size: 13px;
+                font-weight: normal;
+            }
+            .myActiveTab { background-color: #236FBD; color:white; background-image:none;font-size: 13px; font-weight: normal; border-radius:20px;}
+            .myInactiveTab { background-color: white; color:black; background-image:none; font-size: 13px; font-weight: normal; border-radius:20px;}
+            .whiteBG { background-color: white; }
+        </style>
+        
+        <script>
+            var currentIndex = 1;
+            var numberOfLinks = 1;
+            function setCurrentPage(index) {
+                if(currentIndex != index) {
+                    currentIndex = parseInt(index);
+                    getpage(currentIndex);
+                }
+            }
+            function next() {
+                if(currentIndex < numberOfLinks) {
+                currentIndex = currentIndex + 1;
+                getpage(currentIndex);
+                } 
+            }
+            function previous() {
+                if(currentIndex > 1) {
+                currentIndex = currentIndex - 1;
+                getpage(currentIndex);
+                } 
+            }
+            function setFormListPaginationStyle(cIndex, noLinks) {
+                
+                currentIndex = cIndex;
+                numberOfLinks = noLinks;
+            if(currentIndex == numberOfLinks) {
+                
+                $("#nextDown").removeClass("next").addClass("notNext");
+            } else {
+                
+                $("#nextDown").removeClass("notNext").addClass("next");
+            }
+            if(currentIndex == 1) {
+                
+                $("#previousDown").removeClass("prev").addClass("notPrevious");
+            } else {
+                    
+                $("#previousDown").removeClass("notPrevious").addClass("prev");
+            }
+            }
+
+        </script>
+        <apex:pageBlock id="Redemptionsection">
+            <apex:pageMessages />
+            <apex:pageBlockButtons location="top">
+                <apex:commandButton value="{!$Label.Save_Redemption}" action="{!SaveRedemption}" 
+                    onComplete="validateRed({!validAmtReceived});" 
+                    reRender="theTabPanel, Redemptionsection, ReceivablesAllocations, RPARedemptions" 
+                    disabled="{!SaveRedButton}" status="mySaveStatus"/>
+                <apex:commandButton value="{!$Label.PAA}" action="{!SavePaymentSubs}"
+                    rendered="{!SaveRedButton}"
+                    reRender="Redemptionsection,Redemptionsection, ReceivablesAllocations" 
+                    disabled="{!PAAButton}" status="myCreateStatus"/>
+                <apex:commandButton value="{!$Label.Button_Save_Other_Fees}" action="{!SaveOtherFees}" 
+                    reRender="Redemptionsection" disabled="{!SaveOtherFeesButton}" status="mySaveStatus"/>
+
+                <apex:actionStatus id="mySaveStatus">
+                    <apex:facet name="start"> 
+                        <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                        height: 120%;opacity:0.65;width:100%;">
+                            <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                <img class="waitingImage" src="/img/loading.gif" title="Saving ..." />
+                                <span class="waitingDescription">Saving ...</span>
+                            </div>
+                        </div>
+                    </apex:facet>
+                </apex:actionStatus>
+                
+                <apex:actionStatus id="myCreateStatus">
+                    <apex:facet name="start"> 
+                        <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                        height: 120%;opacity:0.65;width:100%;">
+                            <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                <img class="waitingImage" src="/img/loading.gif" title="Creating ..." />
+                                <span class="waitingDescription">Creating ...</span>
+                            </div>
+                        </div>
+                    </apex:facet>
+                </apex:actionStatus>  
+            </apex:pageBlockButtons>
+
+            <apex:pageblockSection columns="2" id="BeforeRedemptionSaved" rendered="{!BeforeRedemptionSection}">
+                <apex:facet name="header">
+                    <span style="color:white;font-size:15px;font-weight:bold;">{!$Label.Create_Redemption}</span>
+                </apex:facet>
+                <!--apex:outputField value="{!acc.AccountNumber}"/>
+                <apex:inputField value="{!red.All_To_School__c}"/-->
+                <apex:outputField value="{!acc.name}"/>
+                <apex:outputField value="{!red.Face_Amount_Applied__c}" label="{!$Label.Redemption_Allocated}"/>
+                <apex:inputField value="{!red.Amount_Received__c}" required="true"/>
+                <apex:outputField value="{!red.Remaining_Amount__c}"/>
+                <!-- 2017.03.21 J Caughie - State Aid split -->
+                <!-- <apex:inputField value="{!red.State_Aid__c}"/>
+                <apex:outputField value="{!red.non_State_Aid__c}"/> -->
+                <!-- 2017.03.21 J Caughie - State Aid split -->
+                <apex:inputField value="{!red.Payor__c}"/>
+                <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                <apex:inputField value="{!red.Type__c}"/>
+                <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                <apex:inputField value="{!red.DBI_Payment__c}"/>
+                <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                <apex:inputTextArea label="Description" value="{!red.Description__c}" rows="4" cols="64"/>
+                <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                <apex:inputField value="{!red.Date_Received__c}"/>
+                <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                <apex:inputField value="{!red.Date_Cleared__c}"/>
+                <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                <apex:inputField value="{!red.Date_Paid__c}"/>
+            </apex:pageblockSection>
+
+            <apex:pageblockSection columns="2" id="AfterRedemptionSaved" rendered="{!AfterRedemptionSection}">
+                <apex:facet name="header">
+                    <apex:outputPanel style="color:white;font-size:15px;font-weight:bold;">{!$Label.Redemption} &nbsp;
+                        <apex:outputLink target="_blank" value="/{!red1.Id}" id="RedNameLink" style="color:white;">{!red1.Name}</apex:outputLink>
+                    </apex:outputPanel>
+                </apex:facet>
+                
+                <!--apex:outputField value="{!acc.AccountNumber}"/>
+                <apex:outputField value="{!red.All_To_School__c}"/-->
+                <apex:outputField value="{!acc.name}"/>
+                <apex:outputText label="{!$Label.Redemption_Allocated}" value="{0,number,$#,##0.00}"> 
+                    <apex:param value="{!RedFaceAmount}" /> 
+                </apex:outputText>
+                <!-- <apex:pageBlockSectionItem ></apex:pageBlockSectionItem> -->
+                <apex:outputField value="{!red.Amount_Received__c}"/>
+                <apex:outputText label="{!$Label.Remit_to_School}" value="{0,number,$#,##0.00}"> 
+                    <apex:param value="{!RedRemitToSchool}" />
+                </apex:outputText>
+                <!-- 2017.03.21 J Caughie - State Aid split -->
+                <!-- <apex:outputField value="{!red.State_Aid__c}"/>
+                <apex:outputField value="{!red.non_State_Aid__c}"/> -->
+                <!-- 2017.03.21 J Caughie - State Aid split -->
+                <apex:outputField value="{!red.Payor__c}"/>
+                <apex:outputText label="{!$Label.Fees_Collected}" value="{0,number,$#,##0.00}"> 
+                    <apex:param value="{!RedFeesCollected}" />
+                </apex:outputText>
+                <apex:outputField value="{!red.Type__c}"/>
+                <apex:outputText id="RemainAmount" label="{!$Label.Remaining_Amount}" value="{0,number,$#,##0.00}"> 
+                    <apex:param name="RemainingAmountValue" value="{!RedRemainAmount}" /> 
+                </apex:outputText>
+                <!-- <apex:pageBlockSectionItem ></apex:pageBlockSectionItem> -->
+                <apex:outputField value="{!red.DBI_Payment__c}"/>
+                <apex:inputText label="Other Fees" value="{!OtherFees}" disabled="{!OtherFeesTextBox}">
+                    <apex:actionSupport event="onchange" action="{!OtherFeesApplied}" reRender="Redemptionsection" 
+                        status="updateStatus" onComplete="validateAmount(false, {!RemainingAmountCrossed},{!NegativeAmount});" >
+                    </apex:actionSupport>
+                    <apex:actionStatus id="updateStatus">
+                        <apex:facet name="start"> 
+                            <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                            height: 120%;opacity:0.65;width:100%;">
+                                <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                    <img class="waitingImage" src="/img/loading.gif" title="Updating..." />
+                                    <span class="waitingDescription">Updating...</span>
+                                </div>
+                            </div>
+                        </apex:facet>
+                    </apex:actionStatus>                 
+                </apex:inputText>
+                <apex:outputField value="{!red.Date_Received__c}"/>
+                <apex:outputField value="{!red.Description__c}"/>
+                <apex:outputField value="{!red.Date_Cleared__c}"/>
+                <apex:pageBlockSectionItem ></apex:pageBlockSectionItem>
+                <apex:outputField value="{!red.Date_Paid__c}"/>
+            </apex:pageblockSection>
+        </apex:pageBlock>
+
+        <apex:outputpanel id="theTabPanel">
+            <apex:tabPanel rendered="{!RedemptionAllocation}" switchtype="client" selectedTab="ReceivableAllocation" tabClass="myActiveTab" inactiveTabClass="myInactiveTab">
+                <apex:tab label="Receivable Allocation" name="ReceivableAllocation" id="tabOne">
+                    <apex:outputPanel id="ReceivablesAllocations" styleClass="whiteBG">
+                        <apex:pageBlock rendered="{!RedemptionAllocation}">
+                            <!--<apex:pageBlockButtons location="top">
+                                <apex:commandButton value="{!$Label.Save_Allocation}" action="{!SaveAllocations}" reRender="Allocations, Redemptionsection, ReceivablesAllocations" disabled="{!SaveAllocButton}"/>
+                                <apex:commandButton value="Refresh Allocations" action="{!RefreshAllocations}" reRender="Allocations" disabled="{!AllDisabled}"/> 
+                                
+                            </apex:pageBlockButtons> -->
+                            
+                            <table style="width:60%">
+                                <tr>
+                                    <td>
+                                        {!$Label.Filter_by_School}
+                                        <apex:selectList label="{!$Label.Filter_by_School}" value="{!selectedschool}" size="1" multiselect="false">
+                                            <apex:selectOptions value="{!ListOfSchool}"/>
+                                                <apex:actionSupport event="onchange" reRender="WrapperList" action="{!filteredBySchool}"/>
+                                        </apex:selectList>
+                                    </td>
+                                    <td>
+                                        {!$Label.Unassigned}
+                                        <apex:inputcheckbox label="{!$Label.Unassigned}" value="{!Unassigned}">
+                                            <apex:actionSupport event="onchange" reRender="WrapperList" action="{!filteredByCheckbox}"/>
+                                        </apex:inputcheckbox>
+                                    </td>
+                                    <td>                            
+                                        <apex:commandButton value="{!$Label.Save_Allocation}" status="mySaveStatus" 
+                                                action="{!SaveAllocations}" oncomplete="totalAllocated('{!RedRemainAmount}')"
+                                                reRender="Allocations, Redemptionsection, ReceivablesAllocations" disabled="{!SaveAllocButton}"/>
+                                        <apex:actionStatus id="mySaveStatus">
+                                            <apex:facet name="start"> 
+                                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                                height: 120%;opacity:0.65;width:100%;">
+                                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                                        <img class="waitingImage" src="/img/loading.gif" title="Saving Allocation..." />
+                                                        <span class="waitingDescription">Saving Allocation...</span>
+                                                    </div>
+                                                </div>
+                                            </apex:facet>
+                                        </apex:actionStatus>
+                                    </td>
+                                    <!--2016.09.20 Loan Interest-->
+                                    <td>
+                                        {!$Label.Loan_Interest}
+                                        <apex:inputcheckbox label="{!$Label.Loan_Interest}" id="loanInterest" value="{!ShowInterest}">
+                                            <apex:actionSupport event="onchange" reRender="WrapperList, Allocations" status="mySaveStatus"/>
+                                        </apex:inputcheckbox>
+                                    </td>
+                                </tr>
+                            </table>
+                            <apex:pageBlockSection columns="1" >
+                                <apex:facet name="header">
+                                    <span style="color:white;font-size:15px;font-weight:bold;">{!$Label.Open_Transactions_for_Charter_Holder} "{!CharterHolder}"</span>
+                                </apex:facet> 
+                                <!-- <apex:actionFunction action="{!filteredBySchool}" name="FilteredBySchool" rerender="WrapperList"/> -->
+                                
+                                <apex:actionFunction name="getpage" action="{!getList}" rerender="WrapperList">
+                                    <apex:param value="" assignTo="{!selectedPageNumber}" name="cPageNumber" />
+                                </apex:actionFunction>
+                                <div>
+                                <apex:outputPanel id="WrapperList">
+
+                                    <apex:outputPanel >
+                                        <apex:dataTable value="{!RowListPage}" var="r" width="100%"
+                                        headerClass="headerRow" rowClasses="odd,even"
+                                        styleClass="list listTable">
+                                            
+                                            <apex:column headerValue="{!$Label.School}">
+                                                <apex:facet name="header">
+                                                    <apex:commandLink action="{!sortWrapper}"
+                                                    value="{!$Label.School}{!IF(sortExpression=='School',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="WrapperList">
+                                                        <apex:param value="School" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                </apex:facet>
+                                                <apex:outputText value="{!r.School}" />
+                                            </apex:column>
+                        
+                                            <!--apex:column headerValue="{!$Label.Description}">
+                                                <apex:facet name="header">
+                                                    <apex:commandLink action="{!sortWrapper}"
+                                                    value="{!$Label.Description}{!IF(sortExpression=='Description',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="WrapperList">
+                                                        <apex:param value="Description" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                    
+                                                </apex:facet>
+                                                
+                                                <apex:outputText value="{!r.Description}" />
+                                            </apex:column-->
+                        
+                                            <apex:column headerValue="{!$Label.Receivable_Name}">
+                                                <apex:facet name="header">
+                                                    
+                                                    <apex:commandLink action="{!sortWrapper}"
+                                                    value="{!$Label.Receivable_Name}{!IF(sortExpression=='RecName',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="WrapperList">
+                                                        <apex:param value="RecName" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                    
+                                                </apex:facet>
+                                                <apex:outputText value="{!r.RecName}" />
+                                            </apex:column>
+                                            
+                                            <apex:column headerValue="{!$Label.Draw_Note}">
+                                                <apex:facet name="header">
+                                                    <apex:commandLink action="{!sortWrapper}"
+                                                    value="{!$Label.Draw_Note}{!IF(sortExpression=='DrawNote',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="WrapperList">
+                                                        <apex:param value="DrawNote" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                </apex:facet>
+                                                <apex:outputText value="{!r.DrawNote}" />
+                                            </apex:column>
+                        
+                                            <apex:column headerValue="{!$Label.Purchase_Date}">
+                                                <apex:facet name="header">
+                                                    <apex:commandLink action="{!sortWrapper}"
+                                                    value="{!$Label.Purchase_Date}{!IF(sortExpression=='PurchaseDate',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="WrapperList">
+                                                        <apex:param value="PurchaseDate" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                    
+                                                </apex:facet>
+                                                <apex:outputText value="{0,date,MM/dd/YYYY}">
+                                                    <apex:param value="{!r.PurchaseDate}" />
+                                                    </apex:outputText>
+                                            </apex:column>
+                        
+                                            <apex:column headerValue="{!$Label.Distribution_date}">
+                                                <apex:facet name="header">
+                                                    
+                                                    <apex:commandLink action="{!sortWrapper}"
+                                                    value="{!$Label.Distribution_date}{!IF(sortExpression=='DistributionDate',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="WrapperList">
+                                                        <apex:param value="DistributionDate" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                    
+                                                </apex:facet>
+                                                <apex:outputText value="{0,date,MM/dd/YYYY}">
+                                                    <apex:param value="{!r.DistributionDate}" />
+                                                </apex:outputText>
+                                            </apex:column>
+                        
+                                            <apex:column headerValue="{!$Label.Expected_Pay_Date}">
+                                                <apex:facet name="header">
+                                                    
+                                                    <apex:commandLink action="{!sortWrapper}"
+                                                    value="{!$Label.Expected_Pay_Date}{!IF(sortExpression=='ExpPayDate',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="WrapperList">
+                                                        <apex:param value="ExpPayDate" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                    
+                                                </apex:facet>
+                                                <apex:outputText value="{0,date,MM/dd/YYYY}">
+                                                    <apex:param value="{!r.ExpPayDate}" />
+                                                </apex:outputText>
+                                            </apex:column>
+                        
+                                            <apex:column headerValue="{!$Label.FV_Amount}">
+                                                <apex:facet name="header">
+                                                
+                                                    <apex:commandLink action="{!sortWrapper}"
+                                                    value="{!$Label.FV_Amount}{!IF(sortExpression=='FVAmount',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="WrapperList">
+                                                        <apex:param value="FVAmount" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                
+                                                </apex:facet>
+                                                
+                                                <apex:outputText label="{!$Label.FV_Amount}" value="{0,number,$#,##0.00}"> <apex:param value="{!r.FVAmount}" /> </apex:outputText>
+                                            </apex:column>
+                                            
+                                            <apex:column headerValue="{!$Label.FV_Amount_Due}">
+                                                <apex:facet name="header">
+                                                    <apex:commandLink action="{!sortWrapper}"
+                                                    value="{!$Label.FV_Amount_Due}{!IF(sortExpression=='FVAmountDue',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="WrapperList">
+                                                        <apex:param value="FVAmountDue" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                </apex:facet>
+                                                <apex:outputText label="{!$Label.FV_Amount_Due}" value="{0,number,$#,##0.00}"> <apex:param value="{!r.FVAmountDue}" /> </apex:outputText>
+                                            </apex:column>
+
+                                            <apex:column headerValue="{!$Label.RD_Interest_Due}" rendered="{!ShowInterest}">
+                                                <apex:facet name="header">
+                                                    <apex:commandLink action="{!sortWrapper}"
+                                                    value="{!$Label.RD_Interest_Due}{!IF(sortExpression=='IntDue',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="WrapperList">
+                                                        <apex:param value="IntDue" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                </apex:facet>
+                                                <apex:outputText label="{!$Label.RD_Interest_Due}" value="{0,number,$#,##0.00}"> <apex:param value="{!r.IntDue}" /> </apex:outputText>
+                                            </apex:column>
+
+                                            <apex:column style="background-color:grey" headerValue="{!$Label.Allocation}">
+                                                <!--<b><apex:outputLabel for="payment" value="{!$Label.Allocation}"></apex:outputLabel></b>-->
+                                                <div class = "PaymentBox">
+                                                <apex:inputText value="{!r.newPayment}" id="payment" disabled="{!PAAButton}">
+                                                    <apex:actionSupport event="onchange" action="{!AllocatePayment}" reRender="ReceivablesAllocations, Allocations, Redemptionsection, WrapperList, ReceivablesAllocations" 
+                                                    status="updateStatus" onComplete="validateAmount({!PaymentCrossed}, {!RemainingAmountCrossed},{!NegativeAmount});document.getElementById('{!$Component.payment}').focus(); totalAllocated({!RedRemainAmount})">
+                                                        <apex:param name="myParam" value="{!r.RowID}"/>
+                                                    </apex:actionSupport>
+                                                </apex:inputText>
+                                                </div>
+                                                <apex:actionStatus id="updateStatus">
+                                                    <apex:facet name="start"> 
+                                                        <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                                        height: 120%;opacity:0.65;width:100%;">
+                                                            <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                                                <img class="waitingImage" src="/img/loading.gif" title="Updating..." />
+                                                                <span class="waitingDescription">Updating...</span>
+                                                            </div>
+                                                        </div>
+                                                    </apex:facet>
+                                                </apex:actionStatus>
+                                            </apex:column>
+
+                                            <apex:column style="background-color:grey" headerValue="{!$Label.RD_Interest_Allocated}" rendered="{!ShowInterest}">
+                                                <div class = "PaymentBox">
+                                                <apex:inputText value="{!r.intPayment}" id="intPayment" styleClass="intPayment" > <!--disabled="{!PAAButton}" -->
+                                                    <apex:actionSupport event="onchange" action="{!AllocatePayment}" reRender="ReceivablesAllocations, Allocations, Redemptionsection, WrapperList, ReceivablesAllocations" 
+                                                    status="updateIntStatus" onComplete="validateAmount({!PaymentCrossed}, {!RemainingAmountCrossed},{!NegativeAmount});document.getElementById('{!$Component.intPayment}').focus(); totalAllocated({!RedRemainAmount})">
+                                                        <apex:param name="myParam" value="{!r.RowID}"/>
+                                                    </apex:actionSupport>
+                                                </apex:inputText>
+                                                </div>
+                                                <apex:actionStatus id="updateIntStatus">
+                                                    <apex:facet name="start"> 
+                                                        <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                                        height: 120%;opacity:0.65;width:100%;">
+                                                            <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                                                <img class="waitingImage" src="/img/loading.gif" title="Updating..." />
+                                                                <span class="waitingDescription">Updating...</span>
+                                                            </div>
+                                                        </div>
+                                                    </apex:facet>
+                                                </apex:actionStatus>
+                                            </apex:column>
+
+                                        </apex:dataTable>
+                                        
+                                        <table width="100%" style="margin-top: 8px;">
+                                            <tr>
+                                            <td>&nbsp;</td>
+                                            <td
+                                                style="float: right; vertical-align: middle; font-size: 15px;">
+                                                <div id="PaginationDown" class="pagination">
+                                                    
+                                                    <a href="#" class="notPrevious" id="previousDown"
+                                                        onClick="previous();return false;">&#60;&#60;Prev</a> 
+                                                        
+                                                <apex:repeat value="{!formListPagination.listOfLinks}"
+                                                    var="number">
+                                                    <a href="#"
+                                                        class="{!IF(number == selectedPageNumber,'current','')}"
+                                                            onClick="setCurrentPage('{!number}');return false;">{!number}</a>
+                                                </apex:repeat>
+                                                    
+                                                    <a id="nextDown" href="#" class="next"
+                                                    onClick="next();return false;">Next&#62;&#62;</a>
+                                        </div></td>
+                                        </tr>
+                                            </table>
+                                            <script>setFormListPaginationStyle({!selectedPageNumber},{!formListPagination.totalPage});</script>
+                                        </apex:outputPanel>
+                                    </apex:outputPanel>
+                                    <div class="clear"></div>
+            
+                                </div>
+                            </apex:pageblocksection>
+                            
+                            <apex:pageblockSection id="Allocations" columns="1">
+                                <apex:facet name="header">
+                                    <span style="color:white;font-weight:bold;font-size:15px;">{!$Label.Allocated_Transactions_for_this_Redemption}</span>
+                                </apex:facet> 
+                                <apex:pageBlockTable value="{!WrapperAllocateList}" var="al" width="100%">
+                                    
+                                    <apex:column headerValue="{!$Label.Allocation_Name}">
+                                        <apex:outputText label="{!$Label.Allocation_Name}" value="{!al.AllocName}"/>
+                                    </apex:column>
+                                    <!--  <apex:column headerValue="Purchase Date" >
+                                        <apex:outputText value="{0,date,MM/dd/YYYY}">
+                                            <apex:param value="{!al.PurchaseDate}"/>
+                                        </apex:outputText>
+                                    </apex:column>
+                                    -->
+                                    <apex:column headerValue="{!$Label.Draw_Note}" >
+                                        <apex:outputText value="{!al.DrawNote}"/>
+                                    </apex:column>
+                                    <apex:column headerValue="{!$Label.Column_Lienholder}" >
+                                        <apex:outputText value="{!al.LienHolder}"/>
+                                    </apex:column>
+                                    <apex:column headerValue="{!$Label.Receivable_Type}" >
+                                        <apex:outputText value="{!al.Type}"/>
+                                    </apex:column>
+                                    <apex:column headerValue="{!$Label.FV_Amount_Due}">  
+                                        
+                                        <apex:outputText label="{!$Label.FV_Amount_Due}" value="{0,number,$#,##0.00}"> <apex:param value="{!al.FVAmountDue}" /> </apex:outputText>
+                                    </apex:column>
+                                    <apex:column headerValue="{!$Label.Face_Amount_Applied}">
+                                        <apex:outputText label="{!$Label.Face_Amount_Applied}" value="{0,number,$#,##0.00}"> <apex:param value="{!al.FaceAmountApplied}" /> </apex:outputText>
+                                    </apex:column> 
+                                    
+                                    <apex:column headerValue="{!$Label.RD_Interest_Allocated}" rendered="{!ShowInterest}">
+                                        <apex:outputText label="{!$Label.RD_Interest_Allocated}" value="{0,number,$#,##0.00}">
+                                            <apex:param value="{!al.LoanInterestApplied}" />
+                                        </apex:outputText>
+                                    </apex:column> 
+                                
+                                </apex:pageBlockTable>
+                            </apex:pageblockSection>
+                        </apex:pageBlock>
+                    </apex:outputPanel>
+                </apex:tab>
+                <apex:tab label="{!$Label.RPA_Program_Fees_Allocation_Tab}" name="RPAProgFeesAllocation" id="tabTwo">
+                    <apex:outputPanel id="RPARedemptions" styleClass="whiteBG">
+                    <apex:pageBlock rendered="{!RedemptionAllocation}">
+                        <apex:pageBlockButtons location="top">
+                            <apex:commandButton value="{!$Label.Save_RPA_Program_Fees_Button}" action="{!SaveRPAProgramFees}" status="SaveProgramFees"
+                            reRender="RPA_Redemptions, Redemptionsection, RPARedemptions" disabled="{!SaveRPAFeesButton}"/>
+                        </apex:pageBlockButtons>
+                        
+                        <apex:actionStatus id="SaveProgramFees">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Saving Program Fees..." />
+                                        <span class="waitingDescription">Saving Program Fees...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                        
+                        <apex:pageBlockSection columns="1" >
+                            <apex:facet name="header">
+                                <span style="color:white;font-size:15px;font-weight:bold;">{!$Label.Title_Active_Available_RPAs}</span>
+                            </apex:facet> 
+                            <!-- <apex:actionFunction name="getpage" action="{!getList}"
+                            rerender="WrapperList">
+                                <apex:param value="" assignTo="{!selectedPageNumber}"
+                                name="cPageNumber" />
+                            </apex:actionFunction>
+                            -->
+                            <div>
+                                <apex:outputPanel id="RPAWrapperList">
+                                    <apex:outputPanel >
+                                        <apex:dataTable value="{!WrapperRPAList}" var="rpa" width="100%"
+                                            headerClass="headerRow" rowClasses="odd,even"
+                                            styleClass="list listTable">
+                    
+                                            <apex:column headerValue="{!$Label.Column_RPA_Account}">
+                                                <apex:facet name="header">
+                                                    <apex:commandLink action="{!sortRPAWrapper}"
+                                                    value="RPA Account{!IF(sortExpression=='RPAAccount',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="RPAWrapperList">
+                                                        <apex:param value="RPAAccount" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                </apex:facet>
+                                                <apex:outputText value="{!rpa.RPAAccount}" />
+                                            </apex:column>
+                        
+                                            <apex:column headerValue="{!$Label.Column_RPA_Name}">
+                                                <apex:facet name="header">
+                                                    <apex:commandLink action="{!sortRPAWrapper}"
+                                                    value="RPA Name{!IF(sortExpression=='RPAName',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="RPAWrapperList">
+                                                        <apex:param value="RPAName" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                </apex:facet>
+                                                <apex:outputText value="{!rpa.RPAName}" />
+                                            </apex:column>
+                        
+                                            <apex:column headerValue="RPA Status">
+                                                <apex:facet name="header">
+                                                    <apex:commandLink action="{!sortRPAWrapper}"
+                                                    value="RPA Status{!IF(sortExpression=='RPAStatus',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="RPAWrapperList">
+                                                        <apex:param value="RPAStatus" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                    
+                                                </apex:facet>
+                                                <apex:outputText value="{!rpa.RPAStatus}" />
+                                            </apex:column>
+                                            
+                                            <apex:column headerValue="{!$Label.Column_RPA_Date}">
+                                                <apex:facet name="header">
+                                                    <apex:commandLink action="{!sortRPAWrapper}"
+                                                    value="RPA Date{!IF(sortExpression=='RPADate',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="RPAWrapperList">
+                                                        <apex:param value="RPADate" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                    
+                                                </apex:facet> 
+                                                <apex:outputText value="{0,date,MM/dd/YYYY}">
+                                                    <apex:param value="{!rpa.RPADate}" />
+                                                    </apex:outputText>
+                                            </apex:column>
+                        
+                                            <apex:column headerValue="{!$Label.Column_RPA_End_Date}">
+                                                <apex:facet name="header">
+                                                    
+                                                    <apex:commandLink action="{!sortRPAWrapper}"
+                                                    value="RPA End Date{!IF(sortExpression=='RPAEndDate',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="RPAWrapperList">
+                                                        <apex:param value="RPAEndDate" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                    
+                                                </apex:facet>
+                                                <apex:outputText value="{0,date,MM/dd/YYYY}">
+                                                    <apex:param value="{!rpa.RPAEndDate}" />
+                                                </apex:outputText>
+                                            </apex:column>
+                        
+                                            <apex:column headerValue="{!$Label.Column_RPA_Program_Fee}">
+                                                <apex:facet name="header">
+                                                
+                                                    <apex:commandLink action="{!sortRPAWrapper}"
+                                                    value="RPA Program Fee{!IF(sortExpression=='RPAProgramFee',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="RPAWrapperList">
+                                                        <apex:param value="RPAProgramFee" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                
+                                                </apex:facet>
+                                                
+                                                <apex:outputText label="RPA Program Fee" value="{0,number,$#,##0.00}"> <apex:param value="{!rpa.RPAProgramFee}" /> </apex:outputText>
+                                            </apex:column>
+
+                                            <apex:column headerValue="{!$Label.Column_RPA_Fee_Balance}">
+                                                <apex:facet name="header">
+                                                
+                                                    <apex:commandLink action="{!sortRPAWrapper}"
+                                                    value="RPA Program Fee Balance{!IF(sortExpression=='RPAFeeBalance',IF(sortDirection='ASC',' ▼',' ▲'),'')}"
+                                                    reRender="RPAWrapperList">
+                                                        <apex:param value="RPAFeeBalance" name="column"
+                                                        assignTo="{!sortExpression}"></apex:param>
+                                                    </apex:commandLink>
+                                                
+                                                </apex:facet>
+                                                
+                                                <apex:outputText label="RPA Program Fee Balance" value="{0,number,$#,##0.00}"> <apex:param value="{!rpa.RPAFeeBalance}" /> </apex:outputText>
+                                            </apex:column>
+
+                                            <apex:column headerValue="{!$Label.Column_Program_Fees}" style="background-color:grey">
+                                                <b><apex:outputLabel for="NewFees" ></apex:outputLabel></b>
+                                                <apex:inputText value="{!rpa.newFees}" id="NewFees" disabled="{!PAAButton}">
+                                                    <apex:actionSupport event="onchange" action="{!AllocateFees}" reRender="RPARedemptions, Redemptionsection, RPAWrapperList, RPA_Redemptions" 
+                                                    status="updateStatus" onComplete="validateAmount({!PaymentCrossed}, {!RemainingAmountCrossed},{!NegativeAmount});document.getElementById('{!$Component.NewFees}').focus()" >
+                                                        <apex:param name="myFees" value="{!rpa.RowID}"/>
+                                                    </apex:actionSupport>
+                                                    <apex:actionStatus id="updateStatus">
+                                                        <apex:facet name="start"> 
+                                                            <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                                            height: 120%;opacity:0.65;width:100%;">
+                                                                <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                                                    <img class="waitingImage" src="/img/loading.gif" title="Updating Program Fees..." />
+                                                                    <span class="waitingDescription">Updating Program Fees...</span>
+                                                                </div>
+                                                            </div>
+                                                        </apex:facet>
+                                                    </apex:actionStatus>
+                                                </apex:inputText>
+                                                
+                                            </apex:column>
+                                        </apex:dataTable>
+                                        <!--table width="100%" style="margin-top: 8px;">
+                                            <tr>
+                                            <td>&nbsp;</td>
+                                            <td
+                                                style="float: right; vertical-align: middle; font-size: 15px;">
+                                                <div id="PaginationDown" class="pagination">
+                                                    
+                                                    <a href="#" class="notPrevious" id="previousDown"
+                                                        onClick="previous();return false;">&#60;&#60;Prev</a> 
+                                                        
+                                                <apex:repeat value="{!formListPagination.listOfLinks}"
+                                                    var="number">
+                                                    <a href="#"
+                                                        class="{!IF(number == selectedPageNumber,'current','')}"
+                                                            onClick="setCurrentPage('{!number}');return false;">{!number}</a>
+                                                </apex:repeat>
+                                                    
+                                                    <a id="nextDown" href="#" class="next"
+                                                    onClick="next();return false;">Next&#62;&#62;</a>
+                                        </div></td>
+                                        </tr>
+                                            </table>
+                                            <script>setFormListPaginationStyle({!selectedPageNumber},{!formListPagination.totalPage});</script-->
+                                    </apex:outputPanel>
+                                </apex:outputPanel>
+                                <div class="clear"></div>
+                            </div>
+                        </apex:pageblocksection>
+            
+                        <apex:pageblockSection id="RPA_Redemptions" columns="1">
+                            <apex:facet name="header">
+                                <span style="color:white;font-weight:bold;font-size:15px;">{!$Label.Section_Collected_Fees_to_RPAs_and_Redemption}</span>
+                            </apex:facet> 
+                            <apex:pageBlockTable value="{!WrapperRPARedList}" var="rred" width="100%">
+                                
+                                <apex:column headerValue="{!$Label.Column_RPA_Name}">
+                                    <apex:outputText value="{!rred.RPAName}"/>
+                                </apex:column>
+                        
+                                <apex:column headerValue="{!$Label.Column_RPA_Redemption_Name}" >
+                                    <apex:outputText value="{!rred.RPARedemptionName}"/>
+                                </apex:column>
+                    
+                                <apex:column headerValue="{!$Label.Column_RPA_Program_Fee}">  
+                                    <apex:outputText label="RPA Program Fee" value="{0,number,$#,##0.00}"> <apex:param value="{!rred.RPAProgramFee}" /> </apex:outputText>
+                                </apex:column>
+                                
+                                <apex:column headerValue="{!$Label.Column_Program_Fee_Collected}">
+                                    <apex:outputText label="{!$Label.Column_Program_Fee_Collected}" value="{0,number,$#,##0.00}"> <apex:param value="{!rred.ProgramFeeCollected}" /> </apex:outputText>
+                                </apex:column> 
+                            </apex:pageBlockTable>
+                        </apex:pageblockSection>
+                        </apex:pageBlock>
+                    </apex:outputPanel>
+                </apex:tab>
+            </apex:tabPanel>
+        </apex:outputpanel>
+            
+        <script src="{!URLFOR($Resource.JQuery, 'js/jquery-1.9.1.min.js')}"/>
+        <script type="text/javascript">
+            function validateAmount(payAmount, RedAmount, Amount){
+                if(payAmount == true){
+                    alert('The amount entered is greater than the amount due');                                //2016.08.29 J Caughie text was 'The amount entered is greater than the FV Amount Due of the Receivable'
+                    
+                    return false;
+                }
+                if(RedAmount == true){
+                    alert('The amount entered is greater than the Remaining Amount of the Redemption');
+                    return false;
+                }
+                if(Amount == true){
+                    alert('The amount entered cannot be zero or negative');
+                    return false;
+                }
+            }
+            function validateSub(RedAmount){
+                if(RedAmount == true){
+                    alert('Cannot save payment subs as the Redemption amount is still remaining to be allocated');
+                    return false;
+                }
+            }
+            function validateRed( RedAmountRec){
+                /*if(RedPayor == true){
+                alert('Please select a payor for the redemption');
+                }*/
+                if(RedAmountRec == true){
+                alert('Please enter the proper amount received for the redemption');
+                }
+            }
+            function ShowAlert(){
+                alert('here u r');
+            }
+            function schoolSelected(){
+                alert('filtering by school');
+                FilteredBySchool();
+                alert('filtered');
+            }
+            
+            function go(field) {
+                var huh = document.getElementById(field).value;
+                alert(huh); //returns the string u put inside of input text field
+            }
+            jQuery.noConflict();
+            
+            function disableInput(){
+                document.getElementByclass('PaymentBox').style.display=none;
+            }
+            function totalAllocated(value){                                                 //2016.09.20 J Caughie - check amount allocated
+                if(value < 0){
+                    alert('Too much allocated. Please review and try again!');
+                    return false;
+                } else {
+                    return true;
+                }
+            } 
+        </script>
+    </apex:form>
+
+</apex:page>

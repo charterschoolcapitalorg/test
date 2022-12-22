@@ -1,0 +1,9 @@
+<aura:component >
+    <aura:attribute name="title" type="String" />
+    <aura:attribute name="fileName" type="String" />
+        <lightning:layout multipleRows="false">
+            <lightning:layoutItem size="1" class="header">
+                <span style="text-align:center;"><b>{!v.title}</b>{!v.fileName}
+                </span></lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

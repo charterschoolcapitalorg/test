@@ -1,0 +1,20 @@
+<aura:component controller="MyAccountItemsCtlr" implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="accts" type="Account[]" />
+    <aura:attribute name="acctSize" type="Integer" />
+    <aura:attribute name="hasOtherItems" type="Boolean" default="false" />
+
+    <aura:attribute name="statusfilter" type="String" />
+    <aura:attribute name="cmos" type="String[]" />
+
+    <aura:handler name="change" value="{!v.cmos}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.statusfilter}" action="{!c.doInit}"/>
+
+    <aura:registerEvent name="showAccountItems" type="c:ShowItems" />
+    
+    <aura:iteration items="{!v.accts}" var="acct">
+        <c:MyAccountItem account="{!acct}" isOnlyAcct="{!and(v.accts.length==1,not(v.hasOtherItems))}" statusfilter="{!v.statusfilter}" cmos="{!v.cmos}" /> 
+    </aura:iteration>    
+    
+	<lightning:overlayLibrary aura:id="overlayLib"/>
+</aura:component>

@@ -1,0 +1,316 @@
+<aura:component controller="DiligenceCheckListController" implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForRecordHome" access="global">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="filteredRecords" type="object[]" default="null"/>
+    <aura:attribute name="today" type="Date"/>
+    <aura:attribute name="ShowSpinner" type="boolean" default="true"/>
+    <aura:attribute name="loading" type="boolean" default="false"/>
+    <aura:attribute name="disableSearch" type="boolean" default="false"/>
+    <aura:attribute name="showClear" type="boolean" default="false"/>
+    <aura:attribute name="aiMappingList" type="List" />
+    <aura:attribute name="ownerList" type="List" />
+    <aura:attribute name="statusList" type="List" />
+    <aura:attribute name="assignedToList" type="List" />
+    <aura:attribute name="propertyList" type="List" />
+    <aura:attribute name="aiMapping" type="String" />
+    <aura:attribute name="owner" type="String" />
+    <aura:attribute name="status" type="String" />
+    <aura:attribute name="startDate" type="Date" />
+    <aura:attribute name="endDate" type="Date" />
+    <aura:attribute name="assignedTo" type="String" />
+    <aura:attribute name="property" type="String" />
+    <aura:attribute name="sortField" type="String" access="private"/>
+    <aura:attribute name="sortDirection" type="String" default="ASC" access="private"/>
+    <aura:attribute name="openmodel" type="boolean" />
+
+
+     <!-- page load spinner-->
+     <aura:if isTrue="{!v.ShowSpinner}">
+        <div class="spinner">
+           <lightning:spinner variant="base" size="large" alternativeText="Please wait..." title="Data loading, please wait."/>
+        </div>
+    </aura:if>
+    <!-- page load spinner--> 
+
+    <!-- page loaded-->
+    <aura:if isTrue="{!!v.ShowSpinner}">
+        <div class="slds-col slds-theme_shade heading slds-p-around_large">
+
+            <lightning:card class="heading">
+                <aura:set attribute="title">
+                    AUM Checklist<br/>
+                    <p style="font-size:12px">AUM Check list provides full picture 
+                        and summary of the Action List and Client Portal 
+                        items related to an Asset Management Facility and Tenant</p>
+                    <lightning:formattedDateTime style="font-size: 10px;" value="{!v.today}"/>
+                </aura:set>
+                <aura:set attribute="actions">
+                    <lightning:button class="slds-p-right_small" variant="brand" label="Search" title="Search" onclick="{! c.handleSearch }" disabled="{!v.disableSearch}"/>
+                    <lightning:button class="slds-button btnCustomStyle" iconName="utility:refresh" variant="Neutral" label="Refresh Data" title="Refresh underlying data" onclick="{! c.handleRefresh }"/>
+                    <lightning:button class="slds-button btnCustomStyle" iconName="utility:info" variant="Neutral" label="Help" title="Help" onclick="{!c.getHelp}"/>
+                </aura:set>
+
+                <!--Help Modal Window-->
+                <aura:if isTrue="{!v.openmodel}">
+                    <div>
+                          <section role="dialog" tabindex="-1" aria-label="Meaningful description of the modal content" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                            <div class="slds-modal__container">
+                              <header class="slds-modal__header">
+                                <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Help</h2>
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeHelp}">
+                                  <lightning:icon iconName="utility:close" size="small" variant="neutral"/>
+                                  <span class="slds-assistive-text">Close</span>
+                                </button>
+                              </header>
+                
+                            <div class="slds-modal__content slds-p-around_medium alignLeft" id="modal-content-id-1">
+                                <h2 class="slds-text-heading--medium">How to use this report</h2>
+                                    
+                                <p style="font-size:medium"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; This report displays Ongoing Diligence info and 
+                                    activity so users can track status of need, 
+                                    request, and fulfillment of asset diligence across Action Items, 
+                                    Client Portal Items, and Lease Compliance items.
+                                    </p>
+                                <br/>
+                                <h2 class="slds-text-heading--medium">How to use search</h2>
+                                    
+                                <p style="font-size:medium"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Apply filters on steps 1 and 2 to view select records. 
+                                    For Step 1 - Select one filter value, 
+                                    for Step 2 - Both Start and End dates have to be selected.
+                                    </p>
+                                <br/>
+                                <h2 class="slds-text-heading--medium">What green and red mean</h2>
+                                
+                                <p style="font-size:medium">
+                                    <span style="color: Black"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Has CP Item: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    <lightning:icon iconName="action:close" alternativeText="Close" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                    <span style="color: black"> - No Open CP Item</span>
+                                </p>
+                                
+                                <p style="font-size:medium">
+                                    <span style="color: Black"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Due Date CP: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    <lightning:icon iconName="action:close" alternativeText="Close" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                    <span style="color: black"> - No CP Due Date &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+                                    <lightning:icon iconName="action:approval" alternativeText="Approved" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                    <span style="color: black"> - With CP Due Date</span>
+                                </p>
+
+                                <p style="font-size:medium">
+                                    <span style="color: Black"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Submitted Date CP: </span>
+                                    <lightning:icon iconName="action:close" alternativeText="Close" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                    <span style="color: black"> - Date Blank &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>
+                                    <lightning:icon iconName="action:approval" alternativeText="Approved" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                    <span style="color: black"> - Date Populated</span>
+                                </p>
+                                
+                                <p style="font-size:medium">
+                                    <span style="color: Black"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Approved Date CP: &nbsp;</span>
+                                    <lightning:icon iconName="action:close" alternativeText="Close" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                    <span style="color: black"> - No CP Approved Date &nbsp;&nbsp;&nbsp; </span>
+                                    <lightning:icon iconName="action:approval" alternativeText="Approved" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                    <span style="color: black"> - With Approved Date</span>
+                                </p>
+
+                                <p style="font-size:medium">
+                                    <span style="color: Black"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Review Date AI: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    <lightning:icon iconName="action:close" alternativeText="Close" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                    <span style="color: black"> - Date Not In Filter Range, </span>
+                                    <lightning:icon iconName="action:approval" alternativeText="Approved" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                    <span style="color: black"> - Date In Filter Range</span>
+                                </p>
+                            </div>
+                              <footer class="slds-modal__footer">
+                                <lightning:button label="Ok"
+                                        variant="brand" class="slds-m-top--medium"
+                                        onclick="{!c.closeHelp}"/>
+                              </footer>
+                            </div>
+                          </section>
+                      <div class="slds-backdrop slds-backdrop_open"></div>
+                    </div>
+                </aura:if>
+                <!---->
+
+                <!--Filter Options-->
+                <aura:set attribute="footer">
+                    
+                    <h1 style="text-align:left; text-decoration:underline">Step 1 - Select one filter value</h1>
+                    <lightning:layout multipleRows="false">
+                        <lightning:layoutItem flexibility="auto" >
+                            <lightning:combobox class="slds-p-left_small slds-p-right_small" name="aiMapping" label="Diligence Item:" value="{! v.aiMapping }" placeholder="Select Diligence Item" options="{! v.aiMappingList }" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="auto" >
+                            <lightning:combobox class="slds-p-right_small" name="property" label="Property:" value="{! v.property }" placeholder="Select Property" options="{! v.propertyList }" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="auto" >
+                            <lightning:combobox class="slds-p-left_small slds-p-right_small" name="owner" label="Owner Portfolio:" value="{! v.owner }" placeholder="Select Owner Portfolio" options="{! v.ownerList }" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="auto" >
+                            <lightning:combobox class="slds-p-right_small" name="status" label="Status:" value="{! v.status }" placeholder="Status Of The Client Portal Item" options="{! v.statusList }" />
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="auto" >
+                            <lightning:combobox class="slds-p-right_small" name="assignedTo" label="Assigned To:" value="{! v.assignedTo }" placeholder="Select The Person Assigned To" options="{! v.assignedToList }" />
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <br/>
+
+                    <h1 style="text-align:left; text-decoration:underline">Step 2 - Both Start and End dates have to be selected</h1>
+                    <lightning:layout multipleRows="false" >
+                        <lightning:layoutItem flexibility="auto" >
+                            <lightning:input class="slds-p-left_small slds-p-right_small" aura:id="startDate" type="date" name="startDate" label="Start Date:" placeholder="Add Initial Date (required)" required="true" value="{! v.startDate }" /> 
+                        </lightning:layoutItem>
+                        <lightning:layoutItem flexibility="auto" >
+                            <lightning:input class="slds-p-right_small" aura:id="endDate" type="date" name="endDate" label="End Date:" placeholder="Add Final Date (required)" required="true" value="{! v.endDate }" />                   
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </aura:set>
+                <!--Filter Options-->
+
+            </lightning:card>
+        </div>
+
+        <!--Table-->
+        <div class="slds-theme_shade slds-p-around_large">
+            <lightning:card class="slds-p-top_xx-small slds-p-bottom_x-small">
+                <aura:if isTrue="{!v.showClear}">
+                    <aura:if isTrue="{!not(empty(v.filteredRecords))}">
+                        <div class="slds-m-top_medium slds-m-bottom_x-large" style="height:720px;">
+                                        <div class="slds-scrollable tableFixHead" style="height:100%;">
+                                            <table class="slds-table slds-table_bordered slds-table_col-bordered slds-table_fixed-layout slds-border_left slds-border_right">
+                                                <thead>
+                                                    <tr class="slds-line-height_reset slds-theme_shade">
+                                                        <th scope="col" style="width:35%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='ActionItem'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                                                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="ActionItem" onclick="{!c.handleSort}">
+                                                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                    <div class="slds-truncate" title="Action Item" style="width:100%">Action Item</div>
+                                                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                    </span>
+                                                                </div>
+                                                            </a>
+                                                        </th>
+                                                        <th scope="col" style="width:20%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='Owner'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                                                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="Owner" onclick="{!c.handleSort}">
+                                                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                    <div class="slds-truncate" title="portfolio Owner">Owner</div>
+                                                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                    </span>    
+                                                                </div>
+                                                            </a>
+                                                        </th>
+                                                        <th scope="col" style="width:40%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='PropertyName'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                                                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="PropertyName" onclick="{!c.handleSort}">
+                                                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                    <div class="slds-truncate" title="Property Name">Property</div>
+                                                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                    </span>    
+                                                                </div>
+                                                            </a>
+                                                        </th>
+                                                        <th scope="col" style="width:45%">
+                                                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                <div class="slds-truncate" title="Account">Account</div>
+                                                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                </span>    
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" style="width:30%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='AssignedTo'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                                                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="AssignedTo" onclick="{!c.handleSort}">
+                                                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                    <div class="slds-truncate" title="Assigned To">Assigned To</div>
+                                                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                    </span>    
+                                                                </div>
+                                                            </a>
+                                                        </th>
+                                                        <th scope="col" style="width:20%">
+                                                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                <div class="slds-truncate" title="Assigned">Assigned</div>
+                                                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                </span>    
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" style="width:20%">
+                                                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                <div class="slds-truncate" title="Has CP Item">Has CP<br/>Item?</div>
+                                                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                </span>    
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" style="width:20%">
+                                                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                <div class="slds-truncate" title="Visible to Client">Visible<br/>to Client</div>
+                                                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                </span>    
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" style="width:20%">
+                                                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                <div class="slds-truncate" title="Due Date CP">Due<br/>Date CP</div>
+                                                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                </span>    
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" style="width:20%">
+                                                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                <div class="slds-truncate" title="Submitted Date CP">Submitted<br/>Date CP</div>
+                                                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                </span>    
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" style="width:20%">
+                                                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                <div class="slds-truncate" title="Approved Date CP">Approved<br/>Date CP</div>
+                                                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                </span>    
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" style="width:20%">
+                                                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                <div class="slds-truncate" title="Review Date AI">Review<br/>Date AI</div>
+                                                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                </span>    
+                                                            </div>
+                                                        </th>
+                                                        <th scope="col" style="width:100%">
+                                                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                                                <div class="slds-truncate" title="Comment">Comment</div>
+                                                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                                                </span>    
+                                                            </div>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                        <aura:iteration items="{!v.filteredRecords}" var="rec" >
+                                            <c:DiligenceCheckListRow diligenceRecord="{!rec}" isLoading="{!v.loading}"/>
+                                        </aura:iteration>
+                                    
+                                </table>
+                            
+                            </div>
+                        </div>
+                        <aura:set attribute="else">
+                            <lightning:formattedText class="slds-m-left_small slds-text-color_error slds-text-heading_small" value="Your search returned no records."/>
+                        </aura:set>
+                    </aura:if>
+                    <aura:set attribute="else">
+                        <lightning:formattedText class="slds-m-left_small slds-text-heading_small" value="Enter Search Criteria to view records."/>
+                    </aura:set>
+                </aura:if>
+    </lightning:card>
+
+    </div>
+    </aura:if>
+    
+</aura:component>

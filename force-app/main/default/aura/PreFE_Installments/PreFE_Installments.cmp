@@ -1,0 +1,77 @@
+<aura:component >
+    <aura:attribute name="installments" type="Pre_FE_Installment__c[]"/>
+    <lightning:tile title="Installments" class="slds-scrollable_y">
+        <div class="slds-p-around_medium">
+            <table class="slds-table slds-table_bordered slds-max-medium-table_stacked-horizontal slds-wrap">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th class="slds-text-title_caps slds-p-left_none" scope="col">
+                            <div class="slds-truncate" title="Receivable Name">Receivable Name</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" title="Gross Value">Gross Value</div>
+                        </th>
+                        <th class="slds-text-title_caps " style="padding-left: 24px;" scope="col">
+                            <div class="slds-truncate" title="DPP">DPP</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" title="Face Value">Face Value</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" title="Discount Amount">Discount Amount</div>
+                        </th>
+                        <th class="slds-text-title_caps" style="padding-left: 24px;" scope="col">
+                            <div class="slds-truncate" title="UPP">UPP</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" title="Transaction Fee">Transaction Fee</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="rightAlign slds-truncate" title="Expected Pay Date">Expected Pay Date</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="slds-truncate" title="Maturity Buffer">Maturity Buffer</div>
+                        </th>
+                        <th class="slds-text-title_caps" scope="col">
+                            <div class="rightAlign slds-truncate" title="Maturity Date">Maturity Date</div>
+                        </th>
+                    </tr>
+                </thead>
+                <aura:iteration items="{!v.installments}" var="installment" >
+                    <tbody>
+                        <td data-label="Receivable Name" class="slds-text-align_left">
+                            <div class="slds-truncate" title="Name">{!installment.Name__c}</div>
+                        </td>
+                        <td data-label="Gross Value" class="slds-text-align_right">
+                            <lightning:formattedNumber value="{!installment.GRV_Amount__c}" maximumFractionDigits="0" class="slds-truncate slds-p-right_xx-large"/>
+                        </td>
+                        <td data-label="DPP" class="slds-text-align_right">
+                            <lightning:formattedNumber value="{!installment.MDPP__c}" maximumFractionDigits="0" class="slds-truncate slds-p-right_xx-large"/>
+                        </td>
+                        <td data-label="Face Value" class="slds-text-align_right">
+                            <lightning:formattedNumber value="{!installment.FV_Amount__c}" maximumFractionDigits="0" class="slds-truncate slds-p-right_xx-large"/>
+                        </td>
+                        <td data-label="Discount Amount" class="slds-text-align_right">
+                            <lightning:formattedNumber value="{!installment.Discount_Amount__c}" maximumFractionDigits="0" class="slds-truncate slds-p-right_xx-large"/>
+                        </td>
+                        <td data-label="UPP" class="slds-text-align_right">
+                            <lightning:formattedNumber value="{!installment.Upfront_Purchase_Price__c}" maximumFractionDigits="0" class="slds-truncate slds-p-right_xx-large"/>
+                        </td>
+                        <td data-label="Transaction Fee" class="slds-text-align_right">
+                            <lightning:formattedNumber value="{!installment.Transaction_Fee__c}" maximumFractionDigits="0" class="slds-truncate slds-p-right_xx-large"/>
+                        </td>
+                        <td data-label="Expected Pay Date" class="slds-text-align_right">
+                            <ui:outputDate aura:id="expdate" class="field" value="{!installment.Expected_Pay_Date__c}" />
+                        </td>
+                        <td data-label="Maturity Buffer" class="slds-text-align_right">
+                            <lightning:formattedNumber value="{!installment.Maturity_Buffer__c}" maximumFractionDigits="0" class="slds-truncate slds-p-right_xx-large"/>
+                        </td>
+                        <td data-label="Maturity Date" class="slds-text-align_right">
+                            <ui:outputDate aura:id="expdate" class="field" value="{!installment.Maturity_Date__c}" />
+                        </td>
+                    </tbody>
+                </aura:iteration>
+            </table>
+        </div>
+    </lightning:tile>
+</aura:component>

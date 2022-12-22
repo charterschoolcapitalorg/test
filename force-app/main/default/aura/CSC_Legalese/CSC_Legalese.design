@@ -1,0 +1,3 @@
+<design:component label="CSC Disclaimer">
+	<design:attribute name="disclaimer" label="Disclaimer" />
+</design:component>

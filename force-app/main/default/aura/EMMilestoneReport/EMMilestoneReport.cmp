@@ -1,0 +1,301 @@
+<aura:component controller="EnrollmentMarketingMilestoneReportCtrl">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="today" type="Date"/>
+    <aura:attribute name="filteredOpportunities" type="object[]"/>
+    <aura:attribute name="originalOpportunities" type="object[]"/>
+    <aura:attribute name="totalRecords" type="String" />
+    <aura:attribute name="oppsSignedContract" type="String" />
+    <aura:attribute name="userList" type="List" default="All Users"/>
+    <aura:attribute name="stateList" type="List" default="All States"/>
+    <aura:attribute name="state" type="String" />
+    <aura:attribute name="user" type="String" />
+    <aura:attribute name="openHelp" type="boolean" />
+    <aura:attribute name="sortField" type="String" access="private"/>
+    <aura:attribute name="sortDirection" type="String" default="ASC" access="private"/>
+
+    <!--Header-->
+    <div class="slds-col slds-theme_shade heading ">
+        <lightning:card class="heading">
+            <aura:set attribute="title">
+                EM Milestone Report 
+                - <lightning:formattedDateTime value="{!v.today}"/>
+                - <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital.vf.force.com/apex/EMMilestoneReportDownloadExcel">⤓ Download *.xls</a>
+                <!--SB - https://charterschoolcapital- -cscfull- -c.sandbox.vf.force.com/apex/EMMilestoneReportDownloadExcel -->
+                - <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital--cscfull--c.sandbox.vf.force.com/apex/EMMilestonePipelineReport">Pipeline</a>
+            </aura:set>
+            <aura:set attribute="actions">
+                <lightning:layout multipleRows="false">
+                    <lightning:combobox name="state" value="{!v.state}" placeholder="Select State" options="{!v.stateList}" onchange="{!c.handleSearch}"/>
+                    <lightning:combobox name="user" value="{!v.user}" placeholder="Select User" options="{!v.userList}" onchange="{!c.handleSearch}"/>
+                </lightning:layout>
+            </aura:set>
+        </lightning:card>
+
+        <lightning:card>
+            <aura:set attribute="title">
+                <!-- <p style="font-size:11px"># Open Uncontracted Opps:</p> <lightning:formattedNumber value="{!v.totalRecords}"/> (all opps on the list below) <br/>
+                <p style="font-size:11px"># Contracted Opps This FY:</p> <lightning:formattedNumber value="{!v.totalRecords}"/> -->
+
+                <span style="color: black; font-size:11px"> Open Uncontracted Opps: </span> <lightning:formattedNumber value="{!v.totalRecords}"/> <br/>
+                <span style="color: black; font-size:11px"> Contracted Opps This FY: </span> <lightning:formattedNumber value="{!v.oppsSignedContract}"/> 
+            </aura:set>
+            <aura:set attribute="actions">
+                <lightning:layout multipleRows="false">
+                        <lightning:button variant="brand" onclick="{! c.handleRefresh }">Refresh</lightning:button>
+                        <lightning:button variant="success" onclick="{!c.openHelp}"> Help </lightning:button>
+                </lightning:layout>
+            </aura:set>
+        </lightning:card>
+
+        <!-- <lightning:layout multipleRows="false">
+            <p style="padding-left:20px;"># Opportunities That Are not Yet Won: &nbsp;&nbsp;&nbsp;<lightning:formattedNumber value="{!v.totalRecords}"/></p>
+            <div class="slds-clearfix">
+                <button class="slds-button slds-float_right" onclick="{! c.handleRefresh }">Refresh</button>
+            </div>
+        </lightning:layout> -->
+
+        <!--Help Modal Window-->
+        <aura:if isTrue="{!v.openHelp}">
+            <div>
+                <section role="dialog" tabindex="-1" aria-label="Meaningful description of the modal content" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">How to use this report</h2>
+                            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeHelp}">
+                            <lightning:icon iconName="utility:close" size="small" variant="neutral"/>
+                            <span class="slds-assistive-text">Close</span>
+                            </button>
+                        </header>
+
+                        <div class="slds-modal__content slds-p-around_medium alignLeft" id="modal-content-id-1">
+                            <h1 class="slds-text-heading--medium" style="font-weight:100; text-align:center">Facilities Milestone Report</h1>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EM milestone report displays all opportunity 
+                                records in the pipeline ...</p>
+                            <br/>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(1) - Button Deck. Use to search for the opportunity Close Date, User, and State. Select Start date and/or End date, click Search. </p>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2) - Total Values Table. Displays total number of Completed records and the total Estimated Project Cost for them. Appling filters does NOT change these numbers.</p>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(3) - Ultimate Totals. Total Estimated Project Cost and Total number of opportunities pulled into the Facilities Milestone Report. Appling filters does NOT change these numbers.</p>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(4) - Report Columns. Sortable. Hover over the column header for 3 seconds to view help text related to symbols.</p>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(5) - Download Link. Click this link to download the Facilities Milestone Report as *.xls</p>
+                            <br/>
+                            <h1 class="slds-text-heading--medium" style="font-weight:100; text-align:center">Symbols</h1>
+                            <p style="font-size:medium">
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<lightning:icon iconName="action:close" alternativeText="Close" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                <span style="color: black"> - Incomplete, </span>
+                                <lightning:icon iconName="action:approval" alternativeText="Approved" title="Approved" size="xx-small" style="zoom:0.5"/>
+                                <span style="color: black"> - Complete, </span>
+                            </p>
+                            <br/>
+                            <h1 class="slds-text-heading--medium" style="font-weight:100; text-align:center">When Click The "Search" Button</h1>
+                            <br/>
+                            <h1 class="slds-text-heading--medium" style="font-weight:100; text-align:center">To Learn More</h1>
+                            <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital.lightning.force.com/lightning/r/Case/5004u00002hVwSUAA0/view">More info...</a>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning:button label="Close" variant="brand" class="slds-m-top--medium" onclick="{!c.closeHelp}"/>
+                        </footer>
+                    </div>
+                </section>
+            </div>
+        </aura:if>
+        <!---->
+    </div>
+
+    <!--Table itself-->
+    <div class="slds-m-top_medium slds-m-bottom_x-large" style="height:720px;">
+        <div class="slds-scrollable tableFixHead" style="height:100%;">
+            <table class="slds-table slds-table_bordered slds-table_col-bordered slds-table_fixed-layout slds-border_left slds-border_right">
+                <thead>
+                    <tr class="slds-line-height_reset slds-theme_shade">
+                        
+                        <!-- 1 -->
+                        <!-- # -->
+                        <th scope="col" style="width:10%">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                <div class="slds-truncate" title="Has CP Item">#</div>
+                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                </span>    
+                            </div>
+                        </th>
+
+                        <!-- 2 -->
+                        <!-- Close Date -->
+                        <th scope="col" style="width:25%" class="{!'slds-is-resizable slds-is-sortable ' + (v.closeDate=='closeDate'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="closeDate" onclick="{!c.handleSort}">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <div class="slds-truncate" title="portfolio Owner">Close<br/>Date</div>
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                    </span>    
+                                </div>
+                            </a>
+                        </th>
+
+                        <!-- 3 -->
+                        <!-- Created -->
+                        <th scope="col" style="width:25%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='createdDate'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="createdDate" onclick="{!c.handleSort}">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <div class="slds-truncate" title="Property Name">Created</div>
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                    </span>    
+                                </div>
+                            </a>
+                        </th>
+
+                        <!-- 4 -->
+                        <!-- Business Days To Close -->
+                        <th scope="col" style="width:25%">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                <div class="slds-truncate" title="Account">Until<br/>Close</div>
+                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                </span>    
+                            </div>
+                        </th>
+
+                        <!-- 5 -->
+                        <!-- Opportunity Name -->
+                        <th scope="col" style="width:100%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='oppName'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="oppName" onclick="{!c.handleSort}">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <div class="slds-truncate" title="Assigned To">Opportunity Name</div>
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                    </span>    
+                                </div>
+                            </a>
+                        </th>
+
+                        <!-- 6 -->
+                        <!-- EM Channel -->
+                        <th scope="col" style="width:45%">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                <div class="slds-truncate" title="Assigned">EM Channel</div>
+                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                </span>
+                            </div>
+                        </th>
+
+                        <!-- 6 -->
+                        <!-- Pipeline Stage -->
+                        <th scope="col" style="width:30%">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                <div class="slds-truncate" title="Assigned">Pipeline<br/>Stage</div>
+                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                </span>    
+                            </div>
+                        </th>
+
+                        <!-- 7 -->
+                        <!-- State -->
+                        <th scope="col" style="width:20%">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                <div class="slds-truncate" title="Has CP Item">State</div>
+                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                </span>    
+                            </div>
+                        </th>
+
+                        <!-- 8 -->
+                        <!-- Opportunity Value -->
+                        <th scope="col" style="width:30%">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                <div class="slds-truncate" title="Visible to Client">Opp<br/>Value</div>
+                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                </span>    
+                            </div>
+                        </th>
+
+                        <!-- 9 -->
+                        <!-- Fee structure -->
+                        <th scope="col" style="width:30%">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                <div class="slds-truncate" title="Visible to Client">Fee<br/>Structure</div>
+                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                </span>
+                            </div>
+                        </th>
+
+                        <!-- 10 -->
+                        <!-- Collect Pre-Qual Info -->
+                        <th scope="col" style="width:35%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='preQualInfo'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="preQualInfo" onclick="{!c.handleSort}">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <div class="slds-truncate" title="Due Date CP">Pre-Qual Info</div>
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                    </span>
+                                </div>
+                            </a>
+                        </th>
+
+                        <!-- 11 -->
+                        <!-- Present EM Pitch Deck to Prospect -->
+                        <th scope="col" style="width:35%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='pitchDeck'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="pitchDeck" onclick="{!c.handleSort}">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <div class="slds-truncate" title="Submitted Date CP">Pitch Deck</div>
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                    </span>    
+                                </div>
+                            </a>
+                        </th>
+
+                        <!-- 12 -->
+                        <!-- Approve EM Client for Contracting -->
+                        <th scope="col" style="width:35%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='approveContracting'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="approveContracting" onclick="{!c.handleSort}">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <div class="slds-truncate" title="Approved Date CP">Approve<br/>Contracting</div>
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                    </span>
+                                </div>
+                            </a>
+                        </th>
+
+                        <!-- 13 -->
+                        <!-- Received Signed Contract -->
+                        <th scope="col" style="width:35%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='signedContract'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="signedContract" onclick="{!c.handleSort}">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <div class="slds-truncate" title="Comment">Signed<br/>Contract</div>
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                    </span>
+                                </div>
+                            </a>
+                        </th>
+
+                        <!-- 14 -->
+                        <!-- Opportunity Owner -->
+                        <th scope="col" style="width:30%">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                <div class="slds-truncate" title="Comment">Opp<br/>Owner</div>
+                                <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                </span>
+                            </div>
+                        </th>
+
+                    </tr>
+                </thead>
+
+                <aura:iteration items="{!v.filteredOpportunities}" var="opp" indexVar="index">
+                    <c:EnrollmentMarketingMilestoneRow opportunity="{!opp}" indexNumber="{!index}"/>
+                </aura:iteration>
+    
+            </table>
+        </div>
+    </div>
+    <!--Table itself-->
+</aura:component>

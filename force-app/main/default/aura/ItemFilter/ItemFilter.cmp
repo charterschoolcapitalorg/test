@@ -1,0 +1,38 @@
+<aura:component >
+    <aura:attribute name="cmoaccounts" type="CMOAccounts" />
+    <aura:attribute name="statusfilter" type="String" default="Pending"/>  
+
+    <aura:registerEvent name="filterChange" type="c:ItemFilterChange" />
+
+    <ltng:require
+        styles="{! $Resource.select2 + '/select2-4.0.3/dist/css/select2.min.css'}" 
+        scripts="{!join(',', $Resource.MDBootstrap + '/js/jquery-3.4.0.min.js', $Resource.select2 + '/select2-4.0.3/dist/js/select2.js')}" 
+        afterScriptsLoaded="{!c.scriptsLoaded}"
+    />
+
+    <lightning:layout multipleRows="false" horizontalAlign="right" >
+        <lightning:layoutItem size="12" mediumDeviceSize="12" class="fixedWidth">
+            <div style="text-align: right;align: right;" > 
+                Select a Status:&nbsp;&nbsp;
+
+                <lightning:select class="select-auto-width" value="{!v.statusfilter}" aura:id="statusfilter" name="itemfilter" >
+                    <option value="Pending">Action Required</option>
+                    <option value="Submitted">Submitted</option>
+                    <option value="Completed Items">Completed Items</option>
+                    <option value="All Items">All Items</option>
+                </lightning:select>
+
+                <span class="{!if(empty(v.cmoaccounts), 'slds-hide', '')}">
+                    &nbsp;&nbsp;
+                    Select Portfolio(s):&nbsp;&nbsp;
+                    <select onchange="{!c.applyFilters}" id="cmofilter" aura:id="cmofilter" style="width:300px" class="select2Class" multiple="multiple">
+                        <option></option>
+                        <aura:iteration items="{!v.cmoaccounts}" var="opts">  
+                            <option value="{!opts.Id}" selected="{!opts.Checked}"> {!opts.Name} </option>
+                        </aura:iteration>
+                    </select>
+                </span>
+            </div>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

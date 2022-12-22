@@ -1,0 +1,104 @@
+<apex:page controller="EnrollmentMarketingMilestoneReportCtrl" contentType="application/vnd.ms-excel#EM_Milestone_Report.xls" cache="true">
+    <!-- <apex:pageBlock title="EM Milestone Report">
+        <apex:pageBlockTable value="{!oppsToExport}" var="opp" border="1px solid black">
+            <apex:column value="{!opp.opp.CloseDate}"/>
+            <apex:column headerValue="Created" value="{!opp.createdDate}"/>
+            <apex:column headerValue="Business Days To Close" value="{!opp.businessDaysToClose}"/>
+            <apex:column value="{!opp.opp.Name}"/>
+            <apex:column headerValue="Num of Opp Schools" value="{!opp.opp.Num_of_Opp_Schools__c}"/>
+            <apex:column headerValue="Channel" value="{!opp.opp.Referral_Source__c}"/>
+            <apex:column headerValue="Pipeline Stage" value="{!opp.opp.Pipeline_Stage__c}"/>
+            <apex:column value="{!opp.opp.STATE__c}"/>
+            <apex:column value="{!opp.opp.Estimate_EM_Project_Value__c}"/>
+            <apex:column value="{!opp.opp.Fee_Structure_Type__c}"/>
+
+            <apex:column headerValue="preQualInfo" value="{!opp.preQualInfo}"/>
+            <apex:column headerValue="pitchDeck" value="{!opp.pitchDeck}"/>
+            <apex:column headerValue="approveContracting" value="{!opp.approveContracting}"/>
+            <apex:column headerValue="signedContract" value="{!opp.signedContract}"/>
+
+            <apex:column headerValue="Owner Last Name" value="{!opp.opp.Owner.LastName}"/>
+        </apex:pageBlockTable>
+    </apex:pageBlock> -->
+
+    <apex:dataTable value="{!oppsToExport}" var="opp" border="1px solid black">
+        <!-- Close Date -->
+        <apex:column>
+            <apex:facet name="header">Close Date</apex:facet>
+            <apex:outputText value="{0,date,MM/dd/yyyy}"><apex:param value="{!opp.opp.CloseDate}" /></apex:outputText>
+        </apex:column>
+        <!-- Created -->
+        <apex:column>
+            <apex:facet name="header">Created</apex:facet>
+            <apex:outputText value="{0,date,MM/dd/yyyy}"><apex:param value="{!opp.opp.createddate}" /></apex:outputText>
+        </apex:column>
+        <!-- BD Close -->
+        <apex:column>
+            <apex:facet name="header">BD Close</apex:facet>
+            <apex:outputText value="{!opp.businessDaysToClose}"/>
+        </apex:column>
+        <!-- Opportunity Name -->
+        <apex:column>
+            <apex:facet name="header">Opportunity Name</apex:facet>
+            <apex:outputText value="{!opp.opp.Name}"/>
+        </apex:column>
+        <!-- Num of Opp Schools -->
+        <apex:column>
+            <apex:facet name="header">Num of Opp Schools</apex:facet>
+            <apex:outputText value="{!opp.opp.Num_of_Opp_Schools__c}"/>
+        </apex:column>
+        <!-- Referral Source -->
+        <apex:column>
+            <apex:facet name="header">Referral Source</apex:facet>
+            <apex:outputText value="{!opp.opp.Referral_Source__c}"/>
+        </apex:column>
+        <!-- Pipeline Stage -->
+        <apex:column>
+            <apex:facet name="header">Pipeline Stage</apex:facet>
+            <apex:outputText value="{!opp.opp.Pipeline_Stage__c}"/>
+        </apex:column>
+        <!-- State -->
+        <apex:column>
+            <apex:facet name="header">State</apex:facet>
+            <apex:outputText value="{!opp.opp.STATE__c}"/>
+        </apex:column>
+        <!-- Estimated Project Value -->
+        <apex:column>
+            <apex:facet name="header">Estimated Project Value</apex:facet>
+            <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.opp.Estimate_EM_Project_Value__c}" /></apex:outputText>
+        </apex:column>
+        <!-- Fee Structure Type -->
+        <apex:column>
+            <apex:facet name="header">Fee Structure Type</apex:facet>
+            <apex:outputText value="{!opp.opp.Fee_Structure_Type__c}"/>
+        </apex:column>
+
+        <!-- preQualInfo -->
+        <apex:column>
+            <apex:facet name="header">Collect Pre-Qual Info</apex:facet>
+            <apex:outputText value="{!opp.preQualInfo}"/>
+        </apex:column>
+        <!-- pitchDeck -->
+        <apex:column>
+            <apex:facet name="header">Present EM Pitch Deck</apex:facet>
+            <apex:outputText value="{!opp.pitchDeck}"/>
+        </apex:column>
+        <!-- approveContracting -->
+        <apex:column>
+            <apex:facet name="header">Approve Contracting</apex:facet>
+            <apex:outputText value="{!opp.approveContracting}"/>
+        </apex:column>
+        <!-- signedContract -->
+        <apex:column>
+            <apex:facet name="header">Receive Signed Contract</apex:facet>
+            <apex:outputText value="{!opp.signedContract}"/>
+        </apex:column>
+
+        <!-- Owner Last Name -->
+        <apex:column>
+            <apex:facet name="header">Owner Last Name</apex:facet>
+            <apex:outputText value="{!opp.opp.Owner.LastName}"/>
+        </apex:column>
+
+    </apex:dataTable>
+</apex:page>

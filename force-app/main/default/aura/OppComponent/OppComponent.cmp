@@ -1,0 +1,39 @@
+<aura:component controller="MyItemRowCtlr" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:attribute name="opp" type="Opportunity" />
+    
+    <aura:attribute name="IFOppType" type="Id" />
+    <aura:attribute name="FOFOppType" type="Id" />
+    <aura:attribute name="FacOppType" type="Id" />
+    
+    							<tr class="slds-text-title">
+                                        <td class="data-column-one slds-cell-wrap" style="font-size:medium;">
+                                            <a onclick="{!c.FireOppEvent}" id="{!v.opp.Id}" target="_blank" style="color:#a8ad00;">
+                                                {!v.opp.Client_Facing_Opportunity_Name__c}
+                                            </a>
+                                        </td>
+                                        
+                                        <td class="data-column-two slds-cell-wrap" style="font-size:medium;">
+                                                <ui:outputDate value="{!v.opp.CloseDate}" format="MMM d"/>
+                                        </td>
+                                        
+                                        
+                                        <aura:if isTrue="{!v.opp.RecordTypeId==v.FOFOppType || v.opp.RecordTypeId==v.IFOppType }">
+                                            <td  class="data-column-two slds-cell-wrap" style="font-size:medium;">
+                                                <lightning:formattedNumber value="{!v.opp.Face_Value__c	}" style="currency" currencyCode="USD" />
+                                        </td>
+                                        </aura:if>
+                                        
+                                        <aura:if isTrue="{!v.opp.RecordTypeId==v.FacOppType}">
+                                        	<td  class="slds-cell-wrap" style="font-size:small;">
+                                                <lightning:formattedNumber value="{!v.opp.Purchase_Price__c}" style="currency" currencyCode="USD" />
+                                        	</td>
+                                        </aura:if>
+                                        
+                                    </tr>
+
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+</aura:component>

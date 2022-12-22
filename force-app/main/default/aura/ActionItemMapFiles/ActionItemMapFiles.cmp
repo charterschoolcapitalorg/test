@@ -1,0 +1,61 @@
+<aura:component >
+	<aura:handler name="init" value="{!this}" action="{!c.init}" />
+    ***********
+    <!--
+    <aura:attribute name="files" type="ContentDocument"/>
+    <aura:attribute name="numFiles" type="Integer"/>
+	
+    <aura:if isTrue="{!v.numFiles>0}">
+       		
+            <div class="slds-text-title_caps" style='background-color:#77c5d5;'>
+            	<section class="slds-clearfix " >  
+                    
+                	<lightning:layout multipleRows="false">
+                        <lightning:layoutItem size="3" mediumDeviceSize="3" ><span style="padding-left:5px;">File Name</span></lightning:layoutItem>  
+                        <lightning:layoutItem size="2" mediumDeviceSize="2" >Date Uploaded</lightning:layoutItem>  
+                        <lightning:layoutItem size="3" mediumDeviceSize="3" >Uploaded By</lightning:layoutItem> 
+                        <lightning:layoutItem size="2" mediumDeviceSize="2" >Download File</lightning:layoutItem>  
+                        <lightning:layoutItem size="2" mediumDeviceSize="2" >Map</lightning:layoutItem>  
+            		</lightning:layout>
+                        
+                </section>
+            </div>
+        
+            
+          <lightning:layout multipleRows="true">
+            <aura:iteration items="{!v.files}" var="f" >
+                
+                <lightning:layoutItem class="slds-truncate" size="3"><span style="padding-left:5px;vertical-align:middle;">{!f.Title}</span></lightning:layoutItem>  
+                <lightning:layoutItem size="2"><span style="vertical-align:middle;"><lightning:formattedDateTime value="{!f.CreatedDate}" month="short" day="2-digit"/></span></lightning:layoutItem>  
+                <lightning:layoutItem size="3"><span style="vertical-align:middle;">{!f.CreatedBy.Name}</span></lightning:layoutItem>  
+                <lightning:layoutItem size="2"><span style="vertical-align:middle;"><a href="{!'/sfc/servlet.shepherd/document/download/'+f.Id}" target="_blank" style="color:#a8ad00;" class="wrapText">Download</a></span></lightning:layoutItem>  
+                <lightning:layoutItem size="2"><span style="vertical-align:middle;"><ui:inputCheckbox aura:id="checkbox2" label="" change="{!c.onCheck}"/></span></lightning:layoutItem>  
+             
+              </aura:iteration>
+            
+          </lightning:layout>
+        </aura:if>    
+    
+    	<div style="text-align: right;">
+        <lightning:layout multipleRows="true" horizontalAlign="right" verticalAlign="end"  >
+            <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column-instruction" aura:id="myRow">
+                &nbsp;
+            </lightning:layoutItem>
+                
+            <lightning:layoutItem size="4" mediumDeviceSize="4" class="data-column-instruction" aura:id="myRow">
+            </lightning:layoutItem>
+             
+            <lightning:layoutItem size="4" mediumDeviceSize="4" class="data-column-instruction" aura:id="myRow">
+            	<lightning:button variant="neutral" label="Save And Close" onclick="{!c.close}"/> 
+            </lightning:layoutItem>
+            
+             <lightning:layoutItem size="4" mediumDeviceSize="4" class="data-column-instruction" aura:id="myRow">
+                <lightning:button variant="neutral" label="Close" onclick="{!c.close}"/> 
+             </lightning:layoutItem>
+                
+        </lightning:layout>
+    </div>
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    -->
+</aura:component>

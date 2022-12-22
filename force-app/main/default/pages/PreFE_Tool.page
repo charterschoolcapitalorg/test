@@ -1,0 +1,34 @@
+<apex:page standardController="Opportunity" sidebar="false">
+    <apex:includeLightning />
+
+    <script>
+      	$Lightning.use("c:PreFE_ToolContainer", function () {
+        	$Lightning.createComponent(
+                "c:FE_InputParameters",
+                {stateName:'{!opportunity.State__c}',
+                    opportunity:'{!opportunity.Id}'},
+                "lightning",
+                /*function(cmp) {$A.eventService.addHandler({
+                    event: 'force:navigateToObjectHome',
+                    handler: function(event) {
+                            if (sforce && sforce.one) {
+                                // VF page in S1 or Lightning Exp
+                                sforce.one.navigateToObjectHome(event.$params$.scope);
+                            } else {
+                                // VF page in Classic
+                                // Ugg! We need an if branch for each possible object type.
+                                // Is there a better way of doing this?
+                                if (event.$params$.scope === 'Contact') {
+                                    window.location = '{!URLFOR($Action.Contact.Tab, $ObjectType.Contact)}';
+                                }
+                            }
+                        }
+                    });
+			     });*/
+                 )
+            });
+    </script>
+
+    <div id="lightning" />
+
+</apex:page>

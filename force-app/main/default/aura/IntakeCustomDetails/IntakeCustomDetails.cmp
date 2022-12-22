@@ -1,0 +1,259 @@
+<aura:component description="IntakeCustomDetail" controller="IntakeCustomDetailCtrl" 
+                implements="forceCommunity:availableForAllPageTypes,force:appHostable" 
+                access="global">
+    
+    <aura:attribute name="modalMessage" type="String"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="res" type="String" />
+    <aura:attribute name="ii" type="Intake_Item__c"/>	
+    <aura:attribute name="owner" type="User"/>
+    <aura:attribute name="files" type="ContentDocument"/>
+    <aura:attribute name="boxUrl" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    
+    <lightning:tabset selectedTabId="tab1">
+        <lightning:tab label="Details" title="Details" id="tab1">
+            <div class="slds-align_absolute-center slds-m-top--large">
+                <lightning:button variant="brand" label="Return To Home" onclick="{!c.handleReturn}"/>
+            </div>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_2-of-3">
+                    <lightning:recordViewForm recordId="{!v.ii.Id}" objectApiName="Intake_Item__c">
+                        <!--div style="position: absolute;left: 0px;width: 70%;"--> 
+                        <div style="left: 0px">
+                            <!--div class="slds-align_absolute-center slds-m-top- -large">
+                        <lightning:button variant="brand" label="Return To Home" onclick="{!c.handleReturn}"/>
+                    </div-->
+                            
+                            <div class="slds-page-header">
+                                <div class="slds-media">
+                                    <div class="slds-media__body">
+                                        <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="{!v.ii.Name}">{!v.ii.Name}</h1>
+                                        <!-- p class="slds-text-body_small slds-line-height_reset">Mark Jaeckal • Unlimited Customer • 11/13/15</p> -->
+                                        <br/>
+                                        <lightning:layout horizontalAlign="left" verticalAlign="stretch">
+                                            
+                                            <lightning:layoutItem flexibility="auto" size="5">
+                                                <lightning:outputField fieldName="Due_Date__c" />  
+                                                <!-- lightning:formattedDateTime value="{!v.ii.Due_Date__c}" month="short" day="2-digit"/> -->
+                                            </lightning:layoutItem>
+                                            <!--&nbsp;&nbsp;&nbsp;-->
+                                            <lightning:layoutItem flexibility="auto" size="5">
+                                                <lightning:outputField fieldName="Status__c" />    
+                                            </lightning:layoutItem>
+                                            <!--lightning:layoutItem flexibility="auto" size="3">
+                        <lightning:outputField fieldName="Account_Manager__c" />   
+                  </lightning:layoutItem>
+                  <lightning:layoutItem flexibility="auto" size="3">
+                        <lightning:outputField fieldName="Account_Manager_Phone__c" />   
+                  </lightning:layoutItem-->
+                                            
+                                        </lightning:layout>
+                                        <br/>
+                                        <lightning:layout horizontalAlign="left" verticalAlign="stretch">
+                                            <lightning:layoutItem flexibility="auto" size="3">
+                                                <lightning:outputField fieldName="Account_Manager__c" />   
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem flexibility="auto" size="3">
+                                                <!--lightning:outputField fieldName="Account_Manager_Phone__c" /-->
+                                                <p class="slds-form-element__label">Account Manager Phone</p>
+                                                <p class="slds-form-element__static"><lightning:formattedPhone value="{!v.ii.Account_Manager_Phone__c}" /></p>
+                                            </lightning:layoutItem>
+                                            <lightning:layoutItem flexibility="auto" size="5">
+                                                <!--lightning:outputField fieldName="Account_Manager_Email__c" /-->
+                                                <p class="slds-form-element__label">Account Manager Email</p>
+                                                <p class="slds-form-element__static"><lightning:formattedEmail value="{!v.ii.Account_Manager_Email__c}" /></p>
+                                            </lightning:layoutItem>
+                                            <!--lightning:layoutItem flexibility="auto" size="3">
+                    </lightning:layoutItem-->
+                                            <!--lightning:layoutItem flexibility="auto" size="3">
+                    <div class="slds-form-element">
+                          <span class="slds-form-element__label"></span>
+                                <div class="slds-form-element__control">
+                                    <span class="slds-form-element__static"><a href="{!v.boxUrl}" target="_blank">View Box Documents</a></span>
+                                </div>    
+                     </div>     
+                 </lightning:layoutItem-->
+                                        </lightning:layout>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-page-header">
+                                <div class="slds-media">
+                                    <div class="slds-media__body">
+                                        
+                                        <div class="slds-m-top--large">
+                                            
+                                            <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Instructions">Instructions</h1>
+                                        </div>
+                                        <div class="slds-grid slds-wrap slds-text-align_left custom-container">
+                                            <div class="slds-size_1-of-1 slds-max-small-size_1-of-1">
+                                                <lightning:outputField fieldName="Comments__c" />  
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="slds-m-top--large">
+                                            <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Item Information">Item Information</h1>
+                                        </div>
+                                        
+                                        <div class="slds-grid slds-wrap slds-text-align_left custom-container">
+                                            <div class="slds-size_1-of-1 slds-max-small-size_1-of-1">
+                                                <lightning:outputField fieldName="Name" />  
+                                            </div>
+                                            <div class="slds-size_1-of-2 slds-max-small-size_1-of-1">
+                                                <lightning:outputField fieldName="Status__c" />  
+                                            </div>
+                                            
+                                            <div class="slds-size_1-of-2 slds-max-small-size_1-of-1">
+                                                <lightning:outputField fieldName="Status_Reason__c" />  
+                                            </div>
+                                            <div class="slds-size_1-of-2 slds-max-small-size_1-of-1">
+                                                <lightning:outputField fieldName="Due_Date__c" />  
+                                            </div>
+                                            <!--div class="slds-size_1-of-2 slds-max-small-size_1-of-1">
+             
+                <lightning:textarea aura:id="pq" label="Client Comments"
+    value="{!v.ii.Client_Comments__c}" />
+            </div-->
+                                            <div class="slds-size_1-of-2 slds-max-small-size_1-of-1">
+                                                <lightning:outputField fieldName="Approved_Date__c" />  
+                                            </div>
+                                            <!--div class="slds-size_1-of-1 slds-max-small-size_1-of-1">
+             
+                <lightning:textarea aura:id="pq" label="Client Comments"
+    value="{!v.ii.Client_Comments__c}" />
+            </div-->
+                                            <div class="slds-size_1-of-2 slds-max-small-size_1-of-1">
+                                                <a onclick="{!c.FireOppEvent}" id="{!v.ii.Opportunity__c}" >
+                                                    <p style="color:#3ABEB6">View Transaction</p>
+                                                </a>  
+                                            </div>
+                                        </div>
+                                        <!--div class="slds-align_absolute-center slds-m-top\-\-large">
+      <lightning:button variant="brand" label="Submit Comment" onclick="{!c.dosubmit}"/>
+     </div-->
+                                        
+                                        <div class="slds-m-top--large">
+                                            <h1 class="slds-page-header__title slds-truncate slds-align-middle" title="Item Information">Client Comments</h1>
+                                        </div>            
+                                        <div class="slds-size_1-of-1 slds-max-small-size_1-of-1">
+                                            
+                                            <lightning:textarea aura:id="pq" label=""
+                                                                value="{!v.ii.Client_Comments__c}" >
+                                            </lightning:textarea>
+                                        </div>
+                                        <div class="slds-align_absolute-center slds-m-top--large">
+                                            <lightning:button variant="brand" label="Submit Comment" onclick="{!c.dosubmit}"/>
+                                        </div>
+                                    </div></div></div>
+                            <!--Modal msg-->
+                            <aura:if isTrue="{!v.isOpen}">
+                                
+                                <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+                                    <div class="slds-modal__container">
+                                        <div class="slds-modal__header">
+                                            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                                                X
+                                                <span class="slds-assistive-text">Close</span>
+                                            </button>
+                                        </div>
+                                        <div class="slds-modal__content slds-p-around--medium" align="center">
+                                            <p>
+                                                <b>
+                                                    {!v.modalMessage}
+                                                </b>
+                                            </p>
+                                        </div>
+                                        <div class="slds-modal__footer">
+                                            <lightning:button variant="destructive" label="Close" onclick="{!c.closeModel}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="slds-backdrop slds-backdrop--open"></div>
+                                
+                                
+                            </aura:if>
+                            <!--Modal msg-->
+                        </div>
+                    </lightning:recordViewForm>
+                    
+                </div> 
+                <div class="slds-col slds-size_1-of-3">
+                    <div class="slds-page-header">
+                        <div class="slds-media">
+                            <div class="slds-media__body">
+                                <!--div class="slds-col slds-size_1-of-3"-->
+                                <lightning:layout horizontalAlign="left" verticalAlign="stretch">
+                                    <div ><!--class="slds-p-around_xx-small"><!- -style="position: absolute;right: 0px;width: 36%; line-height: 5em;"-->                
+                                        <div class="slds-p-around_xx-small">
+                                            <lightning:card iconName="utility:file" class="slds-m-right_large" title="File upload">
+                                                <span style="position:relative;top:-20px;z-index:1;">
+                                                <lightning:fileUpload aura:id="fupload" name="fileUploader"
+                                                                      disabled="{!v.ii.Status__c=='Accepted'}"
+                                                                      multiple="true"
+                                                                      recordId="{!v.ii.Id}"
+                                                                      onuploadfinished="{!c.handleUploadFinished}"/>
+                                                </span>
+                                            </lightning:card>
+                                        </div>
+                                        <div class="slds-p-around_xx-small slds-grid">
+                                            <lightning:card iconName="utility:file" class="slds-m-right_large" title="Files uploaded/shared with me">
+                                                <aura:iteration items="{!v.files}" var="f" >
+                                                    <table class="slds-table slds-table_cell-buffer">
+                                                        
+                                                        <tr class="slds-wrap">
+                                                            <th class="slds-wrap" scope="col" style="font-size:small;">
+                                                                
+                                                                <a href="{!'/sfc/servlet.shepherd/document/download/'+f.Id}" target="_blank" style="color:#3ABEB6;" class="wrapText">{!f.Title}  </a>
+                                                                &nbsp;&nbsp;(&nbsp;<lightning:formattedDateTime value="{!f.CreatedDate}" month="short" day="2-digit"/>&nbsp;)
+                                                            </th>
+                                                        </tr>
+                                                        
+                                                    </table>
+                                                    
+                                                </aura:iteration>
+                                            </lightning:card>
+                                        </div>
+
+
+                                        <!--div class="slds-p-around_xx-small slds-m-left_xx-small">
+                                            <!- -forceChatter:publisher context="RECORD" recordId="{!v.res}" /- ->
+                                            <forceChatter:feed type="Record" subjectId="{!v.res}"/>
+                                        </div-->
+                                        <!--/div-->
+                                    </div>
+                                </lightning:layout>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </lightning:tab>
+        
+        <lightning:tab label="Files" title="Files" id="tab2">
+            <div class="slds-align_absolute-center slds-m-top--large">
+                <lightning:button variant="brand" label="Return To Home" onclick="{!c.handleReturn}"/>
+            </div>
+            <aura:iteration items="{!v.files}" var="f" >
+                <table class="slds-table slds-table_cell-buffer">
+                    
+                    <tr class="slds-text-title_caps">
+                        <th scope="col" style="font-size:small;">
+                            
+                            <a href="{!'/sfc/servlet.shepherd/document/download/'+f.Id}" target="_blank" style="color:#3ABEB6;">{!f.Title}  </a>
+                            &nbsp;&nbsp;(&nbsp;<lightning:formattedDateTime value="{!f.CreatedDate}" month="short" day="2-digit"/>&nbsp;)
+                        </th>
+                    </tr>
+                    
+                </table>
+                
+            </aura:iteration>
+            
+            
+            
+        </lightning:tab>
+    </lightning:tabset>
+    
+</aura:component>

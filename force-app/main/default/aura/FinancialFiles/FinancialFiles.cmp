@@ -1,0 +1,80 @@
+<aura:component controller="FinancialCtrl" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+	<aura:attribute name="finObjId" type="String" />
+    <aura:attribute name="column" type="String" />
+    <aura:attribute name="files" type="ContentDocument[]"/>  
+    <aura:attribute name="showfiles" type="boolean" default="false"/>
+    
+    
+    <aura:if isTrue="{!v.files.length > 0}">
+    	&nbsp;<a class="center" aura:id="{!v.finObjId}" id="{!v.finObjId}" onclick="{!c.viewFiles}" ><ui:outputtext class="center" value="View Files"/></a>
+        
+        <aura:set attribute="else">
+            &nbsp;<ui:outputtext class="centernolink" value="View Files"/>
+        </aura:set>
+        
+    </aura:if>
+    
+    
+    <aura:if isTrue="{!v.showfiles}">
+    <div onkeyup="{!c.formPress}">   
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+        <div class="slds-modal__container">
+           <header class="slds-modal__header large">
+                  Files For {!v.column}    
+            </header>        
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                     
+                        <section class="slds-clearfix" > 
+                            
+                        <lightning:layout multipleRows="false" class="">
+            			  
+                            <lightning:layoutItem class="background slds-text-title_caps slds-p-vertical_small" size="4" flexibility="no-shrink, grow"  >
+                                <span style="text-align:center;padding-left:5px;vertical-align:middle;">File Name</span>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="background slds-text-title_caps slds-p-vertical_small" size="4"  flexibility="no-shrink, grow"  >
+                                <span style="text-align: center;vertical-align:middle;">Date Uploaded</span>
+                            </lightning:layoutItem>
+                            <lightning:layoutItem class="background slds-text-title_caps slds-p-vertical_small" size="4"  flexibility="no-shrink, grow"  >
+                                <span style="text-align: center;vertical-align:middle;">Download</span>
+                            </lightning:layoutItem>
+                        
+                    	</lightning:layout>
+                    
+                    <lightning:layout multipleRows="true" >
+                        <aura:iteration  items="{!v.files}" var="f" indexVar="indx">
+                             <lightning:layoutItem flexibility="no-shrink, grow" size="4">
+                                 <span style="text-align: center;padding-left:5px;vertical-align:middle;">{!f.Title}</span></lightning:layoutItem>  
+                             <lightning:layoutItem flexibility="no-shrink, grow" size="4">
+                                 <span style="text-align: center;vertical-align:middle;">
+                                 <lightning:formattedDateTime value="{!f.CreatedDate}" year="numeric" month="numeric" day="numeric"/></span>
+                            </lightning:layoutItem>  
+                             <lightning:layoutItem flexibility="no-shrink, grow" size="4">
+                                 <span style="text-align: center;vertical-align:middle;">
+                                     <a href="{!'/sfc/servlet.shepherd/document/download/'+f.Id}" target="_blank" class="wrapText"><ui:outputtext class="centernolink" value="Download"/></a></span></lightning:layoutItem>  
+                            	
+                        </aura:iteration>
+                    </lightning:layout>
+                   </section>
+                    
+                 </div>
+                    
+                    <footer class="slds-modal__footer">
+                       
+                        <lightning:button variant="neutral" 
+                                          label="Close"
+                                          title="Close"
+                                          onclick="{! c.close }"/>
+                    </footer>
+                </div>
+            </section>
+  
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+</aura:component>

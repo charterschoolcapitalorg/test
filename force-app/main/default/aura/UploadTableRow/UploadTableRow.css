@@ -1,0 +1,34 @@
+.THIS .data-column {
+    text-align:left;
+}
+.THIS .middle {
+    
+    position:relative;
+    left:10px;
+}
+.THIS .small {
+    text-align:left;
+    width:50px;
+}
+.THIS .uploader {
+    position:relative;
+    top:-20px;
+    left:10px;
+    
+}
+.THIS .overdue {
+    color:#ff0000;
+}
+.THIS .notoverdue {
+    color:#000000;
+}
+.THIS .slds-file-selector__dropzone .slds-file-selector__button{
+    font-size: 0;
+}
+.THIS .slds-file-selector__dropzone .slds-file-selector__text{
+    display: none;
+}
+.THIS .slds-file-selector__dropzone .slds-file-selector__button:after{
+    content: 'Upload files';
+    font-size: .8125rem;
+}

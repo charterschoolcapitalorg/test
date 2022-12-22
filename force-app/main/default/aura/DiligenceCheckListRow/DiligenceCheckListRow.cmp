@@ -1,0 +1,75 @@
+<aura:component >
+    <aura:attribute name="diligenceRecord" type="object" />
+    <aura:attribute name="isLoading" type="Boolean" default="true" />
+
+    <aura:if isTrue="{!v.isLoading}">
+    <div class="slds-p-horizontal--small slds-size--1-of-1">
+        <div class="slds-p-horizontal--small slds-size--1-of-1 isActivityLoading">
+            <lightning:spinner variant="brand" size="small"/>
+        </div>   
+    </div>
+    <aura:set attribute="else">
+        <tbody>
+            <tr class="slds-hint-parent" style="height:2px;">
+                    <td data-label="Record Link" class="slds-text-align_left slds-truncate">
+                        <lightning:formattedUrl target="_blank" value="{!'/' + v.diligenceRecord.ActionItemId}" label="{!v.diligenceRecord.ActionItem}"/>
+                    </td>
+                    <td data-label="Owner" class="slds-text-align_left slds-truncate">
+                        <lightning:formattedText  value="{!v.diligenceRecord.Owner}"/>
+                    </td>
+                    <td data-label="Property Name" class="slds-text-align_left slds-truncate">
+                        <lightning:formattedUrl target="_blank" value="{!'/' + v.diligenceRecord.PropertyId}" label="{!v.diligenceRecord.PropertyName}"/>
+                    </td>
+                    <td data-label="Account" class="slds-text-align_left slds-truncate">
+                        <lightning:formattedUrl target="_blank" value="{!'/' + v.diligenceRecord.AccId}" label="{!v.diligenceRecord.AccName}"/>
+                    </td>
+                    <td data-label="Assigned To" class="slds-text-align_left slds-truncate">
+                        <lightning:formattedText value="{!v.diligenceRecord.AssignedTo}"/>
+                    </td>
+
+                    <!-- Assigned-->
+                    <td class="slds-text-align_center">
+                        <c:DailyReportCell item="{!v.diligenceRecord.Assigned}" />
+                    </td>
+
+                    <!-- Has CP-->
+                    <td class="slds-text-align_center">
+                        <c:DailyReportCell item="{!v.diligenceRecord.HasCP}" />
+                    </td>
+
+                    <!-- CP Visible-->
+                    <td class="slds-text-align_center">
+                        <c:DailyReportCell item="{!v.diligenceRecord.CPVisible}" />
+                    </td>
+
+                    <!-- CP Has Due Date-->
+                    <td class="slds-text-align_center">
+                        <c:DailyReportCell item="{!v.diligenceRecord.HasDueDate}" />
+                    </td>
+
+                    <!-- CP Has Submitted Date-->
+                    <td class="slds-text-align_center">
+                        <c:DailyReportCell item="{!v.diligenceRecord.CPSubmitted}"/>
+                    </td>
+                    
+                    <!-- CP Has Approved Date-->
+                    <td class="slds-text-align_center">
+                        <c:DailyReportCell item="{!v.diligenceRecord.HasApprovedDate}"/>
+                    </td>
+
+                    <!-- AI Review Date In Date Range-->
+                    <td class="slds-text-align_center">
+                        <c:DailyReportCell item="{!v.diligenceRecord.aiReviewDate}"/>
+                    </td>
+                    
+                    <!-- AI Comment-->
+                    <td data-label="Comment" class="slds-text-align_left slds-truncate">
+                        <div style="height:75px; overflow-x: hidden; overflow-y: auto; white-space: initial;">
+                        <lightning:formattedText value="{!v.diligenceRecord.Comments}"/>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </aura:set>
+    </aura:if>
+</aura:component>

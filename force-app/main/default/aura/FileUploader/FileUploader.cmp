@@ -1,0 +1,21 @@
+<aura:component controller="FileUploaderCtrl" implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+    <aura:attribute name="relatedObjects" type="String"/>
+    <aura:attribute name="relatedObjectDisplay" type="String"/>
+    <aura:attribute name="library" type="String"/>
+    <lightning:notificationsLibrary aura:id="notifLib"/>
+
+    <lightning:card title="File Upload - linked to records listed below" iconName="standard:file" class="upload_header">
+        <div class="slds-align_absolute-center">    
+            <lightning:fileUpload label=""
+                name="fileUploader"
+                multiple="true"
+                recordId="{!v.recordId}"
+                onuploadfinished="{!c.handleUploadFinished}" />
+        </div>
+
+        <div class="slds-p-left_medium slds-p-top_medium">
+            <lightning:formattedText value="{!'Will link to ' + v.relatedObjectDisplay}" readonly="true" />
+        </div>
+    </lightning:card>        
+
+</aura:component>

@@ -1,0 +1,16 @@
+<aura:component >
+    <aura:attribute name="item" type="object"/>
+    <aura:attribute name="helpText" type="String" default=""/>
+    <aura:if isTrue="{!or(v.item == 'Completed', v.item == true)}">
+            <lightning:icon iconName="action:approval" alternativeText="Complete" title="{!v.helpText}"/>
+    </aura:if>
+    <aura:if isTrue="{!or(v.item == 'Late', v.item == false)}">
+            <lightning:icon iconName="action:close" alternativeText="Late" title="{!v.helpText}"/>
+    </aura:if>
+    <aura:if isTrue="{!v.item == 'Incomplete'}">
+            <p>&nbsp;&nbsp;&nbsp;</p>
+    </aura:if>
+    <aura:if isTrue="{!v.item == ''}">
+            <p>&nbsp;&nbsp;&nbsp;</p>
+    </aura:if>
+</aura:component>

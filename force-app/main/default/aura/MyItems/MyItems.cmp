@@ -1,0 +1,25 @@
+<aura:component controller="MyItemsCtlr" implements="force:appHostable,flexipage:availableForAllPageTypes,forceCommunity:availableForAllPageTypes" access="global" >    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="opps" type="Opportunity[]" />
+    <aura:attribute name="showList" type="Boolean" default="false"/>
+    <aura:attribute name="oppSize" type="Integer" />
+    <aura:attribute name="hasOtherItems" type="Boolean" default="false" />
+
+    <aura:attribute name="statusfilter" type="String" />
+    <aura:attribute name="cmos" type="String[]" />
+
+    <aura:handler name="change" value="{!v.cmos}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.statusfilter}" action="{!c.doInit}"/>
+    
+    <aura:registerEvent name="showOpportunityItems" type="c:ShowItems" />
+    
+    <aura:iteration items="{!v.opps}" var="opp" indexVar="indx">
+    	<aura:if isTrue="{!!opp.IsClosed}">
+        	<c:MyItem opportunity="{!opp}" isOnlyOpp="{!and(v.oppSize==1,not(v.hasOtherItems))}" statusfilter="{!v.statusfilter}" cmos="{!v.cmos}" /> 
+        </aura:if>
+    </aura:iteration>    
+    
+	<lightning:overlayLibrary aura:id="overlayLib"/>
+
+	
+</aura:component>

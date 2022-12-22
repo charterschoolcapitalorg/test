@@ -1,0 +1,123 @@
+<!--
+ - Created by Ivan Garcia on 3/26/2018.
+ -->
+
+<aura:component description="IntakeCommunity" controller="IntakeCommunityItemsCtrl" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+    <aura:registerEvent name="navigate" type="c:NavigateToC2"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="compact" type="Boolean" default="false"/>
+	<aura:attribute name="rectypes" type="IntakeCommunityItemsCtrl"/>
+    <aura:attribute name="myKeys" type="List"/>
+    <aura:attribute name="opps" type="Opportunity[]"/>
+    <aura:attribute name="closedOpps" type="Opportunity"/>
+    <aura:attribute name="myRecordId" type="String" description="Record to which the files should be attached" />
+    <aura:attribute name="communityContactRoleData" type="Community_Contact_Role__c"/>
+    <aura:attribute name="folderList" type="Box_Read_Only_Shares__c"/>
+	<aura:attribute type="Boolean" name="check1" />
+    <aura:attribute type="Boolean" name="check2" />
+    <aura:attribute type="List" name="allcheck" />
+    <aura:attribute type="String" name="docIdEvent" />
+    <aura:attribute type="List" name="activeSections" default="[]" />
+
+    <aura:attribute type="String" name="selectedTabId" default="schoolTab" />
+    <aura:attribute type="Boolean" name="hasOpportunities" default="false" />
+    <aura:attribute type="Boolean" name="hasAccounts" default="false" />
+    <aura:attribute type="Boolean" name="hasUrgentItems" default="false" />
+    <aura:attribute type="CMOAccounts[]" name="cmoaccounts" default="[]" />
+    <aura:attribute type="String[]" name="cmoIdsSelected" default="[]" />
+    <aura:attribute name="statusfilter" type="String" default="All Items" />
+    
+    <aura:handler name="docUploadedToTop" event="c:FireDocUploadedToTop" action="{!c.handleDocUploaded}"/>
+    
+    <aura:attribute name="rectypelist" type="ItemsByOppRecType" />
+    <aura:registerEvent name="showOpportunities" type="c:DisplayModalOppList" />
+    
+    <aura:attribute name="loadedjquery" type="boolean" default="false"/>
+
+    <aura:handler action="{!c.handleFilterChange}" event="c:ItemFilterChange" name="filterChange"/>
+   
+    <!-- for some reason I have to load this version of JQuery first for select2 to work when clicking on Home page link -->
+    <ltng:require 
+      scripts="{!$Resource.jQuery172}" 
+      afterScriptsLoaded="{!c.scriptsLoaded4}"/> 
+
+    
+    <lightning:tabset selectedTabId="{!v.selectedTabId}" aura:id="tabs">
+        <aura:if isTrue="{!v.hasUrgentItems}">
+            <lightning:tab label="Urgent Items" title="Urgent Items" id="urgentTab">
+                <div class="slds-section slds-is-open">
+                    <div aria-hidden="false" class="slds-section__content">
+                        <c:UrgentItems />
+                    </div>
+                </div>
+            </lightning:tab>
+        </aura:if>
+        <lightning:tab label="View by Project" title="View by Project" id="schoolTab">
+            <c:ItemFilter cmoaccounts="{!v.cmoaccounts}" statusfilter="{!v.statusfilter}" />
+            <br />
+            <lightning:accordion aura:id="accordion" allowMultipleSectionsOpen="true" onsectiontoggle="{! c.handleSectionToggle }" activeSectionName="{!v.activeSections}">
+                <aura:if isTrue="{!v.hasOpportunities}">
+                    <lightning:accordionSection aura:id="opportunityItems" name="opportunities" label="Open Projects">
+                        <c:MyItems hasOtherItems="{!v.hasAccounts}" cmos="{!v.cmoIdsSelected}" statusfilter="{!v.statusfilter}" />
+                    </lightning:accordionSection>
+                </aura:if>
+                <aura:if isTrue="{!v.hasAccounts}">
+                    <lightning:accordionSection aura:id="accountItems" name="accounts" label="Ongoing Diligence">
+                        <c:MyAccountItems hasOtherItems="{!v.hasOpportunities}" cmos="{!v.cmoIdsSelected}" statusfilter="{!v.statusfilter}" />
+                    </lightning:accordionSection>
+                </aura:if>
+            </lightning:accordion>
+        </lightning:tab>
+        <lightning:tab label="View by Item" title="View by Item" id="itemTab">
+            <div class="slds-section slds-is-open">
+                <div aria-hidden="false" class="slds-section__content">
+            		<c:MyProducts />
+                </div>
+            </div>      
+        </lightning:tab>
+        
+        <lightning:tab label="Completed Projects" title="Completed Projects" id="completedTab">
+             
+            <div class="slds-section slds-is-open">
+                
+                <div aria-hidden="false" class="slds-section__content">
+                    <!-- slds-page-header slds-text-title_caps -->
+                    <!-- slds-table slds-table_cell-buffer slds-table_fixed-layout -->
+                    <table class="mySubrowHeader">
+                        <thead>
+                        <tr class="slds-text-title_caps">
+                            <th scope="col" style="background-color:#3ABEB6;" class="tableHeader">
+                                <div class="header-column-one slds-truncate" title="Opportunity Name">Project Name</div>
+                            </th>
+                            <th scope="col" style="background-color:#3ABEB6;" class="tableHeader">
+                                <div class="header-column-two slds-truncate" title="Opportunity Link">Funded Date</div>
+                            </th>
+                            
+                            <th scope="col" style="background-color:#3ABEB6;" class="tableHeader">
+                                    <div class="header-column-two slds-truncate" title="Documents">Funded Amount</div>
+                            </th>
+                            
+                        </tr>
+                        </thead>
+                        <tbody>
+                        
+                        <aura:iteration items="{!v.opps}" var="o" >
+                                <aura:if isTrue="{!o.IsWon}"> 
+                                    <c:OppComponent opp="{!o}"/>
+                                    
+                            	</aura:if>
+                            </aura:iteration>
+
+                        </tbody>
+                    </table>
+                </div>
+                
+            </div>
+			
+        </lightning:tab>
+		
+        
+        <lightning:overlayLibrary aura:id="overlayLib"/>
+        
+    </lightning:tabset>
+</aura:component>

@@ -1,0 +1,14 @@
+.THIS .slds-text-title_caps{
+    color:white;
+    font-size:13px;
+}
+.THIS .isExpandedLeft {
+    border-top-color:#A9A9A9;
+    border-top-width:2px;
+    border-top-style:solid; 
+}
+.THIS .isExpanded {
+    border-top-color:#A9A9A9;
+    border-top-width:2px;
+    border-top-style:solid; 
+}

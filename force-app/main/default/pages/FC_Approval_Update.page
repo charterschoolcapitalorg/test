@@ -1,0 +1,30 @@
+<apex:page standardController="FC_Approval__c" extensions="FC_Approval_Update_Ctrl">
+    <apex:pageMessages />
+    
+    <apex:form >
+        <apex:pageBlock >
+        <apex:pageBlockSection id="approve" columns="1" collapsible="true" title="Approval">
+            <!-- apex:inputfield value="{!approval.status__c}"/> -->
+            
+            <apex:selectList value="{!selectedStatus}" size="1" label="Status:" >
+              <apex:selectOptions value="{!statusOptions}"/>    
+           </apex:selectList> 
+            
+            <apex:inputfield value="{!approval.Comments__c}" style="width: 300px; height: 100px"/>
+            <apex:inputfield value="{!approval.Contingency_Fulfillment_Timeline__c}" style="width: 300px;"/>
+            <apex:inputfield value="{!approval.Contingencies__c}" style="width: 300px; height: 100px"/>
+            
+            
+            
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection id="submit" columns="2" collapsible="false" title="Submit">
+             <apex:commandButton value="Submit" action="{!submit}" />
+            <apex:commandButton value="Exit" action="{!back}" />       
+        </apex:pageBlockSection>
+            
+        </apex:pageBlock>
+        
+    </apex:form>
+         
+</apex:page>

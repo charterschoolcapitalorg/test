@@ -1,0 +1,42 @@
+<aura:component implements="flexipage:availableForRecordHome" 
+                controller="CreateFacilitiesObjectsCtrl">
+    
+    <aura:attribute name="Parcels" type="Parcel__c[]" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:attribute name="Property" type="Account" />
+    
+    
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+    <span style="background-color:#a1dee9;">
+	<lightning:layout multipleRows="false" >
+        <lightning:layoutItem size="1" class=" buildingHeader">
+            <b>Parcels: </b> 
+        </lightning:layoutItem>
+        <lightning:layoutItem size="11" >
+            <lightning:button label="New"  onclick="{!c.newParcel}"/> 
+        </lightning:layoutItem>
+    </lightning:layout>
+        
+    <lightning:layout multipleRows="true" class="mySubrowHeader header-column">	
+		<lightning:layoutItem size="2" class="header-column mySubrowHeader"></lightning:layoutItem>        
+        
+        <lightning:layoutItem size="2" class="mySubrowHeader header-column">Name</lightning:layoutItem>
+        <lightning:layoutItem size="1" class="mySubrowHeader header-column">Parcel Number</lightning:layoutItem>
+        <lightning:layoutItem size="1" class="mySubrowHeader header-column">County</lightning:layoutItem>
+        <!-- <lightning:layoutItem size="1" class="mySubrowHeader header-column">Status</lightning:layoutItem> -->
+        <lightning:layoutItem size="2" class="mySubrowHeader header-column">Balance for Tax Year</lightning:layoutItem>
+        <lightning:layoutItem size="2" class="mySubrowHeader header-column">Final Due Date for Tax Year</lightning:layoutItem>
+        <lightning:layoutItem size="2" class="mySubrowHeader header-column">Next Due Date</lightning:layoutItem>
+        
+     </lightning:layout>
+    </span>
+    
+    
+    <span >
+    <aura:iteration items="{!v.Parcels}" var="b" indexVar="indx">
+        <c:Parcel  Parcel="{!b}" propertyId="{!v.propertyId}"/>
+    </aura:iteration>
+    </span>
+    
+</aura:component>

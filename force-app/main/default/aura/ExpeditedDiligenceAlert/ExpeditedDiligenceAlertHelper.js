@@ -1,0 +1,5 @@
+({
+    sendStatusEmails : function(component) {
+        
+    }
+})

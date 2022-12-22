@@ -1,0 +1,130 @@
+<aura:component description="FacilitiesIntakeItemPQCommunity" controller="IntakeItemPQCommunityCtrl" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+    	
+        <aura:attribute name="toggleBOP" type="boolean" default="false"/>
+        <aura:attribute name="toggleFund" type="boolean" default="false"/>
+        <aura:attribute name="toggleCA" type="boolean" default="false"/>
+        <aura:attribute name="toggleEMO" type="boolean" default="false"/>
+        <aura:attribute name="toggleApplied" type="boolean" default="false"/>
+        <aura:attribute name="firstLoad" type="boolean" default="false"/>
+        <aura:attribute name="rectypes" type="IntakeItemPQCommunityCtrl"/>
+        
+        <aura:attribute name="modalMessage" type="String"/>
+        <aura:attribute name="isOpen" type="boolean" default="false"/>
+        <aura:attribute name="billingStates" access="public" type="String[]"/>
+        <aura:attribute name="billingCountries" access="public" type="String[]"/>
+        <aura:attribute name="dateValidationError" type="boolean" />
+        
+        <aura:attribute name="res" type="String" />
+        <aura:attribute name="pqForm" type="PQ_Form__c"/>
+        <aura:attribute name="options" type="List" />
+        
+        <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+        <aura:handler event="aura:doneRendering" action="{!c.toggleALL}"/>
+    
+        <c:HomeButton/>
+        
+        <br/>
+        <div class="blue_title_section" style="background-color:#a1dee9;">
+            <b class="vertical-align-text" style="font-size:14px;color:white;padding-left:24px;">Pre-Qualification Form</b>
+        </div>
+        
+    	<div class="slds-m-around_medium slds-text-align_left banner">
+            <span >This form functions best in a Chrome browser, so we strongly encourage you to complete it on Chrome. If you don’t yet use Chrome, 
+                <a target="_blank" href= "https://www.google.com/chrome"> you can download it here</a>
+            </span>      
+        </div>   
+   
+        <div class="slds-m-top--large">
+            <h3 class="slds-section__title slds-theme_shade">
+                <!--span style="color:#a1dee9;" class="slds-truncate slds-p-horizontal_small" title="Individual Responsible for Application">Individual Responsible for Application</span-->
+                <c:ClearSubHeader header_text="Individual Responsible for Application"/>
+            </h3>
+            <hr class="hr"/>
+        </div>
+        
+    	<div class="slds-m-around_medium slds-text-align_left banner">
+   		<lightning:input aura:id="pq2" label="First Name" type="text" class="slds-size--1-of-2"
+                         value="{!v.pqForm.First_Name__c}" required="true" pattern="[\s\S]{0,40}"
+                         placeholder = "Input first name here"
+                         messageWhenPatternMismatch="Max 40 characters"/>
+    
+		<lightning:input aura:id="pq2" label="Last Name" type="text" class="slds-size--1-of-2"
+                         value="{!v.pqForm.Last_Name__c}" required="true" pattern="[\s\S]{0,40}" 
+                         messageWhenPatternMismatch="Max 40 characters"/>
+    
+        <lightning:input aura:id="pq2" label="Title" type="text"  class="slds-size--1-of-2"
+                         value="{!v.pqForm.Title__c}" required="true" pattern="[\s\S]{0,40}" 
+                         messageWhenPatternMismatch="Max 40 characters"/>
+    
+		<lightning:input aura:id="pq2" label="Email" type="email" class="slds-size--1-of-2"
+                         value="{!v.pqForm.Email__c}" required="true"/>
+		
+        <lightning:input aura:id="pq2" required="true"  label="School Name" type="text" class="slds-size--1-of-2"
+                         value="{!v.pqForm.School_Name__c}" pattern="[\s\S]{0,100}" 
+                         messageWhenPatternMismatch="Max 100 characters"/>
+        
+        <lightning:input aura:id="pq2" required="true"  label="Charter Holder Name" type="text" readonly="true"
+                         class="slds-size--1-of-2" value="{!v.pqForm.Charter_Holder_Name__c}"/>
+        
+        <div class="slds-m-top--large">
+            <h3 class="slds-section__title slds-theme_shade">
+                <c:ClearSubHeader header_text="Pre-Qualification Questions"/>
+            </h3>
+            <hr class="hr"/>
+        </div>
+            
+        
+        <lightning:input aura:id="pq2" required="true"  label="Current Student Count" type="number"
+                         class="slds-size--1-of-2" value="{!v.pqForm.Current_Student_Count__c}"/>
+        
+		<dl style="position:relative;" class="slds-size--1-of-2 slds-form-element__label">	
+        	<ui:inputDate class="slds-size--1-of-2"  required="true" aura:id="expireDate" label="Charter Expiration Date" 
+                      value="{!v.pqForm.Charter_Expiration_Date__c}" displayDatePicker="true"/>
+    	</dl>
+    	
+        <dl style="position:relative;" class="slds-size--1-of-2 slds-form-element__label">	
+        	<ui:inputDate class="slds-size--1-of-2"  required="true" aura:id="openingDate" label="Opening Date of Your School" 
+                          value="{!v.pqForm.Opening_Date_of_Your_School__c}" displayDatePicker="true"/>
+    	</dl>
+        
+        <dl style="position:relative;" class="slds-size--1-of-2 slds-form-element__label">	
+        	<ui:inputDate class="slds-size--1-of-2"  required="true" aura:id="desirefundDate" label="Desired Funding Date"
+                          value="{!v.pqForm.Desired_Funding_Date__c}" displayDatePicker="true"/>
+    	</dl>
+            
+        <div class="slds-align_absolute-center slds-m-top--large">
+            <lightning:button class="home_button_style" label="Submit" onclick="{!c.dosubmit}"/>
+            <lightning:button class="home_button_style" label="Return To Home" onclick="{!c.handleReturn}"/>
+        </div>
+    </div>
+	    <!--Modal msg-->
+    <aura:if isTrue="{!v.isOpen}">
+
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium" align="center">
+                    <p>
+                        <b>
+                                {!v.modalMessage}
+                        </b>
+                    </p>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning:button variant="destructive" label="Close" onclick="{!c.closeModel}"/>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-backdrop slds-backdrop--open"></div>
+        
+    
+        </aura:if>
+    
+    
+</aura:component>

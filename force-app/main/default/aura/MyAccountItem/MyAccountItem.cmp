@@ -1,0 +1,61 @@
+<aura:component controller="MyAccountItemCtlr">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:attribute name="account" type="Account" />
+    <aura:attribute name="parentId" type="String" />
+    <aura:attribute name="isOnlyAcct" type="Boolean" />
+    <aura:attribute name="showList" type="Boolean" default="false"/>
+    <aura:attribute name="intakeItems" type="IntakeItemWrapper[]" />
+    <aura:handler name="docUploaded" event="c:FireDocUpload" action="{!c.handleDocUploaded}"/>
+    
+    <aura:attribute name="statusfilter" type="String" />
+    <aura:attribute name="cmos" type="String[]" />
+
+    <aura:handler name="change" value="{!v.cmos}" action="{!c.doInit}"/>
+    <aura:handler name="change" value="{!v.statusfilter}" action="{!c.doInit}"/>
+    
+    <div class="slds-p-around--x-small " style="width:1325px">
+        <!-- slds-section__content slds-page-header -->
+        <!-- 77c5d5 -->
+        <div class="slds-page-header slds-text-title_caps" style="background-color:#00558C;">
+            <section class="slds-clearfix " >                
+                <div class="slds-float--left" style="margin-top:-10px;">
+                    <aura:if isTrue="{!v.isOnlyAcct}">
+                    	<!-- lightning:button  variant="base" class="opener" aura:id="opener"  iconName="utility:dash" iconPosition="left" onclick="{!c.toggleSection}" />  -->
+                        <aura:set attribute="else">
+                        	<lightning:button  variant="base" class="opener" aura:id="opener"  iconName="utility:add" iconPosition="left" onclick="{!c.toggleSection}" /> 
+                        </aura:set>
+                    </aura:if>
+                </div>
+                <div class="slds-text-title_caps">
+                    <span class="slds-cell-wrap" style="display:inline-block; width: 45%">{!v.account.Name}</span>
+                    <span style="display:inline-block; width: 25%">&nbsp;</span>
+                    <span style="display:inline-block; width: 25%">&nbsp;</span>
+                </div>
+                
+            </section>
+        </div>
+        <div style="margin-left:20px;">
+            
+            
+            <section class="slds-clearfix " >  
+            <aura:if isTrue="{!v.showList == true || v.isOnlyAcct}">
+                <lightning:layout multipleRows="false" class="mySubrowHeader">
+                    <lightning:layoutItem size="12" class="mySubrowHeader header-column-two"><span style="vertical-align:middle;padding-left:12px;">NEXT STEPS</span></lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="mySubrowHeader header-column-due"><span style="vertical-align:middle;">DUE DATE</span></lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="mySubrowHeader header-column"><span style="vertical-align:middle;">STATUS</span></lightning:layoutItem>
+                    <lightning:layoutItem size="12" class="mySubrowHeader header-column-comments"><span style="vertical-align:middle;">CLIENT COMMENTS</span></lightning:layoutItem> 
+                    <lightning:layoutItem size="12" class="mySubrowHeader header-column-action"><span style="vertical-align:middle;">ACTION</span></lightning:layoutItem>  
+                    <lightning:layoutItem size="12" class="mySubrowHeader header-column-preview"><span style="vertical-align:middle;">REVIEW FILES</span></lightning:layoutItem>  
+                    <lightning:layoutItem size="12" class="mySubrowHeader header-column-assigned"><span style="vertical-align:middle;">ASSIGNED TO</span></lightning:layoutItem>  
+                </lightning:layout>
+                
+                <aura:iteration items="{!v.intakeItems}" var="i" indexVar="idx">
+                    <c:MyItemRow intakeItem="{!i}" idx="{!idx}" parentId="{!v.parentId}" isOnlyOpp="{!v.isOnlyAcct}"/>
+                </aura:iteration>
+                
+            </aura:if>
+            </section>
+        </div>
+    </div>
+</aura:component>

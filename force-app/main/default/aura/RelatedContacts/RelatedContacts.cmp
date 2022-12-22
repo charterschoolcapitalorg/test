@@ -1,0 +1,38 @@
+<aura:component implements="flexipage:availableForRecordHome" 
+                controller="CreateFacilitiesObjectsCtrl">
+    
+    <aura:attribute name="Contacts" type="Related_Contact__c[]" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+    <span style="background-color:#a1dee9;">
+	<lightning:layout multipleRows="false" >
+        <lightning:layoutItem size="1" class=" buildingHeader">
+            <b>Related Contacts: </b> 
+        </lightning:layoutItem>
+        <lightning:layoutItem size="11" >
+            
+        </lightning:layoutItem>
+    </lightning:layout>
+        
+    <lightning:layout multipleRows="true" class="mySubrowHeader header-column">
+        
+         <div style="width:40px;"></div>        
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">First Name</lightning:layoutItem>
+         <lightning:layoutItem size="2" flexibility="auto" class="mySubrowHeader header-column">Last Name</lightning:layoutItem>
+         <lightning:layoutItem size="2" flexibility="auto" class="mySubrowHeader header-column">Account</lightning:layoutItem>
+         <lightning:layoutItem size="3" flexibility="auto" class="mySubrowHeader header-column">Email</lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Facilities Contact?</lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Financial Contact?</lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Rent Invoice?</lightning:layoutItem>
+     </lightning:layout>
+    </span>
+    
+    
+    <span >
+    <aura:iteration items="{!v.Contacts}" var="b" indexVar="indx">
+        <c:RelatedContact  Contact="{!b}" propertyId="{!v.propertyId}"/>
+    </aura:iteration>
+    </span>
+    
+</aura:component>

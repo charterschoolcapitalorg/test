@@ -1,0 +1,87 @@
+<apex:page standardController="ContentVersion" extensions="AddContentController" action="{!init}" docType="html-5.0">
+    <apex:stylesheet value="{!URLFOR($Resource.AddContent, 'css/addContent.css')}" />
+
+    <script type="text/javascript">
+        function openRecord(record, row) {
+            var id = (record.slice(1 + (20 * (row - 1)), (20 * (row) - 1)));
+            var val = '{!$CurrentPage.URL}'.search('/apex');
+            var instance = '{!$CurrentPage.URL}'.slice(0, val + 1);
+            var recordPage = instance + 'sfc/#version/' + id
+            console.log(record);
+            console.log(recordPage);
+            window.open(recordPage, '_blank');
+        }
+    </script>
+
+    <apex:pageMessages id="messages" />
+
+    <apex:form >
+        <apex:pageBlock title="Upload Content" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Upload" action="{!save}" status="spinner" disabled="true"/>
+                <apex:commandButton value="Cancel" action="{!cancel}" immediate="true" disabled="true"/>
+            </apex:pageBlockButtons>
+
+            <apex:actionStatus id="spinner">
+                <apex:facet name="start">
+                    <div class="spinnerContainer">
+                        <div class="spinner"></div>
+                    </div>
+                </apex:facet>
+            </apex:actionStatus>
+
+            <apex:pageBlockSection title="CSC Action Item Details" rendered="{!NOT(ISNULL(ContentVersion.CSC_Action_Item__c))}">
+                <apex:outputField value="{!ContentVersion.CSC_Action_Item__c}" />
+                <apex:outputField value="{!ContentVersion.CSC_Action_List__c}" />
+                <apex:outputField value="{!ContentVersion.Account__c}" />
+                <apex:outputField value="{!ContentVersion.FirstPublishLocationId}" label="Library Type" />
+                <apex:outputField value="{!ContentVersion.Opportunity__c}" />
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Legal Doc Details" rendered="{!NOT(ISNULL(ContentVersion.Legal_Doc__c))}">
+                <apex:outputField value="{!ContentVersion.Legal_Doc__c}" />
+                <apex:outputField value="{!ContentVersion.FirstPublishLocationId}" label="Library Type" />
+                <apex:outputField value="{!ContentVersion.Account__c}" />
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Resolution Details" rendered="{!NOT(ISNULL(ContentVersion.Resolution__c))}">
+                <apex:outputField value="{!ContentVersion.Resolution__c}" />
+                <apex:outputField value="{!ContentVersion.FirstPublishLocationId}" label="Library Type" />
+                <apex:outputField value="{!ContentVersion.Account__c}" />
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Opportunity Details" rendered="{!AND(NOT(ISNULL(ContentVersion.Opportunity__c)),ISNULL(ContentVersion.CSC_Action_Item__c))}">
+                <apex:outputField value="{!ContentVersion.Opportunity__c}" />
+                <apex:outputField value="{!ContentVersion.FirstPublishLocationId}" label="Library Type" />
+                <apex:outputField value="{!ContentVersion.Account__c}" />
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="RPA Details" rendered="{!AND(NOT(ISNULL(ContentVersion.RPA__c)),ISNULL(ContentVersion.Terms_Letter__c))}">
+                <apex:outputField value="{!ContentVersion.RPA__c}" />
+                <apex:outputField value="{!ContentVersion.FirstPublishLocationId}" label="Library Type" />
+                <apex:outputField value="{!ContentVersion.Account__c}" />
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection title="Terms Letter Details" rendered="{!NOT(ISNULL(ContentVersion.Terms_Letter__c))}">
+                <apex:outputField value="{!ContentVersion.Terms_Letter__c}" />
+                <apex:outputField value="{!ContentVersion.RPA__c}" />
+                <apex:outputField value="{!ContentVersion.Account__c}" />
+                <apex:outputField value="{!ContentVersion.FirstPublishLocationId}" label="Library Type" />
+            </apex:pageBlockSection>
+
+            <apex:pageBlockSection columns="1">
+                <apex:inputFile value="{!ContentVersion.VersionData}" filename="{!ContentVersion.PathOnClient}" required="true" disabled="true"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+
+        <apex:pageBlock >
+            <apex:pageBlockSection title="Attached Items" columns="1">
+                <apex:pageBlockTable value="{!ListContent}" var="c" onRowClick="openRecord('{!ListContent}',this.rowIndex)">
+                    <apex:column headerValue="Title" value="{!c.Title}"/>
+                    <apex:column headerValue="Date/Time Created" value="{!c.CreatedDate}"/>
+                    <apex:column headerValue="Created By" value="{!c.CreatedBy.Name}"/>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+</apex:page>

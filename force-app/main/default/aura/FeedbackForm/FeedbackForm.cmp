@@ -1,0 +1,13 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="ConnectApiHelper">
+    <aura:attribute name="feedback" type="String" />
+    <aura:attribute name="compLabel" type="String" default="Leave Feedback"/>
+    <aura:attribute name="groups" type="String"/>
+	<lightning:card title="{!v.compLabel}">
+        <aura:set attribute="actions">
+            <lightning:button label="Submit Feedback" onclick="{!c.submitFeedback}"/>
+        </aura:set>
+        <p class="slds-p-horizontal_small">
+            <lightning:inputRichText variant="bottom-toolbar" value="{!v.feedback}" placeholder="Leave your feedback here. This will be submitted to the SFDC Team for review."/>
+        </p>
+    </lightning:card>
+</aura:component>

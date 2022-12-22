@@ -1,0 +1,41 @@
+<apex:page id="loginPage" showHeader="false" showChat="false" sidebar="false" standardStylesheets="true" controller="ForgotController">
+
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Forgot Password</title>
+
+    <!-- Bootstrap core CSS -->
+    <apex:stylesheet value="{!URLFOR($Resource.Bootstrap4_1, 'css/bootstrap.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.CommunityLogin, 'CommunityLogin/css/main.css')}"/>
+    <link href="https://fonts.googleapis.com/css?family=Lato:400,700,900" rel="stylesheet" type="text/css" />
+
+  </head>
+
+  <body class="login-block">
+
+    <div class="container">
+      <div class="main-div col-12 col-sm-10 col-md-10 col-lg-8 col-xl-6">
+        <div class="align-middle">
+        <apex:image styleClass="center col-12 col-sm-10 col-md-10 col-lg-8 col-xl-8" id="logo" url="{!URLFOR($Resource.Logo, '/CSC_Logo.png')}" alt="Charter School Capital"/>
+        </div>
+        <br/>
+        <div styleClass="form-forgot">
+          <div class="text-center">
+            <p class="heading">NOW, CHECK YOUR EMAIL</p>
+            <p >Check the email account associated with your Client Portal username for instructions on resetting your password.</p>
+            <p >Remember to look in your spam/junk folder, where automated messages sometimes filter.</p>
+            <p > If you still can't log in, contact your Account Manager.</p>
+          </div>
+          <div class="text-center">
+            <a href="./SiteLoginNew">Back to login</a>
+          </div>     
+        </div>
+      </div>
+
+    </div>
+
+  </body>
+
+</apex:page>

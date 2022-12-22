@@ -1,0 +1,26 @@
+<aura:component >
+	<aura:attribute name="LS" type="Lease_School__c" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+	<lightning:layout horizontalAlign="left" verticalAlign="center" class="header-data slds-border_bottom" multipleRows="true" >  
+        <div style="width:40px;vertical-align:middle;text-align:right;" >
+            <a onclick="{!c.editLS}" styleClass="btn ">Edit</a>
+        </div>
+        <lightning:layoutItem size="3" flexibility="auto" class="header-data">
+            <a onclick="{!c.viewLS}" styleClass="btn">{!v.LS.Name}</a>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="3" flexibility="auto" class="header-data">
+            <a onclick="{!c.viewSchool}" styleClass="btn">{!v.LS.Account_School__r.Name}</a>
+        	<!-- {!v.LS.Account_School__r.Name} -->
+        </lightning:layoutItem>
+        <lightning:layoutItem size="2" flexibility="auto" class="header-data">{!v.LS.Lease__r.Name}</lightning:layoutItem>
+        <lightning:layoutItem size="1" flexibility="auto" class="header-data">
+            <ui:outputDate value="{!v.LS.On_Date__c}" format="MM/dd/yyyy" />
+        </lightning:layoutItem> 
+        <lightning:layoutItem size="1" flexibility="auto" class="header-data">
+            <ui:outputDate value="{!v.LS.Off_Date__c}" format="MM/dd/yyyy" />
+        </lightning:layoutItem> 
+    </lightning:layout>
+
+</aura:component>

@@ -1,0 +1,104 @@
+<aura:component>
+    <aura:attribute name="installments" type="Pre_FE_Installment__c[]"/>
+    <aura:attribute name="faceValue" type="Integer"/>
+    <aura:attribute name="upp" type="Integer"/>
+    <aura:attribute name="discount" type="Integer"/>
+    <aura:attribute name="transactionFees" type="Integer"/>
+    <aura:attribute name="programFees" type="Integer"/>
+    <aura:attribute name="totalCost" type="Integer"/>
+    <aura:attribute name="netToSchool" type="Integer"/>
+    <aura:attribute name="transactionEffectiveRate" type="Decimal"/>
+    <aura:handler name="change" value="{!v.installments}" action="{!c.itemsChange}"/>
+    
+        <div class="slds-grid slds-wrap slds-gutters">
+            <div class="slds-col slds-small-align_absolute-center slds-small-size_7-of-12 slds-medium-size_7-of-12 slds-large-size_9-of-12">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="slds-text-title_caps" scope="col">
+                                <div class="slds-truncate" ><b>Summary</b></div>
+                            </th>
+                            <th class="slds-text-title_caps" scope="col">
+                                <div class="col2 slds-truncate" ><b>Value</b></div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="slds-hint-parent">
+                            <td data-label="Face Value">
+                                <div class="slds-truncate" >Face Value</div>
+                            </td>
+                            <td data-label="Face Value">
+                                <div class="col2 slds-truncate"><lightning:formattedNumber value="{!v.faceValue}"/></div>
+                            </td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <td data-label="Face Value">
+                                <div class="slds-truncate" >Discount Amount</div>
+                            </td>
+                            <td data-label="Discount Amount">
+                                <div class="col2 slds-truncate" ><lightning:formattedNumber value="{!v.discount}"/></div>
+                            </td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <td data-label="Face Value">
+                                <div class="slds-truncate" >Upfront Purchase Price</div>
+                            </td>
+                            <td data-label="Upfront Purchase Price">
+                                <div class="col2 slds-truncate" ><lightning:formattedNumber value="{!v.upp}"/></div>
+                            </td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <td data-label="Face Value">
+                                <div class="slds-truncate" >Program Fees</div>
+                            </td>
+                            <td data-label="Discount Amount">
+                                <div class="col2 slds-truncate" ><lightning:formattedNumber value="{!v.programFees}"/></div>
+                            </td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <td data-label="Face Value">
+                                <div class="slds-truncate" >Transaction Fees</div>
+                            </td>
+                            <td data-label="Discount Amount">
+                                <div class="col2 slds-truncate" ><lightning:formattedNumber value="{!v.transactionFees}"/></div>
+                            </td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <td data-label="Face Value">
+                                <div class="slds-truncate" >Total Cost</div>
+                            </td>
+                            <td data-label="Discount Amount">
+                                <div class="col2 slds-truncate" ><lightning:formattedNumber value="{!v.totalCost}"/></div>
+                            </td>
+                        </tr>
+                        <tr class="slds-hint-parent">
+                            <td data-label="Face Value">
+                                <div class="slds-truncate" ><b>Net to School</b></div>
+                            </td>
+                            <td data-label="Discount Amount">
+                                <div class="col2 slds-truncate" ><b><lightning:formattedNumber value="{!v.netToSchool}"/></b></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="slds-col slds-small-align_absolute-center slds-small-size_7-of-12 slds-medium-size_7-of-12 slds-large-size_3-of-12">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                    </thead>
+                    <tbody>
+                        <tr class="slds-hint-parent">
+                            <td data-label="Face Value">
+                                <div class="slds-truncate" >Transaction effective rate</div>
+                            </td>
+                            <td data-label="Transaction effective rate:">
+                                <div class="col2 slds-truncate"><lightning:formattedNumber style="percent" minimumFractionDigits="2" value="{!v.transactionEffectiveRate}"/></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+</aura:component>

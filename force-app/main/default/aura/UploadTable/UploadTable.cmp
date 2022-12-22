@@ -1,0 +1,88 @@
+<aura:component controller="UploadTableCtlr">
+    <aura:attribute name="intakeName" type="String" />
+    <aura:attribute name="intakeItems" type="Intake_Item__c[]"/>
+    <aura:attribute name="selectedIds" type="String" default=""/>
+    <aura:attribute name="fileNames" type="String" default="" />
+    <aura:attribute name="firstId" type="String" default="" />
+    <aura:attribute name="bulkDisable" type="Boolean" default="false" />
+    <aura:attribute name="itemHasRedFlag" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="rowEvent" event="c:UploadTableRowEvent" action="{!c.setSelectedIds}"/>
+    <aura:handler name="docUploaded" event="c:FireDocUpload" action="{!c.handleDocUploaded}"/>
+    <aura:handler name="hasredflag" event="c:FireRedFlagEvent" action="{!c.handleRedFlag}"/>
+    <aura:attribute name="currDateValue" type="String" default=""/>
+    
+    <aura:attribute name="options" type="List" default="[
+    {'label': '45 days', 'value': '45'},
+    {'label': '90 days', 'value': '90'},
+    {'label': 'All days', 'value': ''},
+    ]"/>
+    
+    <!--
+    <lightning:layout>
+        <lightning:layoutItem size="6" mediumDeviceSize="3" class="datelist">
+    		<lightning:combobox name="progress" label="Date Range" value="inProgress" placeholder="45 days" options="{! v.options }" onchange="{! c.handleChange }"/>
+        </lightning:layoutItem>
+   </lightning:layout>
+    -->
+    
+    <lightning:layout multipleRows="false" class="mySubrowHeader">
+       
+        <lightning:layoutItem size="3" mediumDeviceSize="1" class="header-column-small"><span style="vertical-align:middle;">Select</span></lightning:layoutItem>  
+        <lightning:layoutItem size="6" mediumDeviceSize="3" class="header-column"><span style="vertical-align:middle;">Transaction Name</span></lightning:layoutItem>
+        <lightning:layoutItem size="3" mediumDeviceSize="1" class="header-column"><span style="vertical-align:middle;">Due Date</span></lightning:layoutItem>
+        <lightning:layoutItem size="3" mediumDeviceSize="1" class="header-column"><span style="vertical-align:middle;">Status</span></lightning:layoutItem>
+        <lightning:layoutItem size="3" mediumDeviceSize="3" class="header-column"><span style="vertical-align:middle;">Status Reason</span></lightning:layoutItem>    
+        <lightning:layoutItem size="3" mediumDeviceSize="2" class="header-column"><span style="vertical-align:middle;padding-left:15px;">Action</span></lightning:layoutItem>	
+        <lightning:layoutItem size="3" mediumDeviceSize="1" class="header-column"><span style="vertical-align:middle;=">Instructions</span></lightning:layoutItem>
+
+        
+    </lightning:layout>
+    
+    <aura:iteration items="{!v.intakeItems}" var="i">	
+        <c:UploadTableRow intakeItem="{!i}"/>
+    </aura:iteration>
+    
+	<lightning:layout multipleRows="false" >
+        
+        <lightning:layoutItem size="3" class="blank-header-column-small" mediumDeviceSize="1" ><span style="vertical-align:middle;width:50px;"></span></lightning:layoutItem>  
+        
+        <lightning:layoutItem size="6" class="blank-header-column" mediumDeviceSize="3" ><span style="vertical-align:middle;"></span></lightning:layoutItem>
+        <lightning:layoutItem size="3" class="blank-header-column" mediumDeviceSize="1" ><span style="vertical-align:middle;"></span></lightning:layoutItem>
+        
+        <lightning:layoutItem size="3" class="blank-header-column" mediumDeviceSize="1" ><span style="vertical-align:middle;"></span></lightning:layoutItem>
+        <lightning:layoutItem size="3" class="blank-header-column" mediumDeviceSize="3" ><span style="vertical-align:middle;"></span></lightning:layoutItem>    
+        <lightning:layoutItem size="3" class="blank-header-column" mediumDeviceSize="2" >
+            <span style="vertical-align:middle;">
+        	<lightning:fileUpload  name="fileUploader"
+                              	   label="UPLOAD FILE TO SELECTED TRANSACTIONS"
+                                   class="uploadAll"                                                                       
+                                   multiple="false"
+                                   accept="{!v.accept}"
+                                   disabled="{!v.bulkDisable}"
+                                   recordId="{!v.firstId}"
+                                   onuploadfinished="{! c.handleBulkUploadFinished }"/> 
+                </span>
+        </lightning:layoutItem>	
+        <lightning:layoutItem size="3" class="blank-header-column" mediumDeviceSize="1" ><span style="vertical-align:middle;="></span></lightning:layoutItem>
+        	
+    </lightning:layout>
+    
+    <div>
+         
+  
+    </div>  
+    <aura:if isTrue="{!v.itemHasRedFlag}"> 
+    	<div style="text-align:left;margin-top:2px;color:red">Red Flag – please see special instructions by hovering on the <img src="{!$Resource.InfoDotGreen}" width="30" height="30"/> for the Transaction</div>
+        
+        
+    </aura:if>
+    
+    <div style="text-align:right;margin-top:2px;">{!v.fileNames}</div>
+    <div style="text-align:right;margin-top:5px;">
+    	   <lightning:button variant="destructive" class="closeButton" label="Close" title="Close File Uploader" onclick="{! c.handleClose }"/>
+           <lightning:overlayLibrary aura:id="overlayLib"/><!-- approved hack for getting the modal to close with a button -->
+    </div>
+
+		
+</aura:component>

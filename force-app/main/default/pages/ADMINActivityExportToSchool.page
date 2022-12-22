@@ -1,0 +1,240 @@
+<!--
+/**=====================================================================
+ * Appirio, Inc
+ * Name: ADMINActivityExportToSchool
+ * Description: VF Page for Month End Reporting excel sheet
+ * Created Date: [07/07/2014]
+ * Created By: [Rajeev Arya] (Appirio)
+ *
+ * Date Modified            Modified By                 Description of the update
+ * [07/16/2014]            [Rajeev Arya]              [I-121455 - Bugs in Month End Reporting]
+ * [10/08/2014]            [John Caughie]             [Added fields for Purchase ID, Financeable, Calc Discount & CSC PP]
+ * [01/28/2015]            [John Caughie]             [Added fields for Source Attendance Record]
+ =====================================================================*/
+-->
+<apex:page controller="ADMINActivityController" contentType="application/vnd.ms-excel#MonthEndReport - {!TODAY()}.xls" 
+showHeader="false" standardStylesheets="false" cache="true">
+    <style type="text/CSS">
+    
+
+            td {
+                vertical-align: bottom;
+                text-align:center;
+            }
+
+    </style> 
+                
+    <table>
+        <thead>
+            <tr>
+                <th >NetSuite ID</th>
+                <th >State</th>
+                <th >CMO</th>
+                <th >Charter Holder</th>
+                <th >School</th>
+                <th >Purchase Date</th>
+                <th >Receivable Name</th>
+                <th >Receivable Type</th>
+                <th >Face Value</th>
+                <th >Face Value Due</th>
+                <th >Discount Amount</th>
+                <th >Daily Rate</th>
+                <th >Draw Investor</th>
+                <th >Draw Note Description</th>
+                <th >Draw Borrow Date</th>
+                <th >Owner</th>
+                <th >Accrued Interest CSC</th>
+                <th >Accrued Interest CSFC</th>
+                <th >Accrued Interest PCSRC</th>
+                <th >Accrued Interest Total</th>
+                <th >Period Interest CSC</th>
+                <th >Period Interest CSFC</th>
+                <th >Period Interest PCSRC</th>
+                <th >Period Interest Total</th>
+                <!-- <th >Unamort CSC</th> -->
+                <!-- <th >Unamort Owner</th> -->
+                <th >Unamort Total</th>
+                <!-- <th >Gain CSC</th>
+                <th >Gain Owner</th> -->
+                <th >Gain Total</th>
+                <th >Input Start Date</th>
+                <th >Input End Date</th>
+                <th >Purchase ID</th>
+                <th >Financeable</th>
+                <th >Calculator Discount</th>
+                <th >Upfront Purchase Price</th>
+                <th >Source Attendance</th>
+                <th >Expected Pay Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <apex:repeat value="{!MonthEndWrapperMap}" var="MonWrap">
+                <tr>
+                    <td> {!MonthEndWrapperMap[MonWrap].FunRec.School__r.NetSuite_ID_CSC__c} </td> 
+                    <td> {!MonthEndWrapperMap[MonWrap].FunRec.School__r.Operating_State__r.Name} </td>
+                    <td> {!MonthEndWrapperMap[MonWrap].FunRec.Charter_Holder__r.CMO__r.Name} </td> 
+                    <td> {!MonthEndWrapperMap[MonWrap].FunRec.School__r.Charter_Holder__r.name} </td>
+                    <td> {!MonthEndWrapperMap[MonWrap].FunRec.School__r.Name} </td>
+                    <td>  
+                        <apex:outputText value="{0,date,MM-dd-yyyy}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].FunRec.Purchase_Date__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td> {!MonthEndWrapperMap[MonWrap].FunRec.Name} </td>
+                    <td> {!MonthEndWrapperMap[MonWrap].FunRec.RecordType.Name} </td>
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].FunRec.FV_Amount__c}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].FaceValueDue}" />
+                        </apex:outputText>
+                    </td> 
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].FunRec.Discount_Amount__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].FunRec.Daily_Rate__c}" />
+                        </apex:outputText>
+                    </td>
+                    <td> {!MonthEndWrapperMap[MonWrap].dnTx.Draw_Note__r.Investor__r.Name} </td> 
+                    <td> {!MonthEndWrapperMap[MonWrap].dnTx.Draw_Note__r.Note_Description__c} </td>
+
+                    <td> 
+                        <apex:outputText value="{0,date,MM-dd-YYYY}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].dnTx.Draw_Note__r.Borrow_Date__c}" />
+                        </apex:outputText>
+                    </td>
+
+                    <td> {!MonthEndWrapperMap[MonWrap].CurrentOwner} </td>  
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].AccruedInterestCSC}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].AccruedInterestCSFC}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].AccruedInterestPCSRC}" />
+                        </apex:outputText>
+                    </td>
+                            
+                        
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].AccruedInterestTotal}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].PeriodInterestCSC}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].PeriodInterestCSFC}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].PeriodInterestPCSRC}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].PeriodInterestTotal}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <!-- <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].UnamortCSC}" />
+                        </apex:outputText>
+                    </td> -->
+                    
+                    <!-- <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].UnamortPCSRC}" />
+                        </apex:outputText>
+                    </td> -->
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].UnamortTotal}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <!-- <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].GainCSC}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].GainPCSRC}" />
+                        </apex:outputText>
+                    </td> -->
+                    
+                    <td> 
+                        <apex:outputText value="{0,number,$#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].GainTotal}" />
+                        </apex:outputText>
+                    </td>
+                    
+                    <td> 
+                        <apex:outputText value="{0,date,MM-dd-yyyy}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].StartDate}" />
+                        </apex:outputText>
+                    </td>
+                    <td> 
+                        <apex:outputText value="{0,date,MM-dd-yyyy}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].EndDate}" />
+                        </apex:outputText>
+                    </td>
+
+                    <td>{!MonthEndWrapperMap[MonWrap].Purchase_ID}</td>
+
+                    <td>{!MonthEndWrapperMap[MonWrap].Financeable}</td>
+
+                    <td> 
+                        <apex:outputText value="{0,number,#,##0.00000}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].CalculatorDiscount}" />
+                        </apex:outputText>  
+                    </td>
+                    <td> 
+                        <apex:outputText value="{0,number,#,##0.00}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].UpfrontPP}" />
+                        </apex:outputText>  
+                    </td>
+
+                    <td>{!MonthEndWrapperMap[MonWrap].SourceAttRecord}</td>
+                    <td> 
+                        <apex:outputText value="{0,date,MM-dd-yyyy}">
+                            <apex:param value="{!MonthEndWrapperMap[MonWrap].ExpectedPayDate}" />
+                        </apex:outputText>
+                    </td>
+                </tr>
+            </apex:repeat>
+        </tbody>
+            
+    </table> 
+        
+</apex:page>

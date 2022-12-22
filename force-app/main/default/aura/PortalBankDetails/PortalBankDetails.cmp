@@ -1,0 +1,58 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" controller="PortalBankCtrl" access="global" >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+	<aura:attribute name="oppRecord" type="Opportunity"/>
+	<aura:attribute name="oppId" type="string"/>
+	<aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="modalMessage" type="String"/>
+	
+	
+	<div class="slds-grid slds-gutters">
+		<div class="slds-col">
+			Account Name <lightning:input value="{!v.oppRecord.Bank_Account_Name__c}" label="Account Name" title="enter your bank Account Name here"/>
+			Account Number <lightning:input value="{!v.oppRecord.Bank_Account_Num__c}" label="Account Number" title="enter your bank Account Number"/>
+			Routing Number <lightning:input value="{!v.oppRecord.Bank_Routing_Num__c}" label="Routing Number" title="enter your bank Routing Number"/>
+		</div>
+		<div class="slds-col">
+			Bank Name <lightning:input value="{!v.oppRecord.Bank_Name__c}" label="Bank Name" title="enter your Bank Name"/>
+			Address <lightning:input value="{!v.oppRecord.Bank_Address__c}" label="Address" title="enter your bank Address"/>
+			Contact at Bank <lightning:input value="{!v.oppRecord.Bank_Contact__c}" label="Contact at Bank" title="enter your Contact at the Bank"/>
+			Contact Phone <lightning:input value="{!v.oppRecord.Bank_Contact_Phone__c}" label="Contact Phone" title="enter your bank Contact's Phone"/>
+		</div>
+	</div>
+    <br/>
+	<div class="slds-grid slds-gutters">
+		<div class="slds-col slds-align_absolute-center">
+			<lightning:button variant="brand" label="Return" onclick="{!c.handleReturn}"/>
+		    <lightning:button variant="brand" label="Save and Submit Bank Details" onclick="{!c.handleSaveAndSubmit}" />
+		</div>
+	</div>
+
+    <!--Modal msg-->
+    <aura:if isTrue="{!v.isOpen}">
+
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModal}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                </div>
+                <div class="slds-modal__content slds-var-p-around_medium" align="center">
+                    <p>
+                        <b>
+                                {!v.modalMessage}
+                        </b>
+                    </p>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning:button variant="destructive" label="Close" onclick="{!c.closeModal}"/>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="slds-backdrop slds-backdrop- -open"></div> -->
+    </aura:if>
+    <!--Modal msg-->
+
+
+</aura:component>

@@ -1,0 +1,85 @@
+<aura:component implements="lightning:availableForFlowScreens,force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="LeaseAmendmentCtrl">
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="leaseAmendment" type="Lease_Amendment__c" default="{'sobjectType': 'Lease_Amendment__c',}"/>
+    <aura:attribute name="lease" type="Lease__c"/>
+    <aura:attribute name="step" type="string" default="1"/>
+
+    <lightning:notificationsLibrary aura:id="notificationsLibrary"/>
+
+    <aura:if isTrue="{!v.step=='1'}">
+        <h2 class="slds-modal__title">Lease Amendment</h2>
+        <hr/>
+        <lightning:recordEditForm aura:id="amendmentForm"
+                           objectApiName="Lease_Amendment__c"
+                           density="comfy">
+            <lightning:messages />
+            <lightning:inputField fieldName="Amendment_Num__c" value="{!v.leaseAmendment.Amendment_Num__c}"/>
+            <lightning:inputField fieldName="Effective_Date__c" value="{!v.leaseAmendment.Effective_Date__c}"/>
+            <lightning:inputField fieldName="Amendment_Summary__c" value="{!v.leaseAmendment.Amendment_Summary__c}"/>
+            <div class="slds-m-top_large slds-float--right">
+                <lightning:button class="slds-m-top_small" variant="Success" label="Next" onclick="{!c.handleOnNext}"/>
+            </div>
+        </lightning:recordEditForm>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.step=='2'}">
+        <lightning:recordEditForm aura:id="leaseForm"
+                                recordId="{!v.recordId}"
+                                objectApiName="Lease__c"     
+                                density="comfy">
+            
+            <lightning:messages/>
+            <h2 class="slds-modal__title">Lease</h2>
+            <hr/>
+            
+            <h1 class="slds-box slds-box_x-small slds-theme_shade">Details</h1>
+            <br/>
+            <lightning:inputField fieldName="Lease_Owner__c" value="{!v.lease.Lease_Owner__c}"/>
+            <lightning:inputField fieldName="Lease_Type__c" value="{!v.lease.Lease_Type__c}"/>
+            <lightning:inputField fieldName="Escalator__c" value="{!v.lease.Escalator__c}"/>
+            <lightning:inputField fieldName="Escalation_Date__c" value="{!v.lease.Escalation_Date__c}"/>
+            <lightning:inputField fieldName="Base_Year__c" value="{!v.lease.Base_Year__c}"/>
+            <lightning:inputField fieldName="Base_Year_Rent__c" value="{!v.lease.Base_Year_Rent__c}"/>
+            <lightning:inputField fieldName="Lease_Commencement_Date__c" value="{!v.lease.Lease_Commencement_Date__c}"/>
+            <lightning:inputField fieldName="Lease_Expiration_Date__c" value="{!v.lease.Lease_Expiration_Date__c}"/>
+            <lightning:inputField fieldName="Initial_Insurance_Expiration_Date__c" value="{!v.lease.Initial_Insurance_Expiration_Date__c}"/>
+            <lightning:inputField fieldName="Lease_Version__c" value="{!v.lease.Lease_Version__c}"/>
+            <lightning:inputField fieldName="Lease_Version_Number__c" value="{!v.lease.Lease_Version_Number__c}"/>
+           
+            <hr/>
+            <h1 class="slds-box slds-box_x-small slds-theme_shade">Write-up</h1>
+            <br/>
+            <lightning:inputField fieldName="Rent_Concessions__c" value="{!v.lease.Rent_Concessions__c}"/>
+            <lightning:inputField fieldName="Maintenance_Requirements__c" value="{!v.lease.Maintenance_Requirements__c}"/>
+            <lightning:inputField fieldName="Comments__c" value="{!v.lease.Comments__c}"/>
+
+            <hr/>
+            <h1 class="slds-box slds-box_x-small slds-theme_shade">Options</h1>
+            <br/>
+            <lightning:inputField fieldName="Option_to_Extend__c" value="{!v.lease.Option_to_Extend__c}"/>
+            <lightning:inputField fieldName="Option_Extension_Detail__c" value="{!v.lease.Option_Extension_Detail__c}"/>
+            <lightning:inputField fieldName="Purchase_Option__c" value="{!v.lease.Purchase_Option__c}"/>
+            <lightning:inputField fieldName="Purchase_Option_Detail__c" value="{!v.lease.Purchase_Option_Detail__c}"/>
+
+            <hr/>
+            <h1 class="slds-box slds-box_x-small slds-theme_shade">Rent Payment Details</h1>
+            <br/>
+            <lightning:inputField fieldName="Rent_Payment_Amount_Current__c" value="{!v.lease.Rent_Payment_Amount_Current__c}"/>
+            <lightning:inputField fieldName="Periods__c" value="{!v.lease.Periods__c}"/>
+            <lightning:inputField fieldName="Rent_Payment_Due__c" value="{!v.lease.Rent_Payment_Due__c}"/>
+
+        </lightning:recordEditForm>
+
+        <div class="slds-m-top_large slds-float--right">
+            <lightning:button variant="Destructive" label="Previous" onclick="{!c.handleOnGoBack}"/>
+            <lightning:button variant="Success" label="Submit" onclick="{!c.handleOnSubmit}"/>
+        </div>
+    </aura:if>
+
+    <!-- <aura:if isTrue="{!v.step=='3'}">
+        Submitted!
+    </aura:if> -->
+
+</aura:component>

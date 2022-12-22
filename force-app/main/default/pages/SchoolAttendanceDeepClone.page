@@ -1,0 +1,4 @@
+<!-- Page for invoking class to duplicate a Regional Attendance list attached to a School Attendance Record - project 2014.11.17 J Caughie -->
+<apex:page standardController="School_Attendance__c" extensions="SchoolAttDeepCloneWithRegionalAtt" action="{!cloneWithRegionalAtt}">
+     <apex:pageMessages />
+</apex:page>

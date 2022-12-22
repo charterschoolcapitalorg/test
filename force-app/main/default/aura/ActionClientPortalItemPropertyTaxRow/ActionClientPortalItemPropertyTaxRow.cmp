@@ -1,0 +1,124 @@
+<aura:component controller="AcceptClientPortalItemCtrl" >
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="pt" type="Property_Tax__c" />
+    <aura:attribute name="cpi" type="Intake_Item__c" />
+    <aura:attribute name="allFiles" type="ContentDocument"/>
+    <aura:attribute name="selectedFiles" type="ContentDocument"/>
+    <aura:attribute name="numFiles" type="Integer"/>
+    <aura:attribute name="updatePT" type="Boolean" default="false"/>
+
+    <aura:attribute name="selectedIds" type="String" default=""/>
+    <aura:attribute name="selectedIdsArray" type="String[]"/>
+    <aura:handler name="rowEvent" event="c:FileMappingEvent" action="{!c.setSelectedIds}"/>
+
+    <lightning:navigation aura:id="navService"/>
+
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+
+
+    <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+
+    <aura:method name="save" action="{!c.save}">
+        <aura:attribute name="status" type="String" default=""/> 
+    </aura:method>
+
+    <div style="background-color: white;">
+        <lightning:layout multipleRows="false">
+            
+            <!-- Name -->
+            <lightning:layoutItem size="1.5" class="data-column-first slds-var-p-horizontal_small" aura:id="myRow">
+                <a onclick="{!c.openPropertyTax}" styleClass="btn">{!v.pt.Name}</a>
+            </lightning:layoutItem>
+            
+            <!-- Parcel -->
+            <lightning:layoutItem size="1.5" class="data-column slds-var-p-horizontal_small" aura:id="myRow">{!v.pt.Parcel__r.Name}</lightning:layoutItem>  
+            
+            <!-- Tax Year -->
+            <lightning:layoutItem size="1" class="data-column slds-var-p-horizontal_small" aura:id="myRow">{!v.pt.Tax_Year_Number__c}</lightning:layoutItem>
+            
+            <!-- Amout Due -->
+            <!-- <lightning:layoutItem size="1" class="data-column slds-var-p-horizontal_small" aura:id="myRow">{!v.pt.X1st_Amount_Due__c}</lightning:layoutItem> -->
+            <lightning:layoutItem size="1" class="data-column slds-var-p-horizontal_small" aura:id="outstanding">$ 
+            <lightning:formattedNumber value="{!v.pt.X1st_Amount_Due__c}" maximumFractionDigits="2" /> </lightning:layoutItem>
+            
+            <!-- Map to property tax -->
+            <lightning:layoutItem size="1" class="data-column slds-p-horizontal_small checkboxspacing"  aura:id="myRow">
+                <lightning:input variant="label-hidden" name="mappropertytax" class="data-left" aura:id="mappropertytax" checked="false" type="checkbox" onchange="" required="true"/>
+            </lightning:layoutItem>
+            
+            <!-- Outstanding $ -->
+            <lightning:layoutItem size="1" class="data-column slds-var-p-horizontal_small" aura:id="outstanding">$ 
+            <lightning:formattedNumber value="{!v.pt.Outstanding_Balance__c}" maximumFractionDigits="2" /> </lightning:layoutItem>
+
+            <!-- Paid Amount -->
+            <lightning:layoutItem
+                size="1"
+                class="data-column-date"
+                aura:id="myRow"
+            >
+                <lightning:input
+                    variant="label-hidden"
+                    aura:id="cpamount"
+                    type="number"
+                    step=".01" 
+                    formatter="currency"
+                    value="0.0"
+                />
+            </lightning:layoutItem>
+            
+            <!-- Paid Date -->
+            <lightning:layoutItem
+                size="1"
+                class="data-column-date"
+                aura:id="myRow"
+            >
+                <lightning:input
+                    variant="label-hidden"
+                    aura:id="cpdate"
+                    type="date"
+                    value="2022-01-01"
+                />
+            </lightning:layoutItem>
+
+            <!-- Map Files -->
+            <aura:if isTrue="{!v.cpi.Copy_Files_to_AL_PCL__c}">
+                <lightning:layoutItem size="1" class="data-column slds-var-p-horizontal_small" aura:id="myRow">
+                    <aura:if isTrue="{!v.numFiles}">
+                        <c:ActionItemMapFilesCustomModal
+                            files="{!v.allFiles}"
+                            numFiles="{!v.numFiles}"
+                            selectedIds="{!v.selectedIdsArray}"
+                            selectedFiles="{!v.selectedFiles}"
+                            cpi="{!v.cpi}" />
+                    </aura:if>
+                </lightning:layoutItem>
+            </aura:if>
+
+            <!-- Include Client Comments -->
+            <lightning:layoutItem size="1" class="data-column slds-p-horizontal_small checkboxspacing"  aura:id="myRow">
+                <lightning:input variant="label-hidden" name="includecomment" class="data-left" aura:id="includecomment" checked="false" type="checkbox" onchange=""/>
+            </lightning:layoutItem>
+            
+            <!-- CSC Team Comments -->
+            <lightning:textarea
+                class="slds-align_absolute-center"
+                style="width: 250px"
+                aura:id="includecsccomment"
+                name="includecsccomment"
+            />
+
+        </lightning:layout>
+    </div>
+
+</aura:component>

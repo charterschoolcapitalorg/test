@@ -1,0 +1,398 @@
+<aura:component description="IntakeItemPQCommunity" controller="IntakeItemPQCommunityCtrl" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+    <aura:handler name="navigatetoParent" event="c:FireParentPQEvent" action="{!c.doAddSchoolSuccess}" value="{!this}"/>
+    <aura:attribute name="addSchoolSuccess" type="boolean" default="false"/>
+    
+    <aura:attribute name="toggleBOP" type="boolean" default="false"/>
+    <aura:attribute name="toggleFund" type="boolean" default="false"/>
+    <aura:attribute name="toggleCA" type="boolean" default="false"/>
+    <aura:attribute name="toggleEMO" type="boolean" default="false"/>
+    <aura:attribute name="toggleApplied" type="boolean" default="false"/>
+    <aura:attribute name="firstLoad" type="boolean" default="false"/>
+    <aura:attribute name="rectypes" type="IntakeItemPQCommunityCtrl"/>
+    
+    <aura:attribute name="modalMessage" type="String"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="billingStates" access="public" type="String[]"/>
+    <aura:attribute name="billingCountries" access="public" type="String[]"/>
+    <aura:attribute name="dateValidationError" type="boolean" />
+    
+    <aura:attribute name="res" type="String" />
+    <aura:attribute name="pqForm" type="PQ_Form__c"/>
+    <aura:attribute name="options" type="List" />
+    <aura:attribute name="schools" type="String" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="aura:doneRendering" action="{!c.toggleALL}"/>
+    
+    
+    <!--div class="slds-align_absolute-center slds-m-top- -large">
+      <lightning:button variant="brand" class="home_button" label="Return to Home" onclick="{!c.handleReturn}"/>
+     </div-->
+    
+    <c:HomeButton/>
+    
+    <br/>
+    <div class="blue_title_section" style="background-color:#77c5d5;">
+        <b class="vertical-align-text" style="font-size:14px;color:white;padding-left:24px;">Pre-Qualification Form</b>
+    </div>
+    
+    
+    <div class="slds-m-around_medium slds-text-align_left banner">
+        <span >This form functions best in a Chrome browser, so we strongly encourage you to complete it on Chrome. If you don’t yet use Chrome, 
+            <a target="_blank" href= "https://www.google.com/chrome"> you can download it here</a>
+        </span>      
+    </div>
+    
+    <div class="slds-m-top--large">
+        <h3 class="slds-section__title slds-theme_shade">
+            <!--span style="color:#a1dee9;" class="slds-truncate slds-p-horizontal_small" title="Individual Responsible for Application">Individual Responsible for Application</span-->
+            <c:ClearSubHeader header_text="Individual Responsible for Application"/>
+        </h3>
+        <hr class="hr"/>
+    </div>
+    
+    <div class="slds-m-around_medium slds-text-align_left banner">
+        <lightning:input aura:id="pq" label="First Name" type="text" class="slds-size--7-of-12"
+                         placeholder = "Input first name here"
+                         value="{!v.pqForm.First_Name__c}" required="true" pattern="[\s\S]{0,40}" 
+                         messageWhenPatternMismatch="Max 40 characters"/>
+        
+        <lightning:input aura:id="pq" label="Last Name" type="text" class="slds-size--7-of-12"
+                         value="{!v.pqForm.Last_Name__c}" required="true" pattern="[\s\S]{0,40}" 
+                         messageWhenPatternMismatch="Max 40 characters"/>
+        
+        <lightning:input aura:id="pq" label="Title" type="text"  class="slds-size--7-of-12"
+                         value="{!v.pqForm.Title__c}" required="true" pattern="[\s\S]{0,40}" 
+                         messageWhenPatternMismatch="Max 40 characters"/>
+        
+        <lightning:input aura:id="pq" label="Email" type="email" class="slds-size--7-of-12" 
+                         value="{!v.pqForm.Email__c}" required="true"/>
+        
+        <lightning:input aura:id="pq" label="Phone" type="tel" class="slds-size--7-of-12" 
+                         value="{!v.pqForm.Phone__c}" pattern="^[0-9_ ]{0,11}"
+                         messageWhenPatternMismatch="Phone number is not valid" required="true"/>
+        
+        <dl style="position:relative;" class="slds-list_horizontal slds-wrap ">
+            <lightning:select required="true" onchange="{!c.toggleApplied}" value="{!v.pqForm.Previously_applied_to_CSC__c}" aura:id="applied" class="slds-size--7-of-12" 
+                              label="Has someone from your organization/school previously applied for financing with Charter School Capital?" >
+                <option value=""></option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+                <option value="Unknown">Unknown</option>
+            </lightning:select>
+            <lightning:helptext content="Has anyone from the EMO/CMO, Charter Holder, or School applied for CSC funding before?" />
+        </dl>
+        
+        <aura:if isTrue="{!v.toggleApplied}">
+            <lightning:input aura:id="pq" label="Name of School, Organization, or Company?" type="text" 
+                             class="slds-size--7-of-12" 
+                             value="{!v.pqForm.Applicant_Organization_Account__c}" required="true" pattern="[\s\S]{0,100}" 
+                             messageWhenPatternMismatch="Max 100 characters"/>
+            
+        </aura:if>
+    </div>
+    
+    
+    <!-- REMOVED FOR NEW ENHANCEMENTS -->
+    
+    <!--lightning:select aura:id="pq" required="true" class="slds-size__1-of-2" 
+                          value="{!v.pqForm.School_open_and_active__c}"  label="Is this school open and are students being taught?" >
+         <option value=""></option>
+         <option value="Yes">Yes</option>
+         <option value="No">No</option>
+         <option value="Unknown">Unknown</option>
+     </lightning:select-->
+    
+    
+    
+    
+    <div class="slds-m-top--large">
+        <h3 class="slds-section__title slds-theme_shade">
+            <!--span style="background-color:Orange;" class="slds-truncate slds-p-horizontal_small" title="Charter Holder">Charter Holder</span-->
+            <c:ClearSubHeader header_text="Charter Holder"/>
+        </h3>
+        <hr class="hr"/>
+    </div>
+    
+    <div class="slds-m-around_medium slds-text-align_left banner">
+        
+		<!-- ui:outputText class="generate_text" value="{!v.pqForm.Charter_Holder_Name__c}"/>
+        <lightning:input aura:id="pq" required="true"  label="Charter Holder Name" type="text" readonly="true" class="slds-size- -7-of-12 generate_text"
+                         value="{!v.pqForm.Charter_Holder_Name__c}"><ui:outputText class="generate_text" value="{!v.pqForm.Charter_Holder_Name__c}"/></lightning:input>
+        
+        <lightning:input aura:id="pq" required="true"  label="State Organized" type="text" readonly="true" class="slds-size- -7-of-12 generate_text"
+                         value="{!v.pqForm.State_Organized__c}"/>
+        -->
+        
+        <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+            <label class="slds-form-element__label" for="form-element-03">
+                <abbr class="slds-required" title="required">*</abbr>Charter Holder Name</label>
+            <div class="slds-form-element__control">
+                <ui:outputText class="generate_text" value="{!v.pqForm.Charter_Holder_Name__c}"/>
+            </div>
+        </div>
+
+        <div class="slds-form-element slds-form-element_edit slds-hint-parent">
+            <label class="slds-form-element__label" for="form-element-03">
+                <abbr class="slds-required" title="required">*</abbr>State Organized</label>
+            <div class="slds-form-element__control">
+                <ui:outputText class="generate_text" value="{!v.pqForm.State_Organized__c}"/>
+            </div>
+        </div>
+        
+        <dl style="position:relative;" class="slds-size--7-of-12 slds-form-element__label">		
+            <ui:inputDate class="slds-size--7-of-12"  required="true" aura:id="charterDate" label="When was the charter issued?" 
+                          value="{!v.pqForm.Charter_Opened_Date__c}" displayDatePicker="true"/>
+        </dl>
+        <dl style="position:relative;" class="slds-size--7-of-12 slds-form-element__label">	
+            <ui:inputDate class="slds-size--7-of-12"  required="true" aura:id="expireDate" label="When will the charter expire?" 
+                          value="{!v.pqForm.Charter_Expiration_Date__c}" displayDatePicker="true"/>
+        </dl>        
+        <lightning:input aura:id="pq" required="true" label="How many sites operate under this charter document?" 
+                         type="number" class="slds-size--7-of-12"
+                         value="{!v.pqForm.of_sites_under_charter__c}"/>
+    </div>
+    
+    <div class="slds-m-top--large">
+        <h3 class="slds-section__title slds-theme_shade">
+            <!--span style="background-color:Orange;" class="slds-truncate slds-p-horizontal_small" title="Authorizer/Sponsor">Authorizer/Sponsor</span-->
+            <c:ClearSubHeader header_text="Authorizer/Sponsor"/>
+        </h3>
+        <hr class="hr"/>
+    </div>
+    
+    <div class="slds-m-around_medium slds-text-align_left banner">
+        <dl style="position:relative;" class="slds-list_horizontal slds-wrap">
+            <lightning:input class="slds-size--7-of-12" aura:id="pq" required="true" label="Authorizer or Sponsor Name" type="text"  
+                             value="{!v.pqForm.Authorizer_or_Sponsor_Name__c}" pattern="[\s\S]{0,100}" 
+                             messageWhenPatternMismatch="Max 100 characters"/>
+            <lightning:helptext content="Who is the Charter Holder authorizer/sponsor?" />
+            
+        </dl>
+        <lightning:select class="slds-size--7-of-12" aura:id="pq" required="true" value="{!v.pqForm.Good_Standing__c}" name="goodtstand" label="Are you in good standing?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+        <lightning:select class="slds-size--7-of-12" aura:id="pq" required="true" value="{!v.pqForm.CAP_SIP__c}" name="corract" label="Is the school under a 'Corrective Action Plan' (CAP) or 'School Improvement Plan' (SIP)?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+        
+        <lightning:select class="slds-size--7-of-12" aura:id="pq" required="true" value="{!v.pqForm.Changing_authorizer_sponso__c}" name="changeauth" label="Are you in the process of changing your authorizer/sponsor?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+    </div>
+    
+    
+    <div class="slds-m-top--large">
+        <h3 class="slds-section__title slds-theme_shade">
+            <!--span style="background-color:Orange;" class="slds-truncate slds-p-horizontal_small" title="Authorizer/Sponsor">School Status</span-->
+            <c:ClearSubHeader header_text="School Status"/>
+        </h3>
+        <hr class="hr"/>
+    </div>
+    
+    <div class="slds-m-around_medium slds-text-align_left banner">
+        <dl style="position:relative;" class="slds-list_horizontal slds-wrap">
+            <lightning:select class="slds-size--7-of-12" aura:id="pq" required="true" value="{!v.pqForm.currently_under_review_or_audit__c}" name="reviewaudit" 
+                              label="Are you currently under review or audit?" >
+                <option value=""></option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+                <option value="Unknown">Unknown</option>
+            </lightning:select>
+            <lightning:helptext content="Is the charter holder under review or audit?" />
+        </dl>
+        
+        <lightning:select class="slds-size--7-of-12" aura:id="pq" required="true" value="{!v.pqForm.expectation_of_review_or_audit__c}" name="underreviewaudit" 
+                          label="Do you have a reasonable expectation that you may be reviewed or audited?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+        <lightning:select class="slds-size--7-of-12" aura:id="pq" required="true" value="{!v.pqForm.Unknown_prior_review_or_audit__c}" name="unknownreviewaudit" 
+                          label="Have you been under review or audit and the outcome is known or unknown?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+        <lightning:select class="slds-size--7-of-12" aura:id="pq" required="true" value="{!v.pqForm.Has_Lien__c}" name="lien" 
+                          label="Is there a Tax Lien or other UCC Lien filings against the assets of the school?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+        <lightning:select class="slds-size--7-of-12" aura:id="pq" required="true" value="{!v.pqForm.Has_Bond__c}" name="bond" 
+                          label="Does this school have a bond issue outstanding with regard to the school and/or Charter Holder?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+        <lightning:select class="slds-size--7-of-12" aura:id="pq" required="true" value="{!v.pqForm.Has_Litigation__c}" name="litigation" 
+                          label="Does the school have active or pending litigation?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+    </div>
+    
+    
+    <div class="slds-m-top--large">
+        <h3 class="slds-section__title slds-theme_shade">
+            <!--span style="background-color:Orange;" class="slds-truncate slds-p-horizontal_small" title="School Support">School Support</span-->
+            <c:ClearSubHeader header_text="School Support"/>
+        </h3>
+        <hr class="hr"/>
+    </div>
+    
+    <div class="slds-m-around_medium slds-text-align_left banner">
+        <lightning:select class="slds-size--7-of-12"  required="true" value="{!v.pqForm.BOP__c}" onchange="{!c.toggleBOP}" aura:id="backoffice" 
+                          label="Does the school use a back office provider (BOP) for support?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+        <aura:if isTrue="{!v.toggleBOP}">
+            <lightning:input aura:id="pq" required="true" label="Back Office Provider (BOP) Name" type="text" 
+                             class="slds-size--7-of-12"
+                             value="{!v.pqForm.BOP_Name__c}" pattern="[\s\S]{0,100}" 
+                             messageWhenPatternMismatch="Max 100 characters"/>
+            
+            <lightning:input aura:id="pq" required="true" label="BOP Contact First Name" type="text" 
+                             class="slds-size--7-of-12"
+                             value="{!v.pqForm.BOP_Contact_First_Name__c}" pattern="[\s\S]{0,40}" 
+                             messageWhenPatternMismatch="Max 40 characters"/>
+            
+            <lightning:input aura:id="pq" required="true" label="BOP Contact Last Name" type="text"  
+                             class="slds-size--7-of-12"
+                             value="{!v.pqForm.BOP_Contact_Last_Name__c}" pattern="[\s\S]{0,40}" 
+                             messageWhenPatternMismatch="Max 40 characters"/>
+            
+            <lightning:input aura:id="pq" required="true" label="Email" type="email"  class="slds-size--7-of-12"
+                             value="{!v.pqForm.BOP_Email__c}"/>
+            
+            <lightning:input aura:id="pq" required="true" label="Direct Phone" type="tel" pattern="^[0-9_ ]{0,11}"
+                             messageWhenPatternMismatch="Phone number is not valid" class="slds-size--7-of-12"
+                             value="{!v.pqForm.BOP_Phone__c}"/>
+        </aura:if>
+        
+        <lightning:select class="slds-size--7-of-12" aura:id="hasemo" required="true" onchange="{!c.toggleEMO}" value="{!v.pqForm.Part_of_EMO_CMO__c}" name="hasbopemo" 
+                          label="Does the school have an Education Management Organization (EMO) or Charter Management Organization (CMO)?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+        <aura:if isTrue="{!v.toggleEMO}">
+            <lightning:input aura:id="pq" required="true" label="EMO/CMO Company Name" type="text"  
+                             class="slds-size--7-of-12"
+                             value="{!v.pqForm.EMO_CMO_Company_Name__c}" pattern="[\s\S]{0,100}" 
+                             messageWhenPatternMismatch="Max 100 characters"/>
+        </aura:if>
+    </div>
+    
+    
+    <div class="slds-m-top--large">
+        <h3 class="slds-section__title slds-theme_shade">
+            <!--span style="background-color:Orange;" class="slds-truncate slds-p-horizontal_small" title="Funding Sources">Funding Sources</span-->
+            <c:ClearSubHeader header_text="Funding Sources"/>
+        </h3>
+        <hr class="hr"/>
+    </div>
+    
+    <div class="slds-m-around_medium slds-text-align_left banner">
+        <lightning:select class="slds-size--7-of-12"  required="true" value="{!v.pqForm.Approved_for_other_financing__c}" onchange="{!c.toggleFund}" aura:id="fund" 
+                          label="Has the school been approved for other financing programs?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+        <aura:if isTrue="{!v.toggleFund}">
+            <lightning:input aura:id="pq" required="true"  label="Please provide details" type="text" 
+                             class="slds-size--7-of-12"
+                             value="{!v.pqForm.Other_financing_details__c}" pattern="[\s\S]{0,255}" 
+                             messageWhenPatternMismatch="Max 255 characters"/>
+            
+            <!-- aura:if isTrue="{!v.toggleCA}"> -->
+            <!-- Removed on 2019.08.20 - as per Amy to Jen -->
+            <!--aura:if isTrue="{!v.pqForm.State_Organized__c=='CA'}">
+                
+                <lightning:select class="slds-size- -7-of-12" aura:id="pq" required="true" value="{!v.pqForm.CA_Directly_Funded__c}" name="directfund" 
+                                  label="Are you directly funded?" >
+                    <option value=""></option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Unknown">Unknown</option>
+                </lightning:select>
+            </aura:if-->
+        </aura:if>
+        
+        <lightning:select class="slds-size--7-of-12" aura:id="pq" required="true" value="{!v.pqForm.Affiliated_with_other_businesses__c}" name="officeaffil" 
+                          label="Are any officers/board members affiliated with entities that your school does business with?" >
+            <option value=""></option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Unknown">Unknown</option>
+        </lightning:select>
+    </div>
+    
+    <div class="slds-m-top--large">
+        <h3 class="slds-section__title slds-theme_shade">
+            <!--span style="background-color:Orange;" class="slds-truncate slds-p-horizontal_small" title="School / Site Information">School / Site Information</span-->
+            <c:ClearSubHeader header_text="School/Site Information"/>
+        </h3>
+        <hr class="hr"/>
+    </div>
+    
+    <c:PQSchoolSiteInfo intakeId="{!v.res}" aura:id="schoolinfo"/>
+    
+    <div class="slds-align_absolute-center slds-m-top--large">
+        <lightning:button class="home_button_style" label="Submit" onclick="{!c.dosubmit}"/>
+        <lightning:button class="home_button_style" label="Return To Home" onclick="{!c.handleReturn}"/>
+    </div>
+    
+    <!--Modal msg-->
+    <aura:if isTrue="{!v.isOpen}">
+        
+        <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                        X
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                </div>
+                <div class="slds-modal__content slds-p-around--medium" align="center">
+                    <p>
+                        <b>
+                            {!v.modalMessage}
+                        </b>
+                    </p>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning:button variant="destructive" label="Close" onclick="{!c.closeModel}"/>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-backdrop slds-backdrop--open"></div>
+        
+        
+    </aura:if>
+    <!--Modal msg-->
+    
+</aura:component>

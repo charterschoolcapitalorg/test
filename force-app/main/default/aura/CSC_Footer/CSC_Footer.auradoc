@@ -1,0 +1,6 @@
+<aura:documentation>
+	<aura:description>Documentation</aura:description>
+	<aura:example name="CustomFooter" ref="standardFooter" label="Label">
+		Standard CSC footer, with Terms and Privacy Policy links.
+	</aura:example>
+</aura:documentation>

@@ -1,0 +1,241 @@
+<aura:component implements="force:lightningQuickAction,force:hasRecordId" controller="EWS_Ctrl" >
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <aura:attribute name="saved" type="Boolean" default="false" />
+    <aura:attribute name="showSpinner" type="Boolean" default="true" />
+    <aura:attribute name="isNoARModalOpen" type="Boolean" default="false" />
+    <aura:attribute name="clonedRecord" type="EWS__c" />
+    <aura:attribute name="recordTypeName" type="String" />
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner />
+    </aura:if>
+
+    <!--  this tag sets modal width -->
+    <aura:html tag="style">
+        .slds-modal__container {
+         min-width: 60vw;
+        }
+    </aura:html> 
+  
+    <h2>{!v.recordTypeName}</h2>
+    <br/>
+
+    <lightning:recordEditForm
+        onload="{!c.handleLoad}"
+        onsubmit="{!c.handleSubmit}"
+        onsuccess="{!c.handleSuccess}"
+        objectApiName="EWS__c"
+        density="comfy" >
+        <!-- the messages component is for error messages -->
+        <lightning:messages />
+        
+        <aura:if isTrue="{!and(not(v.saved), v.recordTypeName=='Financial')}">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Account__c" value="{!v.clonedRecord.Account__c}"/>
+                    <lightning:inputField fieldName="Review_Date__c" value="{!v.clonedRecord.Review_Date__c}"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Fiscal_Year__c" value="{!v.clonedRecord.Fiscal_Year__c}"/>
+                    <lightning:inputField fieldName="Quarter_Ending_FY__c" value="{!v.clonedRecord.Quarter_Ending_FY__c}"/>
+                </div>
+            </div>
+
+            <hr/>
+            
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="FDA_County__c" value="{!v.clonedRecord.FDA_County__c}"/>
+                    <lightning:inputField fieldName="FDA_District__c" value="{!v.clonedRecord.FDA_District__c}"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Date_Opened__c" value="{!v.clonedRecord.Date_Opened__c}"/>
+                    <lightning:inputField fieldName="Num_of_Shortfalls_Current_FY__c" value="{!v.clonedRecord.Num_of_Shortfalls_Current_FY__c}"/>
+                </div>
+            </div>
+
+            <hr/>
+            
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Audit_Information__c" value="{!v.clonedRecord.Audit_Information__c}"/>
+                    <lightning:inputField fieldName="Net_Assets__c" value="{!v.clonedRecord.Net_Assets__c}"/>
+                    <lightning:inputField fieldName="Non_Facilities_Liabilities__c" value="{!v.clonedRecord.Non_Facilities_Liabilities__c}"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Annual_Rent_Expense__c" value="{!v.clonedRecord.Annual_Rent_Expense__c}"/>
+                    <lightning:inputField fieldName="Prior_Year_Surplus_Deficit__c" value="{!v.clonedRecord.Prior_Year_Surplus_Deficit__c}"/>
+                </div>
+            </div>
+            
+            <hr/>
+            
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Budgeted_Revenue__c" value="{!v.clonedRecord.Budgeted_Revenue__c}"/>
+                    <lightning:inputField fieldName="Budgeted_Donations__c" value="{!v.clonedRecord.Budgeted_Donations__c}"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Budgeted_Surplus_Deficit__c" value="{!v.clonedRecord.Budgeted_Surplus_Deficit__c}"/>
+                </div>
+            </div>
+            
+            <hr/>
+            
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Budgeted_Attendance__c" value="{!v.clonedRecord.Budgeted_Attendance__c}"/>
+                    <lightning:inputField fieldName="Attendance_Current__c" value="{!v.clonedRecord.Attendance_Current__c}"/>
+                    <lightning:inputField fieldName="Attendance_Prior__c" value="{!v.clonedRecord.Attendance_Prior__c}"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Year_1_Latest__c" value="{!v.clonedRecord.Year_1_Latest__c}"/>
+                    <lightning:inputField fieldName="Year_2__c" value="{!v.clonedRecord.Year_2__c}"/>
+                    <lightning:inputField fieldName="Year_3_Oldest__c" value="{!v.clonedRecord.Year_3_Oldest__c}"/>
+                </div>
+            </div>
+            
+            <hr/>
+            
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Number_of_Months_Outstanding__c" value="{!v.clonedRecord.Number_of_Months_Outstanding__c}"/>
+                    <lightning:inputField fieldName="Cross_Year_Funding_Date__c" value="{!v.clonedRecord.Cross_Year_Funding_Date__c}"/>
+                    <lightning:inputField fieldName="Cross_Year_Funding_Amount__c" value="{!v.clonedRecord.Cross_Year_Funding_Amount__c}"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Number_of_Fundings_per_Year__c" value="{!v.clonedRecord.Number_of_Fundings_per_Year__c}"/>
+                    <lightning:inputField fieldName="Avg_percentage_of_Face_Funded__c" value="{!v.clonedRecord.Avg_percentage_of_Face_Funded__c}"/>
+                    <lightning:inputField fieldName="Avg_Days_Notice_given__c" value="{!v.clonedRecord.Avg_Days_Notice_given__c}"/>
+                </div>
+            </div>
+            
+            <hr/>
+            
+        </aura:if>
+        <aura:if isTrue="{!and(not(v.saved), v.recordTypeName=='Underwriting')}">               
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Account__c" value="{!v.clonedRecord.Account__c}"/>
+                    <lightning:inputField fieldName="Review_Date__c" value="{!v.clonedRecord.Review_Date__c}"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Fiscal_Year__c" value="{!v.clonedRecord.Fiscal_Year__c}" required="true" onchange="{!c.getRatinginfo}"/>
+                    <lightning:inputField fieldName="Quarter_Ending_FY__c" value="{!v.clonedRecord.Quarter_Ending_FY__c}"/>
+                </div>
+            </div>
+
+            <hr/>
+            
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Date_Opened__c" value="{!v.clonedRecord.Date_Opened__c}" readonly="true"/>
+                    <lightning:inputField fieldName="Initial_Funding_Date__c" value="{!v.clonedRecord.Initial_Funding_Date__c}"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Charter_Renewal_Date__c" value="{!v.clonedRecord.Charter_Renewal_Date__c}"/>
+                </div>
+            </div>
+
+            <hr/>
+            
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Lease_Status__c" value="{!v.clonedRecord.Lease_Status__c}"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Lease_Expiration_Date__c" value="{!v.clonedRecord.Lease_Expiration_Date__c}"/>
+                </div>
+            </div>
+
+            <hr/>
+            
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Closure_Indication__c" value="{!v.clonedRecord.Closure_Indication__c}"/>
+                    <lightning:inputField fieldName="Google_alerts__c" value="{!v.clonedRecord.Google_alerts__c}"/>
+                    <lightning:inputField fieldName="Management_changes_in_past_year__c" value="{!v.clonedRecord.Management_changes_in_past_year__c}"/>
+                    <lightning:inputField fieldName="CAP_SIP_SOD_Financial_CAP_in_FL__c" value="{!v.clonedRecord.CAP_SIP_SOD_Financial_CAP_in_FL__c}"/>
+                    <lightning:inputField fieldName="Proof_of_Good_Standing__c" value="{!v.clonedRecord.Proof_of_Good_Standing__c}"/>
+                    <lightning:inputField fieldName="Audit_Completion__c" value="{!v.clonedRecord.Audit_Completion__c}"/>
+                </div>
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Tax_Payment_Status__c" value="{!v.clonedRecord.Tax_Payment_Status__c}"/>
+                    <lightning:inputField fieldName="Rent_Payment_Status__c" value="{!v.clonedRecord.Rent_Payment_Status__c}"/>
+                    <lightning:inputField fieldName="Historical_Ratings_Color__c" value="{!v.clonedRecord.Historical_Ratings_Color__c}" readonly="true"/>
+                    <lightning:inputField fieldName="Historical_Ratings_Actual__c" value="{!v.clonedRecord.Historical_Ratings_Actual__c}" readonly="true"/>
+                <!--<lightning:inputField fieldName="Current_Academic_Performance__c" value="{!v.clonedRecord.Current_Academic_Performance__c}"/>
+                    <lightning:inputField fieldName="Current_Year_1_Academic_Performance__c" value="{!v.clonedRecord.Current_Year_1_Academic_Performance__c}"/>
+                    <lightning:inputField fieldName="Current_Year_2_Academic_Performance__c" value="{!v.clonedRecord.Current_Year_2_Academic_Performance__c}"/>
+                -->
+                </div>
+            </div>
+            
+            <hr/>
+            
+<!--         <aura:set attribute="else">
+            <p>Saved! New record id is {!v.recordId}</p>
+        </aura:set> -->
+        </aura:if>
+           
+        <aura:if isTrue="{!!v.saved}">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="Comments__c" value="{!v.clonedRecord.Comments__c}"/>
+                </div>
+            </div>
+
+            <div class="slds-m-top_medium">
+                <lightning:button disabled="{!v.disabled}" variant="brand" type="submit" name="save" label="Save" />
+             </div>
+
+            <div class="slds-hidden">
+                <div class="slds-col">
+                    <lightning:inputField fieldName="RecordTypeId" value="{!v.clonedRecord.RecordTypeId}"/>
+                    <lightning:inputField fieldName="Date_Opened__c" value="{!v.clonedRecord.Date_Opened__c}"/>
+                    <lightning:inputField fieldName="Charter_Renewal_Date__c" value="{!v.clonedRecord.Charter_Renewal_Date__c}"/>
+                    <lightning:inputField fieldName="Historical_Ratings_Color__c" value="{!v.clonedRecord.Historical_Ratings_Color__c}"/>
+                    <lightning:inputField fieldName="Historical_Ratings_Actual__c" value="{!v.clonedRecord.Historical_Ratings_Actual__c}"/>
+                </div>
+            </div>
+            <aura:set attribute="else">
+                <p>Saved! New record id is {!v.recordId}</p>
+            </aura:set>  
+        </aura:if>
+
+    </lightning:recordEditForm>
+    
+    <aura:if isTrue="{!v.isNoARModalOpen}">
+             
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal/Popup Box Header Starts here-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Modal/PopUp Box</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p><b>The system doesn't see an Academic Rating record for the prior FY. You may continue to create your EWS record, but any academic rating info will need to be manually populated.
+                            </b>
+                        </p>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="brand"
+                                          label="OK"
+                                          title="OK"
+                                          onclick="{!c.closeNoARModel}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+  
+</aura:component>

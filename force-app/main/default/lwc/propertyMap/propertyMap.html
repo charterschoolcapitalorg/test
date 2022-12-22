@@ -1,0 +1,17 @@
+<template>
+    <article class="slds-card custom-css">
+        <div class="slds-card__body slds-card__body_inner">
+            <lightning-map
+                map-markers={mapMarkers}
+                zoom-level="10">
+            </lightning-map>
+            <p class="slds-hide"><lightning-formatted-address
+                    street={street}
+                    city={city}
+                    province={state}
+                    postal-code={zip}
+                ></lightning-formatted-address>
+            </p>
+        </div>
+    </article>
+</template>

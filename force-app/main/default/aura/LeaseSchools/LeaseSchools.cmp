@@ -1,0 +1,38 @@
+<aura:component implements="flexipage:availableForRecordHome" 
+                controller="CreateFacilitiesObjectsCtrl">
+    
+    <aura:attribute name="LSs" type="Lease_School__c[]" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:attribute name="recTypeId" type="Id" />
+   
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+    <span style="background-color:#a1dee9;">
+	<lightning:layout multipleRows="false" >
+        <lightning:layoutItem size="1" class=" buildingHeader">
+            <b>Lease Schools: </b> 
+        </lightning:layoutItem>
+        <lightning:layoutItem size="11" >
+        </lightning:layoutItem>
+    </lightning:layout>
+        
+    <lightning:layout multipleRows="true" class="mySubrowHeader header-column">    
+        <div style="width:40px;"></div>      
+        <lightning:layoutItem size="3" flexibility="auto" class="mySubrowHeader header-column">Name</lightning:layoutItem>
+         <lightning:layoutItem size="3" flexibility="auto" class="mySubrowHeader header-column">Account</lightning:layoutItem>
+         <lightning:layoutItem size="2" flexibility="auto" class="mySubrowHeader header-column">Lease</lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">On Date</lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Off Date</lightning:layoutItem>
+         
+        
+     </lightning:layout>
+    </span>
+    
+    
+    <span >
+    <aura:iteration items="{!v.LSs}" var="b" indexVar="indx">
+        <c:LeaseSchool  LS="{!b}" propertyId="{!v.propertyId}"/>
+    </aura:iteration>
+    </span>
+    
+</aura:component>

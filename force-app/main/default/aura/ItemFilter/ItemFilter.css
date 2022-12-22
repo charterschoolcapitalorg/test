@@ -1,0 +1,11 @@
+.THIS .select-auto-width {
+    
+    display: inline-block;
+    text-align: right;
+    align: right;
+    width: 150px;
+}
+
+.THIS .fixedWidth {
+	width:1390px;
+}

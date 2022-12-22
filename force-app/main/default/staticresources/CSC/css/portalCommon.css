@@ -1,0 +1,159 @@
+/* Uses Sticky Footer by Ryan Fait http://ryanfait.com/ */
+html {
+	height: 100%;
+	margin: 0px;
+}
+
+body {
+	height: 100%;
+	margin: 0px;
+	background-color: white;
+	background-image: url(../img/bg_page.png);
+	background-repeat: repeat-x;
+	font-family: 'Lato', Helvetica, Arial, sans-serif;
+	color: #4f5050;
+}
+
+.wrapper {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin-bottom: -60px;
+}
+
+.contentWrapper {
+	width: 1020px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.push, .pageFooter {
+	height: 60px;
+	margin: 0px;
+}
+
+.pageHeader {
+	width: 100%;
+	height: 145px;
+	margin-bottom: 25px;
+}
+
+.pageHeader .logo {
+	background-image: url(../img/logo.png);
+	width: 206px;
+	height: 92px;
+	position: relative;
+	top: 35px;
+}
+
+.pageContent {
+	margin-bottom: 20px;
+}
+
+.pageFooter {
+	background-color: #e99619;
+	color: white;
+	width: 100%;
+	text-transform: capitalize;
+}
+
+.pageFooter .contentWrapper {
+	padding-top: 20px;
+}
+
+.sectionHeader {
+	padding-top: 20px;
+	padding-bottom: 20px;
+	border-bottom: 1px dotted black;
+}
+
+.sectionHeader h2 {
+	font-weight: bold;
+	font-size: 1.3em;
+}
+
+.labelRow label {
+	font-weight: bold;
+	margin-top: 10px;
+	margin-bottom: 4px;
+	display: block;
+}
+
+.requiredIndicator {
+	color: #790000;
+}
+
+input, select, textarea, label {
+	color: #54544a;
+	font-size: 14px;
+	font-weight: 300;
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+input, select, textarea {
+	background-color: #f5f5f5;
+	box-sizing: border-box;
+	font-size: 14px !important;
+	padding: 4px 5px !important;
+	border: 1px solid #dddddd;
+	width: 95%;
+}
+
+table.cscForm {
+	width: 100%;
+}
+
+table.cscForm td.full {
+	width: 100%;
+}
+
+table.cscForm td.first, table.cscForm td.last {
+	width: 50%;
+}
+
+input.btn {
+	background-color: #EE9E21;
+	color: #FFFFFF !important;
+	width: auto;
+	font-weight: bold;
+	cursor: pointer;
+	text-decoration: none;
+	line-height: 19px;
+}
+
+.note {
+	padding-top: 10px;
+	font-size: 0.85em;
+	font-family: sans-serif;
+	line-height: 1.5em;
+}
+
+.buttonContainer {
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+
+.pageFooter .copyright {
+	font-size: 14px;
+}
+
+.pageFooter .copyright a {
+	color: white;
+	text-transform: uppercase;
+	text-decoration: none;
+}
+
+.spinnerContainer {
+	width: 100%;
+	height: 100%;
+	position: fixed;
+}
+
+.spinner {
+	background-image: url(../img/loading.gif);
+	height: 32px;
+	width: 32px;
+	position: fixed;
+	top: 40%;
+	left: 48%;
+}

@@ -1,0 +1,12 @@
+<aura:component >
+    <aura:attribute name="selectedrectype" type="ItemsByOppRecType" />
+    <aura:attribute name="intakeitems" type="Intake_Item__c[]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    this is the section details component
+    
+    <aura:iteration items="{!v.intakeitems}" var="o">
+        {!o.name}
+    </aura:iteration>    
+	
+</aura:component>

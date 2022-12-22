@@ -1,0 +1,101 @@
+<aura:component >
+    <aura:attribute name="opportunity" type="object" />
+        <tbody>
+            <tr class="slds-hint-parent">
+                <td data-label="Close Date" class="slds-text-align_left" style="width:50px">
+                    <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.opp.CloseDate}" format="MMM-DD"/>
+                </td>
+                <td data-label="Business Days to Close" class="slds-text-align_right" style="width:30px">
+                    <lightning:formattedNumber value="{!v.opportunity.businessDaysToClose}" maximumFractionDigits="0" class="slds-truncate"/>
+                </td>
+
+                <!-- Client Portal Testing-->
+                <!-- <td class="slds-text-align_left" style="width:30px">
+                    <aura:if isTrue="{!v.opportunity.opp.Client_Portal_Testing_Opp__c}">
+                        <c:DailyReportCell item="Completed" helpText="Portal Opportunity"/>
+                        <aura:set attribute="else">
+                            <c:DailyReportCell item="Incomplete" helpText="Portal Opportunity"/>
+                        </aura:set>
+                    </aura:if>
+                </td> -->
+                <td data-label="Opp Type" class="slds-text-align_left slds-truncate" style="width:70px;">
+                    <p class="slds-truncate" style="width:60px;"><lightning:formattedText value="{!v.opportunity.opp.RecordType.Name}"/></p>
+                </td>
+                <td data-label="Account Name" class="slds-text-align_left" style="width:100px;">
+                    <lightning:formattedUrl target="_blank" value="{!'/' + v.opportunity.opp.Id}" label="{!v.opportunity.opp.Account.Name}"/>
+                </td>
+                <td data-label="State" class="slds-text-align_left" style="width:50px">
+                    <lightning:formattedText value="{!v.opportunity.opp.STATE__c}"/>
+                </td>
+                <td data-label="Amount" class="slds-text-align_right" style="width:100px; padding-right:32px">
+                    <lightning:formattedNumber value="{!v.opportunity.opp.NET_Amount_Requested__c}" maximumFractionDigits="0" class="slds-truncate"/>
+                </td>
+
+                <!-- FE Prepared-->
+                <td class="slds-text-align_left">
+                    <c:DailyReportCell item="{!v.opportunity.fePrepared}" helpText="FE Prepared"/>
+                </td>
+
+                <!-- CP Open-->
+                <td class="slds-text-align_left">
+                    <c:DailyReportCell item="{!v.opportunity.cpOpen}" helpText="CP open for Client"/>
+                </td>
+
+                <!-- FE Approved-->
+                <td class="slds-text-align_left">
+                    <c:DailyReportCell item="{!v.opportunity.feApproved}" helpText="FE Approved by Client"/>
+                </td>
+
+                <!-- OILS Received-->
+                <td class="slds-text-align_left">
+                    <c:DailyReportCell item="{!v.opportunity.oilsReceived}" helpText="OILS Received"/>
+                </td>
+
+                <!-- Submitted for pre-Approval-->
+                <td class="slds-text-align_left">
+                    <c:DailyReportCell item="{!v.opportunity.paSubmitted}" helpText="pre-Approval Submitted"/>
+                </td>
+                  
+                <!-- Funding Committee-->
+                <td class="slds-text-align_left">
+                    <c:DailyReportCell item="{!v.opportunity.fcSent}" helpText="FC Sent"/>
+                </td>
+
+                <!-- Funding Committee Approval-->
+                <td class="slds-text-align_left">
+                    <c:DailyReportCell item="{!v.opportunity.fcApproval}" helpText="FC Approved"/>
+                </td>
+
+                <!-- Signature Pages Received-->
+                <td class="slds-text-align_left">
+                    <c:DailyReportCell item="{!v.opportunity.sigPages}" helpText="Signature Pages Received"/>
+                </td>
+
+                <!-- Ready Email Sent-->
+                <td class="slds-text-align_left">
+                    <c:DailyReportCell item="{!v.opportunity.emailSent}" helpText="Ready Email Sent"/>
+                </td>
+                
+                <!-- Committed-->
+                <td class="slds-text-align_left">
+                    <aura:if isTrue="{!v.opportunity.opp.Receivables_Purchased__c}">
+                        <c:DailyReportCell item="Completed" helpText="Receivables Committed"/>
+                        <aura:set attribute="else">
+                            <c:DailyReportCell item="Incomplete" helpText="Receivables Committed"/>
+                        </aura:set>
+                    </aura:if>
+                </td>
+
+
+                <td data-label="Opportunity Owner" class="slds-text-align_left" style="width:70px">
+                    <lightning:formattedText value="{!v.opportunity.opp.Owner.LastName}"/>
+                </td>
+                <td data-label="Paralegal" class="slds-text-align_left" style="width:70px">
+                    <lightning:formattedText value="{!v.opportunity.opp.Paralegal__r.LastName}"/>
+                </td>
+                <td data-label="Financial Analyst" class="slds-text-align_left" style="width:70px">
+                    <lightning:formattedText value="{!v.opportunity.opp.Financial_Review__r.LastName}"/>
+                </td>
+            </tr>
+        </tbody>
+</aura:component>

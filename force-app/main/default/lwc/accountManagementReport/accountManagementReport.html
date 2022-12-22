@@ -1,0 +1,108 @@
+<template>
+  <lightning-card variant="Narrow"  title="Charters with active Working Capital receivables." icon-name="standard:account">
+    <div class="slds-grid slds-gutters" >
+      <div class="slds-col slds-size_8-of-12 slds-text-heading_medium" style="padding-top: 20px; padding-left: 30px;">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            Total outstanding: <lightning-formatted-number value={total} format-style="currency" currency-code="USD" minimum-fraction-digits="0" maximum-fraction-digits="0"></lightning-formatted-number>
+
+      </div>
+
+      <lightning-layout horizontal-align="center" vertical-align="end">
+        <div class="slds-var-m-top_large slds-var-p-right_medium">
+            <lightning-layout-item size="4">
+              <lightning-combobox
+              name="filter"
+              label="Owner filter:"
+              value={value}
+              placeholder="All"
+              options={ownerFilter}
+              onchange={handleChange} >
+        </lightning-combobox>
+              </lightning-layout-item>
+          </div>
+        
+          <lightning-layout-item size="6">
+            <lightning-button label="Refresh data" title="Refresh underlying data" icon-name="utility:refresh" class="slds-m-left_x-small" onclick={handleRefresh}></lightning-button>
+          </lightning-layout-item>
+      </lightning-layout>
+
+
+
+    </div>
+
+    <div>
+      <lightning-accordion class="example-accordion"
+          onsectiontoggle={handleToggleSection}
+            active-section-name={accordianSection}
+            allow-multiple-sections-open>
+        <lightning-accordion-section name="A" label="Help">
+          <ul class="slds-list_dotted">
+            <li>"Charter Holder" - hyperlink to the account listed</li>
+            <li>"# O/S Recs" - the number of active receivables for the client. For example, Feb LCFF and Feb deferred LCFF count as two. Hyperlinked to Outstanding Receivables report</li>
+            <li>"Last Effective Rate" - an effective rate taken from the last batch of receivables purchased</li>
+            <li>"Bought through" - this will show as 'not calculable' when there are either manual receivables (eg Pennsylvania) or a receivable does not represent a single month (eg EPA, Initial Payment)</li>
+          </ul>
+        </lightning-accordion-section>
+      </lightning-accordion>
+    </div>
+  </lightning-card>
+  <div>
+    <br/>
+  </div>
+  <lightning-datatable
+    key-field="id"
+    columns={columns}
+    data={filteredData}
+    hide-checkbox-column
+    sorted-direction={sortDirection}
+    sorted-by={sortedBy}
+    wrap-text-max-lines="3"
+    onrowaction={handleRowAction}
+    onsort={onHandleSort}>
+  </lightning-datatable>
+  <!-- following section to prevent cut off at utility bar -->
+  <div>
+    &nbsp;
+  </div>
+  <div>
+    &nbsp;
+  </div>
+  <div>
+    &nbsp;
+  </div>
+
+  <template if:true={isModalOpen}>
+    <!-- Modal/Popup Box LWC starts here -->
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <!-- Modal/Popup Box LWC header here -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                    <lightning-icon icon-name="utility:close"
+                        alternative-text="close"
+                        variant="inverse"
+                        size="small" ></lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate"><b>{rowAccName}</b></h2>
+            </header>
+            <!-- Modal/Popup Box LWC body starts here -->
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <p><b>Latest Strategy</b></p>
+                <p><lightning-formatted-text value={latestStrategy}></lightning-formatted-text></p>
+                =================
+                <p><b>Latest Update</b></p>
+                <p><lightning-formatted-text value={latestUpdate}></lightning-formatted-text></p>
+            </div>
+            <!-- Modal/Popup Box LWC footer starts here -->
+            <footer class="slds-modal__footer">
+                <button class="slds-button slds-button_brand" onclick={closeModal} title="OK">Close</button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+
+
+</template>

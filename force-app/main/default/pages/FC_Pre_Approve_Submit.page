@@ -1,0 +1,10 @@
+<apex:page standardController="FC_Form__c" extensions="FC_Submit_Pre_Approval_Ctrl" action="{!approve}">
+	<apex:pageMessages />
+	
+	
+	<apex:form >
+	  	<apex:commandButton value="Continue" action="{!approve}" rendered="{!confirmation}"/>
+	  	<apex:commandButton value="Exit" action="{!back}" rendered="{!!confirmation}"/>
+	</apex:form>
+	     
+</apex:page>

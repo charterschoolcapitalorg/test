@@ -1,0 +1,40 @@
+<aura:component implements="flexipage:availableForRecordHome" 
+                controller="CreateFacilitiesObjectsCtrl">
+    
+    <aura:attribute name="Buildings" type="Building__c[]" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:attribute name="Property" type="Account" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+        
+    <span style="background-color:#a1dee9;">
+	<lightning:layout multipleRows="false" >
+        <lightning:layoutItem size="1" class=" buildingHeader">
+            <b>Buildings: </b> 
+        </lightning:layoutItem>
+        <lightning:layoutItem size="11" >
+            <lightning:button label="New"  onclick="{!c.newBuilding}"/> 
+        </lightning:layoutItem>
+    </lightning:layout>
+        
+    <lightning:layout multipleRows="true" class="mySubrowHeader header-column">
+            
+         <lightning:layoutItem size="2" class="header-column mySubrowHeader"></lightning:layoutItem>   
+        
+         <lightning:layoutItem size="2" class="mySubrowHeader header-column">Name</lightning:layoutItem>
+         <lightning:layoutItem size="2" class="mySubrowHeader header-column">Address</lightning:layoutItem>
+         <lightning:layoutItem size="1" class="mySubrowHeader header-column">Square Feet</lightning:layoutItem>
+         <lightning:layoutItem size="2" class="mySubrowHeader header-column">Date Last Expanded</lightning:layoutItem>
+         <lightning:layoutItem size="2" class="mySubrowHeader header-column">Year Of Construction</lightning:layoutItem> 
+         <lightning:layoutItem size="1" class="mySubrowHeader header-column">Building Capacity</lightning:layoutItem>  
+     </lightning:layout>
+    </span>
+    
+    
+    <span >
+    <aura:iteration items="{!v.Buildings}" var="b" indexVar="indx">
+        <c:Building  Building="{!b}" propertyId="{!v.propertyId}"/>
+    </aura:iteration>
+    </span>
+    
+</aura:component>

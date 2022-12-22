@@ -1,0 +1,16 @@
+<apex:page standardController="Lead" extensions="LeadDiligenceRulesController">
+
+<apex:form >
+    <apex:messages style="font-size: 18px;color:red" />
+    
+    <apex:pageBlock id="confirm" >
+        Do Not Create Opportunity?  <apex:inputCheckbox value="{!doNotCreateOpp}"/>
+    </apex:pageBlock>
+    
+    
+    <apex:commandButton value="Start Conversion" action="{!execute}" />
+    <apex:commandButton value="Back" action="{!back}" />
+    
+    
+ </apex:form>    
+</apex:page>

@@ -1,0 +1,35 @@
+<apex:page standardController="Opportunity" showHeader="false" sidebar="false" title="Opportunity Grid">
+	<GBLite:TabbedPageComponent pageAPIName="GBTabs_Opportunity_Grid" >
+	<GBLite:EmbedComponent baseGridUrl="{!$Page.GBLite__Grid}" />
+		<script>
+			var pageDefinition = {
+	"name": "Opportunity Grid",
+	"tabs": [
+		{
+			"name": "Process Checklist",
+			"content": "{!gridPage}gname=Action Lists with Items_Opp&fpf=Opportunity__r.Id&fpv={!Id}",
+			"id": 1555520157843
+		},
+		{
+			"name": "Client Portal Checklist",
+			"content": "{!gridPage}gname=Client Portal Checklist&fpf=Opportunity__r.Id&fpv={!Id}",
+			"id": 1555517679538
+		},
+		{
+			"name": "Edit Account Related List",
+			"content": "{!gridPage}gname=Accounts with Related Contacts&fpf=Account.Id&fpv={!Opportunity.AccountId}&ea=1",
+			"id": 1555526688498
+		}
+	],
+	"id": 1555517608892,
+	"description": "",
+	"globalButtons": true,
+	"object": "Opportunity",
+	"height": "2000",
+	"showHeader": false,
+	"showSidebar": false,
+	"pageAPIName": "GBTabs_Opportunity_Grid"
+};
+		</script>
+	</GBLite:TabbedPageComponent>
+</apex:page>

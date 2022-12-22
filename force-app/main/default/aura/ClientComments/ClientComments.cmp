@@ -1,0 +1,103 @@
+<aura:component controller="MyItemRowCtlr" >
+     <aura:html tag="style">
+         .slds-form-element__label {
+    		display: none;
+		}       
+         .slds-modal__container{ 
+             vertical-align: middle;
+        	 height: 100%; 
+             max-height: 100vh; 
+			 width: 100%; 
+             max-width: 150vh;        
+           }
+    </aura:html>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    
+    <aura:attribute name="intakeItem" type="Intake_Item__c" />
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+      
+  	<!--loading spinner start... style=Brand Medium (blue dots)-->
+     <aura:if isTrue="{!v.Spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+           <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+             <span class="slds-assistive-text">Loading</span>
+             <div class="slds-spinner__dot-a"></div>
+             <div class="slds-spinner__dot-b"></div>
+           </div>
+        </div>
+     </aura:if>
+    
+    <div class="slds-float_left">
+    <lightning:recordEditForm aura:id="recordViewForm"
+                                     recordId="{!v.intakeItem.Id}"
+                                     objectApiName="Intake_Item__c">
+        <lightning:messages />
+        
+        <lightning:layout horizontalAlign="left" multipleRows="true">
+        
+        
+        <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column">
+            <b>Item Instructions:<br/></b>
+            {!v.intakeItem.Comments__c}<br/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column">
+            &nbsp;
+        </lightning:layoutItem>
+            
+            
+        <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column">
+            <b>Special Instructions:<br/></b>
+            {!v.intakeItem.Status_Reason__c}<br/>
+        </lightning:layoutItem>
+        <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column">
+            &nbsp;
+        </lightning:layoutItem>
+            
+            
+        <lightning:layoutItem size="12" mediumDeviceSize="12" >
+            
+            
+            <b>Client Comments:</b>
+            <br/>
+            
+            <!-- lightning:textarea escape="false" maxlength="32000" aura:id="comments" value="{!v.intakeItem.Client_Comments__c}" /> -->
+            <lightning:inputRichText  aura:id="comments" value="{!v.intakeItem.Client_Comments__c}" />
+            
+             <!-- ui:inputText
+			 lightning:inputField aura:id="comments" fieldName="Client_Comments__c" -->
+            
+			<!-- class=slds-floatleft slds-align_absolute-center -->
+            
+                
+        </lightning:layoutItem> 
+            
+            
+            
+        
+        <lightning:layoutItem size="12" mediumDeviceSize="12" class="data-column">
+            &nbsp;
+        </lightning:layoutItem>
+            
+            
+        <lightning:layoutItem alignmentBump="right" size="12" mediumDeviceSize="12"  aura:id="myRow">
+            <span style="horizontal-align:right;text-align:right;float:right;">
+                
+                <lightning:button variant="neutral" label="Save" onclick="{!c.save}"/> 
+                &nbsp;&nbsp;
+                <lightning:button variant="neutral" label="Close" onclick="{!c.close}"/>
+            </span>
+        </lightning:layoutItem>
+        
+            
+            
+        
+        </lightning:layout>
+    </lightning:recordEditForm>
+    </div>
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+</aura:component>

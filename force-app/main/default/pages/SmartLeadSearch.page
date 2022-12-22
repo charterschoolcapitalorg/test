@@ -1,0 +1,210 @@
+<apex:page standardController="Lead" extensions="SmartLeadSearchExtension" sidebar="true" tabstyle="Lead" id="pg">
+ <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>   
+    <apex:sectionHeader title="Leads" subtitle="{!$Label.Smart_Lead_Search}"/>
+    
+  <style type="text/css">
+  
+    .data_field{
+        padding-right:20px;
+     }
+     span#icon_clear{   
+            font-family:verdana;
+            cursor:pointer;
+            color:#38468F;
+            font-weight:bold;
+            position:relative;
+            height:20px;
+            left:-18px;
+     }
+     span#icon_clear:hover{
+            color:#ccc;
+     }
+</style>   
+  
+    <apex:form id="frm">
+        <script>
+          // Character limits of search lead for all fields
+          var searchCharacterLimit = 3;
+        </script>
+                
+        <table class="list" width="100%">
+
+            <tr class="dataRow" onmouseout="javascript:hiOff(this)" onmouseover="javascript:hiOn(this)">
+                <td class="labelCol" colspan="1" style="width:200px;" ><h2 class="pageDescription">{!$Label.Smart_Lead_Search}</h2></td>
+                <td class="dataCell" colspan="4"><a href="javascript:void(0);" onclick="resetSearchStatus();"> {!$Label.Reset_Search}</a> </td>
+            </tr>   
+            <tr class="dataRow" onmouseout="javascript:hiOff(this)" onmouseover="javascript:hiOn(this)">
+                <td class="labelCol" style="width:200px;" > {!$Label.Search_by} </td>
+                <td class="dataCell" >{!$ObjectType.Lead.Fields.FirstName.Label} </td>
+                <td class="dataCell" >{!$ObjectType.Lead.Fields.LastName.Label}</td>
+                <td class="dataCell" >{!$ObjectType.Lead.Fields.Email.Label}</td>
+                <td class="dataCell" >{!$ObjectType.Lead.Fields.Company.Label}</td>
+            </tr>   
+            <tr class="dataRow" onmouseout="javascript:hiOff(this)" onmouseover="javascript:hiOn(this)">
+                <td class="labelCol" style="width:200px;" > {!$Label.Search_criteria}: </td>
+                <td class="dataCell" >  
+                     <apex:outputPanel id="op1">
+                        <apex:inputText styleClass="data_field" title="Minimum two characters are required" value="{!leadFirstNameToSearch}" onblur="BlurEventFunction(this.id,event);" id="txtLeadFName" style="width:100px;" />
+                         <span class="cross_icon" id="icon_clear">x</span>
+                    </apex:outputPanel> 
+                </td>
+                <td class="dataCell" >  
+                     <apex:outputPanel id="op2">
+                        <apex:inputText styleClass="data_field" title="Minimum two characters are required" value="{!leadLastNameToSearch}" onblur="BlurEventFunction(this.id,event);"  id="txtLeadLName" style="width:100px;" />
+                        <span class="cross_icon" id="icon_clear">x</span>
+                    </apex:outputPanel> 
+                </td>
+                
+                <td class="dataCell" >  
+                     <apex:outputPanel id="op3" >
+                        <apex:inputText styleClass="data_field" title="Minimum two characters are required" value="{!leadEmail}" onblur="BlurEventFunction(this.id,event);" id="txtLeadEmail" style="width:100px;" />
+                         <span class="cross_icon" id="icon_clear">x</span>
+                    </apex:outputPanel> 
+                </td>
+                  
+                 <td class="dataCell"  >  
+                     <apex:outputPanel id="op4">
+                        <apex:inputText styleClass="data_field" title="Minimum two characters are required" value="{!leadCompany}" onblur="BlurEventFunction(this.id,event);"  id="txtLeadCompany" style="width:100px;" />                                                                                                                            
+                         <span class="cross_icon" id="icon_clear">x</span> 
+                    </apex:outputPanel>
+                </td>                                        
+            </tr>   
+        </table>
+        
+        <input type="hidden" id="oldLeadFName" value="" />
+        <input type="hidden" id="oldLeadLName" value="" />
+        <input type="hidden" id="oldLeadEmail" value="" />
+        <input type="hidden" id="oldLeadCompany" value="" />
+<script>
+
+     $j=jQuery.noConflict();
+     
+     $j('.data_field').each(function() {
+        if ($j(this).val().length <= 0) {
+            $j(this).next().fadeOut(300);
+        }
+        else {
+            $j('.cross_icon').fadeIn(300);
+        }
+    });
+    
+    $j('.data_field').on('keyup', function() {
+        if ($j(this).val().length > 0) {
+            $j(this).next().fadeIn(300);
+            //$j('.cross_icon').fadeIn(300);
+        }
+        else {
+            //$j('.cross_icon').fadeOut(300);
+        }
+    });
+
+    $j('.cross_icon').on('click',function() { 
+          
+          if(this.parentElement.id == 'pg:frm:op1'){               
+              resetSearchStatus('1');
+          }
+          else if(this.parentElement.id == 'pg:frm:op2'){              
+              resetSearchStatus('2');
+          }
+          else if(this.parentElement.id == 'pg:frm:op3'){               
+              resetSearchStatus('3');
+          } 
+          else if(this.parentElement.id == 'pg:frm:op4'){               
+              resetSearchStatus('4');
+          } 
+          //setTimeout("validateForSearch2()",1500); CODE_COMMENTED - Rajeev Arya(Appirio India) - [07/08/2014] - I-120345 SmartSearch asset on Production
+    });
+
+    
+    function BlurEventFunction(ctrl,e){
+      if(document.getElementById(ctrl).value==''){
+              return;
+          } 
+          var keycode = (e.keyCode ? e.keyCode : e.which); 
+           if(keycode == '13'){         
+            e.preventDefault();
+            return false;
+          }
+          else{      
+           setTimeout("validateForSearch2()",100);
+            return false;
+          }  
+    }  
+    //Function to trim string
+    function fncTrim(value) {
+        return value.replace(/^\s*/, "").replace(/\s*$/, "");
+    }
+ 
+    function validateForSearch2(){
+        try{            
+            var txtLeadFirstName = document.getElementById("pg:frm:txtLeadFName").value;
+            var txtLeadCompany= document.getElementById("pg:frm:txtLeadCompany").value;
+            var txtLeadLastName = document.getElementById("pg:frm:txtLeadLName").value;
+            var txtLeadEmailToSearch = document.getElementById("pg:frm:txtLeadEmail").value;      
+            
+             
+  if(fncTrim(txtLeadCompany) != '' || fncTrim(txtLeadFirstName) != '' || fncTrim(txtLeadLastName) != '' || fncTrim(txtLeadEmailToSearch) != ''){
+        
+        var oldLeadFirstName = document.getElementById('oldLeadFName').value;
+        var oldLeadLastName = document.getElementById('oldLeadLName').value;
+        var oldLeadEmail = document.getElementById('oldLeadEmail').value; 
+        var oldLeadCompany = document.getElementById('oldLeadCompany').value; 
+        
+        document.getElementById('oldLeadFName').value = oldLeadFirstName;
+        document.getElementById('oldLeadLName').value = oldLeadLastName;
+        document.getElementById('oldLeadEmail').value = oldLeadEmail;
+        document.getElementById('oldLeadCompany').value=oldLeadCompany 
+        
+        var isChange = 'No';
+               
+        if(fncTrim(txtLeadFirstName).length >= searchCharacterLimit && txtLeadFirstName != oldLeadFirstName){
+           isChange = 'Yes';
+        }
+       
+        if(fncTrim(txtLeadLastName).length >= searchCharacterLimit && txtLeadLastName != oldLeadLastName){
+           isChange = 'Yes';
+        }
+        if(fncTrim(txtLeadEmailToSearch).length >= searchCharacterLimit && txtLeadEmailToSearch != oldLeadEmail){
+           isChange = 'Yes';
+        }
+        
+        if(fncTrim(txtLeadCompany).length >= searchCharacterLimit && txtLeadCompany!= oldLeadCompany ){
+           isChange = 'Yes';
+        }
+        
+        if(isChange == 'Yes' ){                             
+            search(txtLeadFirstName,txtLeadLastName,txtLeadEmailToSearch);
+        } 
+    }    
+  }
+  catch(e){
+    alert(e);
+  }     
+ }
+ 
+    function goToBack(){
+        window.location.href = '/{!leadPrefix}/o';
+        return false;
+    }
+</script>
+
+<apex:actionFunction action="{!performSearch}" name="search" reRender="leadsearchResult,accountsearchResult,contactSearchResult" status="status" >
+    <apex:param name="d2" value="" assignTo="{!leadFirstNameToSearch}" />
+    <apex:param name="d" value="" assignTo="{!leadLastNameToSearch}" />
+    <apex:param name="d3" value="" assignTo="{!leadEmail}" />
+</apex:actionFunction>
+<apex:actionFunction name="resetSearchStatus" action="{!resetSearchStatus}" reRender="frm" status="status">
+    <apex:param name="txtobj" value="" assignTo="{!resetTextBoxName}" />
+</apex:actionFunction>  
+<!-- apex:actionFunction name="showLeadButtonOff" reRender="leadsearchResult" action="{!showLeadButtonOff}" / !-->
+<apex:outputPanel id="leadsearchResult">
+<c:SmartLeadSearchDisplay l="{!this}" />
+ </apex:outputPanel>      
+     <apex:outputPanel id="contactSearchResult">
+        <c:SmartContactSearchDisplay c="{!contactSearch}" OtherPageCalling="{!OtherPageCalling}"/>
+     </apex:outputPanel>  
+     <apex:outputPanel id="accountsearchResult">
+        <c:SmartAccountSearchDisplay a="{!accountSearch}" OtherPageCalling="{!OtherPageCalling}" />
+     </apex:outputPanel>      
+     </apex:form>
+</apex:page>

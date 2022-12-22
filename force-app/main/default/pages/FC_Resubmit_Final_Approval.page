@@ -1,0 +1,13 @@
+<apex:page standardController="FC_Form__c" extensions="FC_Submit_Pre_Approval_Ctrl" >
+	<apex:pageMessages />
+	
+	<apex:form >
+	  	<apex:pageBlock >
+		     
+			    <apex:commandButton value="ReSubmit For Final FC Approval" action="{!resubmitfinal}" />
+			    <apex:commandButton value="Exit" action="{!back}" />
+     
+		</apex:pageBlock>
+	</apex:form>
+	     
+</apex:page>

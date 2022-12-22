@@ -1,0 +1,50 @@
+<apex:component controller="SiteLoginController" id="loginComponent">
+  <apex:form id="loginForm" forceSSL="true">
+    <apex:outputPanel layout="block">
+      <apex:pageMessages id="error"/>
+        <apex:pageBlock >
+                
+      <apex:pageBlockSection columns="1">
+  
+      <apex:pageBlockSectionItem >
+   <apex:outputLabel value="{!$Label.site.username}" for="username"/>
+        <apex:inputText id="username" value="{!username}"/>
+            </apex:pageBlockSectionItem>
+            
+                  </apex:pageBlockSection>
+
+                  <apex:pageBlockSection columns="1">
+
+      
+            <apex:pageBlockSectionItem >
+        <apex:outputLabel value="{!$Label.site.password}" for="password"/>
+        <apex:inputSecret id="password" value="{!password}"/>
+            </apex:pageBlockSectionItem>
+                 
+                  </apex:pageBlockSection>
+                 
+                <apex:pageBlockSection columns="1">
+                  
+                    <apex:panelGroup >
+                        <apex:inputCheckbox />
+        <apex:outputLabel value="Remember Me" for="rememberUsername" />
+                        </apex:panelGroup>
+        
+
+      </apex:pageBlockSection>
+        </apex:pageBlock>
+
+
+        <apex:outputText value=""/>
+        <apex:commandButton action="{!login}" value="{!$Label.site.login_button}" id="loginButton"/> <br/> <br/>
+        <apex:outputText value=""/>
+        <apex:outputText value=""/>
+        <apex:outputText value=""/>
+        <apex:panelGroup id="theLinks">
+          <apex:outputLink value="{!$Page.ForgotPassword}"> {!$Label.site.forgot_your_password_q}</apex:outputLink>
+          <apex:outputText value=" Lost Password? " rendered="{!$Site.RegistrationEnabled}" />
+          <apex:outputLink value="{!$Page.SiteRegister}" rendered="{!$Site.RegistrationEnabled}">{!$Label.site.new_user_q}</apex:outputLink>
+        </apex:panelGroup>
+    </apex:outputPanel>
+  </apex:form>
+</apex:component>

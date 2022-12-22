@@ -1,0 +1,13 @@
+<apex:page >
+  <apex:includeLightning />
+  <script>
+    $Lightning.use("c:FacilitiesMilestoneApp", function () {
+      $Lightning.createComponent(
+        "c:FacilitiesMilestoneReport",
+        {},
+        "lightning",
+      )
+    });
+  </script>
+  <div id="lightning" />
+</apex:page>

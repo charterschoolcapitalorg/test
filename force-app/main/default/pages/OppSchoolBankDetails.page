@@ -1,0 +1,20 @@
+<apex:page standardController="Opportunity" extensions="OppSchoolBankDetailsExt" showHeader="true" sidebar="false">
+
+    <apex:sectionHeader title="Opportunity {!Opportunity.Name}" subtitle="Bank Details" />
+
+    <apex:pageBlock rendered="{!$ObjectType.Bank_Usage__c.accessible}">
+            <apex:pageBlockTable value="{!OppSchoolsBanks}" var="b">
+                <apex:column headerValue="School" value="{!b.Account__r.Name}"/>
+                <apex:column value="{!b.Account_Name__c}"/>
+                <apex:column headerValue="Bank" value="{!b.Bank__r.Name}"/>
+                <apex:column headerValue="Routing" >{!IF(LEN(b.Routing_Number__c)=9,LEFT(b.Routing_Number__c,3)&'-'&MID(b.Routing_Number__c,4,3)&"-"&RIGHT(b.Routing_Number__c,3), b.Routing_Number__c)} </apex:column>
+                <apex:column value="{!b.Account_Number__c}"/>
+                <apex:column value="{!b.Reference__c}"/>
+                <apex:column value="{!b.Usage__c}"/>
+            </apex:pageBlockTable>
+    </apex:pageBlock>
+    <apex:pageBlock rendered="{!NOT($ObjectType.Bank_Usage__c.accessible)}">
+        <apex:outputText >Access denied.</apex:outputText>
+    </apex:pageBlock>
+
+</apex:page>

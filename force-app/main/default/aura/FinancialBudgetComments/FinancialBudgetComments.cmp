@@ -1,0 +1,48 @@
+<aura:component controller="FinancialCtrl">
+    <aura:attribute name="showBudgetComments" type="boolean" default="false"/>
+    <aura:attribute name="startdatefq" type="String"/>
+    <aura:attribute name="enddatefq" type="String"/>
+    <aura:attribute name="enddatefy" type="String"/>
+    <aura:attribute name="accId" type="String"/>
+    <aura:handler name="init" value="{! this }" action="{! c.init }"/>
+    
+    <aura:attribute name="options" type="List" access="PRIVATE"/>
+    <aura:attribute name="commentMap" type="List" access="PRIVATE"/>
+    <aura:attribute name="selectedValue" type="String" default="" access="PRIVATE"/>
+    <aura:attribute name="selectedRecordId" type="String" access="PRIVATE"/>
+    <aura:attribute name="selectedRecordComments" type="String" access="PRIVATE"/>
+    <aura:attribute name="recordSaved" type="Boolean" default="false"/>
+    <aura:attribute name="allowComments" type="Boolean" default="false"/>
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    
+    <lightning:layoutItem size="3" class="lowerit slds-p-right_small">
+        <lightning:select name="quarterId" label="Select a quarter:" aura:id="quarterId" value="{!v.selectedValue}" onchange="{!c.quarterChange}">
+            <option value="">Select a quarter...</option>
+            <aura:iteration items="{!v.options}" var="option">
+                <option text="{!option.label}" value="{!option.value}" selected="false"/>
+            </aura:iteration>
+        </lightning:select>
+        <br/>
+        <lightning:button variant="destructive" 
+                          label="Close"
+                          title="Close"
+                          onclick="{! c.close }"/>
+        <lightning:button variant="success" 
+                          label="Save Record"
+                          title="Save"
+                          onclick="{! c.save }"/>
+        <br/>
+        <aura:if isTrue="{!v.recordSaved}">
+            <p><br/><lightning:formattedText value="Success! Your comments have been saved. Please click the close button if you are finished making changes." class="notification"/></p>
+        </aura:if>
+    </lightning:layoutItem>
+   <aura:if isTrue="{!v.allowComments}">
+    <lightning:layoutItem size="6" class="lowerit" >
+        <p>
+            <lightning:inputRichText value="{!v.selectedRecordComments}"/>
+        </p>
+        <br/>
+        
+    </lightning:layoutItem>
+    </aura:if>
+</aura:component>

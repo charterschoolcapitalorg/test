@@ -1,0 +1,294 @@
+<!--
+/**=====================================================================
+ * Appirio, Inc
+ * Name: ADMINActivity
+ * Description: T-288639 - Create custom VF Page for interest calc
+ * Created Date: [07/03/2014]
+ * Created By: [Rajeev Arya] (Appirio)
+ *
+ * Date Modified            Modified By                 Description of the update
+ * [07/07/2014]            [Rajeev Arya]              [FR Month End Reporting - Export to Excel]
+ * [07/16/2014]            [Rajeev Arya]              [T-295831 - Journal Entries development]
+ * [01/03/2017]            [John Caughie]             [Added Draw Payment section]
+ * [03/22/2017]            [John Caughie]             [Added Loan jurnal section redemptions & monthly interest] 
+ =====================================================================*/
+-->
+
+<apex:page Controller="ADMINActivityController" sidebar="true" id="ADMINActivityPage" >
+   <apex:form id="form">
+    <script type="text/javascript" language="javascript">
+        if(jQuery) {
+            jQuery.noConflict();
+        }
+    </script>
+    <style>
+    
+    .myActiveTab { background-color: #236FBD; color:white; background-image:none;font-size: 13px; font-weight: normal; border-radius:20px;}
+    .myInactiveTab { background-color: white; color:black; background-image:none; font-size: 13px; font-weight: normal; border-radius:20px;}
+    
+    </style>    
+        
+        <apex:pageBlock title="{!$Label.Page_Title_Admin_Activity_Page}">
+            <apex:pageMessages id="Message"/>
+            <apex:tabPanel switchtype="client" selectedTab="ReceivableInterest" id="theTabPanel" tabClass="myActiveTab" inactiveTabClass="myInactiveTab">
+                <apex:tab label="{!$Label.Tab_label_On_Demand_Draw_Interest_Calculation}" name="MonthlyInterest" id="tabOne">
+                    <apex:pageBlock title="Monthly Draw Interest">
+                        <b>{!$Label.Label_Select_Date}</b>
+                        <apex:inputText value="{!dateSelected}" size="10" id="date" onFocus="DatePicker.pickDate(false, this, false);" />    
+                        <apex:commandButton value="{!$Label.Button_Start_Batch_Interest}" status="mySaveStatus" 
+                        onclick="alert('The Draw Interest will now be calculated. \nIt may take a couple of seconds. \nPlease be patient.');"
+                        action="{!CalculateInterest}"
+                        oncomplete="document.getElementById('{!$Component.date}').focus()" rerender="Message"/>
+                    
+                        <apex:actionStatus id="mySaveStatus">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Draw Interest is being calculated ..." />
+                                        <span class="waitingDescription">Draw Interest is being calculated ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:pageBlock>
+                    <apex:pageBlock title="Quarterly Payments">
+                        <b>{!$Label.Label_Select_Date}</b>
+                        <apex:inputText value="{!datePayments}" size="10" id="paymentDate" onFocus="DatePicker.pickDate(false, this, false);" />    
+                        <apex:selectList value="{!investor}" size="1">
+                            <apex:selectOptions value="{!investors}"/>
+                        </apex:selectList>
+                        <apex:commandButton value="{!$Label.Button_Create_Draw_Payments}" status="paymentSaveStatus" 
+                            onclick="alert('The Draw Payments will now be calculated. \nIt may take a couple of seconds. \nPlease be patient.');"
+                            action="{!CalculatePayments}"
+                            oncomplete="document.getElementById('{!$Component.paymentDate}').focus()" rerender="Message"/>
+
+                        <apex:actionStatus id="paymentSaveStatus">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Draw Payments are being calculated ..." />
+                                        <span class="waitingDescription">Draw Payments are being calculated ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:pageBlock>
+                </apex:tab>
+                
+                <apex:tab label="{!$Label.Tab_label_Monthly_Receivable_Interest_Extract_to_Excel}" name="ReceivableInterest" id="tabTwo">
+                    <apex:outputText style="font-size:16px; color:red"  value="Start Date is the end of the month prior to the reporting month, eg 10/31/14 to 11/30/14" ></apex:outputText>
+                    <br/>
+                    <br/>
+                    <apex:pageBlock title="Month End Interest" >
+                        <b>{!$Label.Start_Date}</b>
+                        <apex:inputText value="{!startDate}" label="start date" size="10" id="startdate" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <b>{!$Label.End_Date}</b>
+                        <apex:inputText value="{!endDate}" size="10" id="enddate" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <apex:commandButton onclick="alert('The Month End Report is being generated. \nIt may take a couple of seconds. \nPlease be patient.');" 
+                        value="{!$Label.Button_Generate_Excel_Spreadsheet}" status="generateStatus" 
+                        action="{!GenerateExcelReport}"/>
+                        <apex:actionStatus id="generateStatus">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Generating Report ..." />
+                                        <span class="waitingDescription">Generating Report ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                        <!-- <apex:commandButton onclick="if(!confirm('Are you sure?')){return}; alert('The Journal Entries are being created. \nIt may take a couple of seconds. \nPlease be patient.');" -->
+            
+                        <apex:commandButton onclick="return confirm('Generating Month-End Interest Journal Entries - Continue?')" 
+                        value="{!$Label.Button_Generate_Journal_Entries}" action="{!CreateJournalEntries}" 
+                        status="generateStatusJournal" />
+                        <apex:actionStatus id="generateStatusJournal">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Creating Entries ..." />
+                                        <span class="waitingDescription">Creating Entries ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:pageBlock>
+                    
+                    <apex:pageBlock title="{!$Label.Label_Purchase_Journals}" >
+                        <b>{!$Label.Start_Date}</b>
+                        <apex:inputText value="{!startDateOther}" label="start date" size="10" id="startdatePur" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <b>{!$Label.End_Date}</b>
+                        <apex:inputText value="{!endDateOther}" size="10" id="enddatePur" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <apex:commandButton value="{!$Label.Button_Create_Purchase_Journal_Entries}" status="generateStatusPur" 
+                        action="{!CreatePurchaseJournalEntries}"
+                        onclick="alert('The Purchase journal entries are being generated. \nIt may take a couple of seconds. \nPlease be patient.');"
+                        oncomplete="document.getElementById('{!$Component.startdatePur}').focus();" rerender="Message"/>
+                        <apex:actionStatus id="generateStatusPur">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Creating Entries ..." />
+                                        <span class="waitingDescription">Creating Entries ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:pageBlock>
+                    
+                    <apex:pageBlock title="{!$Label.Label_PCSRC_Draw_Journals}" >
+                        <b>{!$Label.Start_Date}</b>
+                        <apex:inputText value="{!startDateDraw}" label="start date" size="10" id="startdateDraw" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <b>{!$Label.End_Date}</b>
+                        <apex:inputText value="{!endDateDraw}" size="10" id="enddateDraw" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <apex:commandButton value="{!$Label.Button_Create_PCSRC_Draw_Journal_Entries}" status="generateStatusDraw" 
+                        action="{!CreatePCSRCJournalEntries}"
+                        onclick="alert('The PCSRC draw journal entries are being generated. \nIt may take a couple of seconds. \nPlease be patient.');"
+                        oncomplete="document.getElementById('{!$Component.startdateDraw}').focus();" rerender="Message"/>
+                        <apex:actionStatus id="generateStatusDraw">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Creating Entries ..." />
+                                        <span class="waitingDescription">Creating Entries ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:pageBlock>
+
+                    <!--Section for calculating monthly draw interest-->
+                    <apex:pageBlock title="{!$Label.Label_Draw_Interest}">
+                        <b>{!$Label.Start_Date}</b>
+                        <apex:inputText value="{!startDateDrawInt}" label="start date" size="10" id="startdateInt" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <b>{!$Label.End_Date}</b>
+                        <apex:inputText value="{!endDateDrawInt}" size="10" id="enddateInt" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <apex:commandButton value="{!$Label.Button_Create_Monthly_Draw_Interest}" status="generateStatusDrawInt"
+                            action="{!CreateMonthlyDrawEntries}"
+                            onclick="alert('The Monthly Draw Interest journal entries are being generated. \nIt may take a couple of seconds. \nPlease be patient.');"
+                            oncomplete="document.getElementById('{!$Component.startDateDrawInt}').focus();" rerender="Message"/>
+
+                        <apex:actionStatus id="generateStatusDrawInt">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Creating Entries ..." />
+                                        <span class="waitingDescription">Creating Entries ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:pageBlock>
+                    <!--Section for calculating monthly draw interest-->
+                    
+                    <apex:pageBlock title="{!$Label.Label_Redemption_Journals}">
+                        <b>{!$Label.Start_Date}</b>
+                        <apex:inputText value="{!startDateRed}" label="start date" size="10" id="startdateRed" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <b>{!$Label.End_Date}</b>
+                        <apex:inputText value="{!endDateRed}" size="10" id="enddateRed" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <apex:commandButton value="{!$Label.Button_Create_Redemption_Journal_Entries}" status="generateStatusRed" 
+                        action="{!CreateRedemptionJournalEntries}"
+                        onclick="alert('The Redemption journal entries are being generated. \nIt may take a couple of seconds. \nPlease be patient.');"
+                        oncomplete="document.getElementById('{!$Component.startdateRed}').focus();" rerender="Message"/>
+                        
+                        <apex:actionStatus id="generateStatusRed">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Creating Entries ..." />
+                                        <span class="waitingDescription">Creating Entries ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:pageBlock>
+
+                    <!--Section for creating draw journals-->
+                    <apex:pageBlock title="{!$Label.Label_Draw_Journals}">
+                        <b>{!$Label.Start_Date}</b>
+                        <apex:inputText value="{!startDateDrawEntry}" label="start date" size="10" id="startDateDrawEntry" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <b>{!$Label.End_Date}</b>
+                        <apex:inputText value="{!endDateDrawEntry}" size="10" id="endDateDrawEntry" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <apex:commandButton value="{!$Label.Button_Create_Draw_Journal_Entries}" status="generateStatusDraws" 
+                        action="{!CreateDrawNoteJournalEntries}"
+                        onclick="alert('The Draw Note journal entries are being generated. \nIt may take a couple of seconds. \nPlease be patient.');"
+                        oncomplete="document.getElementById('{!$Component.startDateDrawEntry}').focus();" rerender="Message"/>
+                        
+                        <apex:actionStatus id="generateStatusDraws">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Creating Entries ..." />
+                                        <span class="waitingDescription">Creating Entries ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:pageBlock>
+                    <!--Section for creating draw journals-->
+
+                    <!--Section for creating draw entry journals-->
+                    <apex:pageBlock title="{!$Label.Label_Draw_Entry_Journals}">
+                        <b>{!$Label.Start_Date}</b>
+                        <apex:inputText value="{!startDateDrawPayments}" label="start date" size="10" id="startDateDrawPayments" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <b>{!$Label.End_Date}</b>
+                        <apex:inputText value="{!endDateDrawPayments}" size="10" id="endDateDrawPayments" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <apex:commandButton value="{!$Label.Button_Create_Draw_Entry_Journal}" status="generateStatusDrawPayments" 
+                        action="{!CreateMonthlyDrawPayments}"
+                        onclick="alert('The Draw Note journal entries are being generated. \nIt may take a couple of seconds. \nPlease be patient.');"
+                        oncomplete="document.getElementById('{!$Component.startDateDrawPayments}').focus();" rerender="Message"/>
+                        
+                        <apex:actionStatus id="generateStatusDrawPayments">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Creating Entries ..." />
+                                        <span class="waitingDescription">Creating Entries ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:pageBlock>
+                    <!--Section for creating draw entry journals-->
+
+                    <!--Section for creating loan journals-->
+                    <apex:pageBlock title="{!$Label.Label_Loan_Journals}">
+                        <b>{!$Label.Start_Date}</b>
+                        <apex:inputText value="{!startLoanCalculationDate}" label="start date" size="10" id="startLoanCalculationDate" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <b>{!$Label.End_Date}</b>
+                        <apex:inputText value="{!endLoanCalculationDate}" size="10" id="endLoanCalculationDate" onFocus="DatePicker.pickDate(false, this, false);" />
+                        <apex:commandButton value="{!$Label.Button_Create_Loan_Journals}" status="generateStatusDrawPayments" 
+                        action="{!createMonthlyLoanEntries}"
+                        onclick="alert('The Draw Note journal entries are being generated. \nIt may take a couple of seconds. \nPlease be patient.');"
+                        oncomplete="document.getElementById('{!$Component.startLoanCalculationDate}').focus();" rerender="Message"/>
+                        
+                        <apex:actionStatus id="generateStatusDrawPayments">
+                            <apex:facet name="start"> 
+                                <div class="waitingSearchDiv" id="el_loading" style="background-color: #fbfbfb;
+                                height: 120%;opacity:0.65;width:100%;">
+                                    <div class="waitingHolder" style="top: 74.2px; width: 91px;">
+                                        <img class="waitingImage" src="/img/loading.gif" title="Creating Entries ..." />
+                                        <span class="waitingDescription">Creating Entries ...</span>
+                                    </div>
+                                </div>
+                            </apex:facet>
+                        </apex:actionStatus>
+                    </apex:pageBlock>
+                    <!--Section for creating loan journals-->
+                
+                </apex:tab>                     
+                
+            </apex:tabPanel>
+        </apex:pageBlock>
+    </apex:form>
+
+</apex:page>

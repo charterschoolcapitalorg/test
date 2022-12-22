@@ -1,0 +1,75 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader" controller="RescorePricingRateController">
+
+    <aura:attribute name="hasErrors" type="Boolean" default="false"/>
+    <aura:attribute name="errorTitle" type="String" default="Error(s)" />
+    <aura:attribute name="errMsgs" type="List" default="[]"/>
+
+    <aura:attribute name="loading" type="Boolean" default="false" />
+    <aura:attribute name="loadingList" type="List" default="[]" />
+
+    <aura:attribute name="showFrm" type="Boolean" default="true" />
+    <aura:attribute name="isBefore" type="Boolean" default="true" /> 
+
+    <aura:attribute name="oldMarketRateId" type="Id" />
+    <aura:attribute name="mRateFlds" type="List" />
+    <aura:attribute name="pRateFlds" type="List" />
+    <aura:attribute name="childRates" type="Object"/>
+    <aura:attribute name="cRateErrors" type="Object"/>
+    <aura:attribute name="rateColumns" type="List"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:if isTrue="{!v.loading}">
+        <lightning:spinner alternativeText="Loading" />
+    </aura:if>
+    <lightning:card title="Rescore">
+        <aura:set attribute="actions">
+            <lightning:button label="Rescore" variant="brand" onclick="{! c.rescore }"/>
+        </aura:set>
+
+        <aura:if isTrue="{!v.hasErrors}">
+            <ui:message title="{!v.errorTitle}" severity="error" closable="false">
+                <aura:iteration items="{!v.errMsgs}" var="er" >
+                    <ui:outputText value="{!er.message}" /> <br/>
+                </aura:iteration>
+            </ui:message>
+        </aura:if>
+
+        <aura:if isTrue="{!v.showFrm}">
+
+            <aura:if isTrue="{!v.isBefore}">
+                <ui:message title="Warning" severity="warning" closable="false">
+                    You’re about to rescore this School’s pricing. This means that Student Count, Charter Term, and Intercept information on this Pricing Rate record will be refreshed to reflect current values found elsewhere in Salesforce. This will likely change the School Markup, Effective Rate (Scoring), and potentially the Final Effective Rate.
+                </ui:message>
+            </aura:if>
+
+            <aura:if isTrue="{! not( empty( v.childRates ) ) }">
+                <div class="slds-section slds-is-open">
+                    <h3 class="slds-section__title slds-theme_shade">
+                        <span class="slds-truncate slds-p-horizontal_small" title="Section Title">School Rates</span>
+                    </h3>
+                    <div aria-hidden="false" class="slds-section__content">
+                        <p>
+                            <lightning:datatable
+                                keyField="Id"
+                                errors="{! v.cRateErrors }"
+                                data="{! v.childRates }"
+                                columns="{! v.rateColumns }"
+                                hideCheckboxColumn="true"
+                            />
+                        </p>
+                    </div>
+                </div>
+            </aura:if>
+            
+        </aura:if>
+
+    </lightning:card>
+
+    
+<aura:html tag="style">
+    .quick-actions-panel{  
+        overflow-y: hidden !important;  
+    } 
+</aura:html>
+</aura:component>

@@ -1,0 +1,18 @@
+<apex:page docType="html-5.0" showHeader="false" sidebar="false" standardStylesheets="false" id="portalTemplate">
+    <apex:stylesheet value="{!URLFOR($Resource.CSC, 'css/portalCommon.css')}" />
+    
+    <div class="wrapper contentWrapper">
+            <div class="pageHeader">
+                <div class="logo"></div>
+            </div>
+            <div class="pageContent">
+                <apex:insert name="body" />
+            </div>
+            <div class="push"></div>
+        </div>
+        <div class="pageFooter">
+            <div class="contentWrapper">
+                <span class="copyright">Copyright &copy; {!YEAR(TODAY())} Charter School Capital, Inc. All Rights Reserved. <a href="http://charterschoolcapital.com/terms-of-use/" target="_blank">Terms of Use</a> | <a href="http://charterschoolcapital.com/privacy-policy/" target="_blank">Privacy Policy</a></span>
+            </div> 
+        </div>
+</apex:page>

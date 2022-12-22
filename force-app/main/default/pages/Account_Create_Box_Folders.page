@@ -1,0 +1,11 @@
+<apex:page standardController="Account" extensions="AccountCreateBoxStructureController">
+
+<apex:form >
+    <apex:messages style="font-size: 18px;color:red" />
+    
+    <apex:commandButton value="Create" action="{!execute}" />
+    <apex:commandButton value="Back" action="{!back}" />
+    
+    
+ </apex:form>    
+</apex:page>

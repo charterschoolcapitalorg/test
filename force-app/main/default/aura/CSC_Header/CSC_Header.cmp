@@ -1,0 +1,11 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global" >
+    <aura:attribute name="header" type="String" default="Charter School Capital"/>
+    <aura:attribute name="subheading" type="String" default="Client Portal"/>
+    <aura:attribute name="banner" type="String" default="Main text here"/>
+    <div class="slds-align_absolute-center headline">{!v.header}</div>
+    <div class="slds-align_absolute-center subheading">{!v.subheading}</div>
+    <p></p>
+    <div class="slds-m-around_medium slds-text-align_left banner">
+        {!v.banner}
+    </div>
+</aura:component>

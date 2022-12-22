@@ -1,0 +1,35 @@
+<aura:component >
+    <aura:attribute name="Building" type="Building__c" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+	<lightning:layout verticalAlign="center" class="slds-border_bottom header-data" multipleRows="true" >
+        
+        <lightning:layoutItem flexibility="auto"  size="2" >
+                   <ui:inputSelect label="" aura:id='actionl' 
+                             class="select actionselect" >
+                        <option value="">Select An Action</option>
+                        <option value="newsuite">New Suite</option>
+                    </ui:inputSelect>
+              
+                    <lightning:icon style="vertical-align:middle;" iconName="standard:output" alternativeText="Go" onclick="{!c.newSuite}"/>
+                    &nbsp;&nbsp;<a onclick="{!c.editBuilding}" styleClass="btn ">Edit</a>
+        </lightning:layoutItem>
+        
+            <lightning:layoutItem flexibility="auto" class="header-data"  size="2" >
+                <a onclick="{!c.viewBuilding}" styleClass="btn">{!v.Building.Name}</a>
+        	</lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" class="header-data"  size="2" >{!v.Building.Address__c}</lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" class="header-data"  size="1" >
+                <lightning:formattedNumber value="{!v.Building.Square_Feet__c}"/></lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" class="header-data"  size="2" >
+                <ui:outputDate  value="{!v.Building.Date_Last_Expanded__c}" format="MM/dd/yyyy" />
+                
+        	</lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" class="header-data"  size="2" >
+                <ui:outputDate  value="{!v.Building.Year_of_Construction__c}" format="MM/dd/yyyy" />
+                </lightning:layoutItem>
+            <lightning:layoutItem flexibility="auto" class="header-data"  size="1" >
+                <lightning:formattedNumber value="{!v.Building.Building_Capacity__c}"/></lightning:layoutItem>
+        </lightning:layout>
+</aura:component>

@@ -1,0 +1,33 @@
+<aura:component implements="force:hasRecordId,flexipage:availableForRecordHome,force:lightningQuickActionWithoutHeader" 
+                controller="FinancialCtrl">
+	<ltng:require styles="{!$Resource.facilitiesui}" />
+    
+    <aura:attribute name="rowdata" type="FinancialCtrl.DataWrapper" />
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="viewType" type="String"/>
+    
+    <lightning:layout multipleRows="false" >
+        <lightning:layoutItem flexibility="no-shrink, grow" class="data-column-medium">
+            {!(v.rowdata.Name=='BLANK' ? '&nbsp;' : v.rowdata.Name)}
+            
+            
+        </lightning:layoutItem>
+        	<lightning:layoutItem flexibility="no-shrink, grow" class="data-column-icon">
+                <aura:if isTrue="{!v.rowdata.helptext !=''}">
+                    
+                        &nbsp;&nbsp;&nbsp;<lightning:icon iconName="utility:info" size="xx-small" 
+                              title="{!v.rowdata.helptext}" class="myhelpIcon"/>
+                    
+                </aura:if>
+	        </lightning:layoutItem>
+        
+            <aura:iteration  items="{!v.columns}" var="cd" indexVar="indx">
+                <lightning:layoutItem flexibility="no-shrink, grow" class="data-column-small center">
+                    
+                	<c:FinancialUIDataRowValue aura:id="datarowval"  theindex="{!indx}" rowdata="{!v.rowdata}"
+                       fieldlabel="{!v.rowdata.Name}" column="{!cd}" commentfieldlabel="blah" viewType="{!v.viewType}" varianceSign="{!v.rowdata.GoodVarianceSign}"/>
+                </lightning:layoutItem>
+            </aura:iteration>    
+    </lightning:layout> 
+    
+</aura:component>

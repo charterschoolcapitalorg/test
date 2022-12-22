@@ -1,0 +1,3 @@
+<aura:event access="global" type="Component" description="Record removal">
+    <aura:attribute name="record" type="Integer"/>
+</aura:event>

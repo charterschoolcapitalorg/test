@@ -1,0 +1,13 @@
+<aura:component implements="force:appHostable,forceCommunity:availableForAllPageTypes" access="global">
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:NavigateToC2" action="{!c.NavigateComponent}"/>
+    <aura:handler event="c:NavigateToWorkingGroup" action="{!c.NavigateWorkingGroup}"/>
+    <aura:handler event="c:NavigateToHomePage" action="{!c.doInit}"/>
+    <aura:handler event="c:NavigateToOpp" action="{!c.NavigateToOpp}"/>
+    <aura:handler event="c:FireDetailEvent" action="{!c.FireDetailEvent}"/>
+    <aura:handler event="c:NavigateToFacPQ" action="{!c.NavigateToFacPQ}"/>
+    
+    <!-- c:WorkingGroupForms accountId="0011k000006pA6I"/> -->
+        {!v.body}
+</aura:component>

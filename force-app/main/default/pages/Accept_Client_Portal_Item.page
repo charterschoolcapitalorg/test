@@ -1,0 +1,24 @@
+<apex:page standardController="Intake_Item__c" >
+ <apex:includeLightning />
+ <apex:includeScript value="/lightning/lightning.out.js" />
+ 
+    <div id="LightningComponentid" style="height:800px;" />  
+     
+    <script>
+    console.log('in VF page');
+    $Lightning.use("c:AcceptClientPortalItemApp", function() {
+    	var theme = "{!$User.UITheme}";
+    	console.log('uitheme - ' + theme);
+        $Lightning.createComponent("c:AcceptClientPortalItem",
+          { 
+          	recordId :"{!$CurrentPage.Parameters.id}",
+          	theme : theme
+          },
+          "LightningComponentid",
+          function(cmp) {
+             console.log('Display Lightning component in visualforce page');
+          });
+    });
+    </script>
+	 
+</apex:page>

@@ -1,0 +1,6 @@
+<apex:page standardController="School_Attendance__c" extensions="MakeActiveSchoolAttendance_RateCardCont" action="{!makeCurrentSchoolAttendanceActive}">
+	<apex:outputPanel style="display:none" >
+		{!School_Attendance__c.School__c}
+		{!School_Attendance__c.Active__c}
+	</apex:outputPanel>
+</apex:page>

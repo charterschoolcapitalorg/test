@@ -1,0 +1,107 @@
+<aura:component controller="OperationsReporting" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="filteredOpportunities" type="object[]"/>
+    <aura:attribute name="originalOpportunities" type="object[]"/>
+    <aura:attribute name="opps" type="Opportunity[]"/>
+    <aura:attribute name="today" type="Date"/>
+    <aura:attribute name="ShowSpinner" type="boolean" default="true"/>
+    <aura:attribute name="userList" type="List" default="All"/>
+
+    <!-- page load spinner-->
+    <aura:if isTrue="{!v.ShowSpinner}">
+        <div class="spinner">
+           <lightning:spinner variant="base" size="large" alternativeText="Please wait..." title="Data loading, please wait."/>
+        </div>
+    </aura:if>
+    <!-- page load spinner--> 
+
+
+    <!-- page loaded-->
+    <aura:if isTrue="{!!v.ShowSpinner}">
+        <div class="slds-col slds-theme_shade heading slds-p-around_large">
+            <lightning:card class="heading">
+                <aura:set attribute="title">
+                    Working Capital Milestone Report - <lightning:formattedDateTime value="{!v.today}"/>&nbsp;
+                    <a style="font-size: 10px;" target="_blank" href="https://charterschoolcapital.lightning.force.com/lightning/r/Knowledge__kav/ka04u000000UD1SAAW/view">Help information</a>
+                </aura:set>
+                <aura:set attribute="actions">
+                    <lightning:button class="slds-button btnCustomStyle" iconName="utility:refresh" variant="Neutral" label="Refresh Data" title="Refresh underlying data" onclick="{! c.handleRefresh }"/>
+                    <lightning:combobox class="slds-button  btnCustomStyle" name="user" label="" value="New" placeholder="Select User" options="{! v.userList }" onchange="{! c.handleChange }"/>
+                </aura:set>
+            </lightning:card>
+        </div>
+        
+        <div class="slds-table--header-fixed_container slds-m-top_medium slds-p-bottom_medium" style="height:600px;">
+            <div class="slds-scrollable" style="height:100%;">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table--header-fixed">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed slds-p-left_xx-small" title="Close Date">Close</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-col slds-size_1-of-1 slds-truncate slds-cell-fixed" title="Business Days to Close">Days</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed slds-p-left_x-small" title="Portal" style="width:55px">Type</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed slds-p-left_x-small" title="Account" style="width:100px">Account Name</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="State">State</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed slds-p-left_small" title="Amount Requested">Amount</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="FE Approved by Client? - 8 BD" style="width:75px">FE<br/>Prep?</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="OILS Received? - 7 Business Days" style="width:75px">CP<br/>Open</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="FE Approved by Client? - 8 BD" style="width:75px">FE<br/>Apprv?</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="OILS Received? - 7 Business Days" style="width:75px">OILS<br/>Rcvd</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="OILS Received? - 7 Business Days" style="width:75px">Submitted<br/>pre-Approval</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="FC Form Sent to FC? - 5 BD" style="width:75px">FC<br/>Sent?</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="FC Approval Received? - 4 BD" style="width:75px">FC<br/>Apprv?</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="Signature Pages Received - 3 BD" style="width:75px">Sig<br/>Pages?</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="Ready Email Sent? - 3 BD" style="width:75px">Email<br/>Sent?</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="Committed" style="width:70px">Commit?</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="Owner">Owner</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="Paralegal">Paralegal</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate slds-cell-fixed" title="Fin Analyst">Analyst</div>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <aura:iteration items="{!v.filteredOpportunities}" var="opp" >
+                        <c:DailyReportRow opportunity="{!opp}"/>
+                    </aura:iteration>
+                </table>
+            </div>
+        </div>
+    </aura:if>
+    
+</aura:component>

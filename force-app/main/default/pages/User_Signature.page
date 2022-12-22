@@ -1,0 +1,26 @@
+<apex:page standardController="User" extensions="UserSignatureCtrl" standardStylesheets="False" showHeader="false" action="{!redirect}">
+    <div>
+        <span style="font-family: Lato, Arial, sans-serif; font-size: 14pt; font-weight: bold; color: #CF7F00; padding: 2px;">{!User.Name}</span>
+        <span style="font-family: Lato, Arial, sans-serif; font-size: 11pt; color: #9a9a9a; padding: 2px;"> (indicate your pronouns – e.g. she/her, he/him, they/them)</span><br/>
+        <span style="font-family: Lato, Arial, sans-serif; font-size: 11pt; color: #717C7D; padding: 2px;">....................................................</span>
+    </div>
+    
+    <div>
+        <span style="font-family: Lato, Arial, Helvetica, sans-serif; font-size: 11pt; color: #717C7D; padding: 2px;">{!$User.Department}</span><br/>
+        <span style="font-family: Lato, Arial, Helvetica, sans-serif; font-size: 11pt; color: #717C7D; padding: 2px;"><a href="https://charterschoolcapital.com/" target="_blank" style="font-family: Lato, Arial, Helvetica, sans-serif; font-size: 11pt; color: #717C7D;">{!$Organization.Name}</a></span><br/>
+    </div>
+    <br/>
+    <div>
+        <span style="font-family: Lato, Arial, Helvetica, sans-serif; font-size: 11pt; color: #717C7D; padding: 2px;"><b>Direct</b> {!User.Phone}</span><br/>
+        <span style="font-family: Lato, Arial, Helvetica, sans-serif; font-size: 11pt; color: #717C7D; padding: 2px;"><b>Mobile</b> {!User.Mobile_Formatted__c}</span><br/>
+        <span style="font-family: Lato, Arial, Helvetica, sans-serif; font-size: 11pt; color: #717C7D; padding: 2px;"><b>LinkedIn</b> <a href="https://www.linkedin.com/company/charter-school-capital-inc-/" target="_blank" style="font-family: Lato, Arial, Helvetica, sans-serif; font-size: 11pt; color: #717C7D; padding: 2px;">
+            LinkedIn.com/company/charter-school-capital
+        </a></span>
+        <span style="font-family: Lato, Arial, sans-serif; font-size: 11pt; color: #9a9a9a; padding: 2px;"> (we prefer you add your own LinkedIn profile, but you can default to the company link)</span><br/>
+    </div>
+    <br/>
+    <div>
+        <span style="font-family: Lato, Arial, Helvetica, sans-serif; font-size: 11pt; color: #717C7D; padding: 2px;">{!$Organization.Street}</span><br/>
+        <span style="font-family: Lato, Arial, Helvetica, sans-serif; font-size: 11pt; color: #717C7D; padding: 2px;">{!$Organization.City}, Oregon {!LEFT($Organization.PostalCode,5)}</span>
+    </div>  
+</apex:page>

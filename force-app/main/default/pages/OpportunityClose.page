@@ -1,0 +1,28 @@
+<apex:page standardController="Opportunity" extensions="OpportunityCloseExt">
+    <apex:pageMessages />
+    <apex:form >
+        <apex:pageBlock >
+            <apex:pageBlockButtons >
+                <apex:commandButton value="Save" action="{!save}"/>
+                <apex:commandButton value="Cancel" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+            <apex:pageBlockSection title="Opportunity Information">
+                <apex:outputField value="{!opportunity.Account.Name}"/>
+                <apex:outputField value="{!opportunity.name}"/>
+                <apex:outputField value="{!opportunity.closeDate}"/>
+                <apex:outputField value="{!opportunity.Total_Price__c}"/>
+            </apex:pageBlockSection>
+            <apex:pageBlockSection title="Close Information">
+                <apex:outputField value="{!opportunity.stageName}"/>
+                <apex:outputPanel style="display:none;visibility:hidden">
+                    <apex:inputField value="{!opportunity.stageName}"/>
+                </apex:outputPanel>
+                <apex:inputField value="{!opportunity.Reason__c}" required="true"/>
+                <apex:inputField value="{!opportunity.Outcome__c}" required="true"/>
+                <apex:inputField value="{!opportunity.IsAllowStageUpdation__c}" rendered="false"/>
+                <apex:inputField value="{!opportunity.Reason_Lost_Notes__c}" required="true" style="width:300px; height:100px"/>
+                <apex:inputField value="{!opportunity.Closed_Lost_Future_Follow_up_Date__c}"/>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>    
+</apex:page>

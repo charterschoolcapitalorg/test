@@ -1,0 +1,2 @@
+<apex:page standardController="Redemption__c" extensions="ConductorFromListViewController" recordSetVar="records" action="{!prepareConductorUrl}">
+</apex:page>

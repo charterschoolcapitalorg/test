@@ -1,0 +1,44 @@
+<aura:component implements="flexipage:availableForRecordHome" 
+                controller="CreateFacilitiesObjectsCtrl">
+    
+    <aura:attribute name="Leases" type="Lease__c[]" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:attribute name="recTypeId" type="Id" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+   
+    
+    <span style="background-color:#a1dee9;">
+	<lightning:layout multipleRows="false" >
+        <lightning:layoutItem size="1" class=" buildingHeader">
+            <b>Leases: </b> 
+        </lightning:layoutItem>
+        <lightning:layoutItem size="11" >
+            <lightning:button label="New"  onclick="{!c.newLease}"/> 
+        </lightning:layoutItem>
+    </lightning:layout>
+        
+    <lightning:layout multipleRows="true" class="mySubrowHeader header-column">
+		<lightning:layoutItem size="2" class="header-column mySubrowHeader"></lightning:layoutItem>   
+         <!-- <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Lease Ref #</lightning:layoutItem> -->
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Lease Record</lightning:layoutItem>
+         <lightning:layoutItem size="2" flexibility="auto" class="mySubrowHeader header-column">Tenant</lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Lease Type</lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Base Year Rent</lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Escalator</lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Purchase Option</lightning:layoutItem> 
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Escalation Date</lightning:layoutItem> 
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Lease Expiration Date</lightning:layoutItem> 
+         <lightning:layoutItem size="1" flexibility="auto" class="mySubrowHeader header-column">Lease Status</lightning:layoutItem>
+     </lightning:layout>
+    </span>
+    
+    
+    <span >
+    <aura:iteration items="{!v.Leases}" var="b" indexVar="indx">
+        <c:Lease  Lease="{!b}" propertyId="{!v.propertyId}"/>
+    </aura:iteration>
+    </span>
+    
+</aura:component>

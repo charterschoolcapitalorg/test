@@ -1,0 +1,31 @@
+<aura:component >
+    <aura:attribute name="Suite" type="Suite__c" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    <lightning:recordViewForm recordId="{!v.Suite.Id}" objectApiName="Suite__c">
+	<lightning:layout verticalAlign="center" class="slds-border_bottom header-data" multipleRows="true" >
+        <!-- div style="width:130px;vertical-align:middle;" >
+             
+        </div> -->
+        
+        <div style="width:40px;vertical-align:middle;text-align:right;" >
+            	<a onclick="{!c.editSuite}" styleClass="btn ">Edit</a>
+        </div>
+        
+        <lightning:layoutItem class="header-data"  size="2" >
+            <a onclick="{!c.viewSuite}" styleClass="btn">{!v.Suite.Name}</a>
+        </lightning:layoutItem>
+        <lightning:layoutItem class="header-data"  size="2" >{!v.Suite.Building__r.Name}</lightning:layoutItem>
+        <lightning:layoutItem class="header-data"  size="1" >
+            {!v.Suite.Suite_Number__c}
+        </lightning:layoutItem>
+        <lightning:layoutItem class="header-data"  size="2" ><lightning:formattedNumber value="{!v.Suite.Net_Rentable_Area__c}"/></lightning:layoutItem>
+        <lightning:layoutItem class="header-data"  size="1" >
+            <!-- <lightning:outputField class="centeralign" variant="label-hidden" fieldName="Vacancy__c" /> -->
+            <lightning:outputField variant="label-hidden" fieldName="Vacancy__c" />
+        </lightning:layoutItem>
+        <lightning:layoutItem class="header-data"  size="3" >{!v.Suite.Vacancy_Reason__c}</lightning:layoutItem>
+            
+        </lightning:layout>  
+    </lightning:recordViewForm>
+</aura:component>

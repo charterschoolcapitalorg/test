@@ -1,0 +1,72 @@
+<template>
+  <lightning-card variant="Narrow"  title="AUM Student Count Report" icon-name="standard:account">
+    
+    <div class="slds-grid slds-gutters" >
+      <div class="slds-col slds-size_8-of-12" style="padding-top: 20px; padding-left: 30px;">
+        <lightning-accordion class="help-accordion"
+          onsectiontoggle={handleToggleSection}
+          active-section-name={accordianSection}
+          allow-multiple-sections-open>
+            <lightning-accordion-section name="A" label="Help">
+              <ul class="slds-list_dotted">
+                <li>"Current Yr Student Count" - latest report date Student count for this fiscal year</li>
+                <li>"Previous Yr Student Count" - latest report date Student count for last year's fiscal year</li>
+                <li>"% Change" - (Current - Previous) / Previous</li>
+                <li>"Charter Exp" - the end date on the "active" Charter Terms record on the school. No value = no active record!</li>
+                <li>"Charter Cap" - Not listed = No Cap Limit is unchecked and there is no cap.value entered on the active Terms record. Blank means no active Terms record!</li>
+              </ul>
+            </lightning-accordion-section>
+        </lightning-accordion>
+      </div>    
+
+      <lightning-layout horizontal-align="center" vertical-align="end">
+        <div class="slds-var-m-top_large slds-var-p-right_medium">
+            <lightning-layout-item size="4">
+              <lightning-combobox
+                name="filter"
+                label="Owner filter:"
+                value={value}
+                placeholder="All"
+                options={ownerFilter}
+                onchange={handleChange} >
+              </lightning-combobox>
+            </lightning-layout-item>
+          </div>
+        
+          <lightning-layout-item size="12">
+            <lightning-button label="Refresh data" title="Refresh underlying data" icon-name="utility:refresh" class="slds-var-m-left_x-small" onclick={handleRefresh}></lightning-button>
+          </lightning-layout-item>
+      </lightning-layout>
+
+
+
+    </div>
+  </lightning-card>
+
+  <div>
+    <br/>
+  </div>
+
+  <!-- sldsValidatorIgnoreNextLine -->
+  <lightning-datatable
+    key-field="id"
+    columns={columns}
+    data={filteredData}
+    hide-checkbox-column
+    sorted-direction={sortDirection}
+    sorted-by={sortedBy}
+    wrap-text-max-lines="3"
+    onrowaction={handleRowAction}
+    onsort={onHandleSort}>
+  </lightning-datatable>
+  <!-- following section to prevent cut off at utility bar -->
+  <div>
+    &nbsp;
+  </div>
+  <div>
+    &nbsp;
+  </div>
+  <div>
+    &nbsp;
+  </div> 
+</template>

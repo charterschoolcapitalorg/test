@@ -1,0 +1,181 @@
+<aura:component controller="AcceptClientPortalItemCtrl">
+  <aura:handler name="init" value="{!this}" action="{!c.init}" />
+  <aura:attribute name="ai" type="CSC_Action_Item__c" />
+  <aura:attribute name="cpi" type="Intake_Item__c" />
+  <aura:attribute name="allFiles" type="ContentDocument" />
+  <aura:attribute name="selectedFiles" type="ContentDocument" />
+  <aura:attribute name="numFiles" type="Integer" />
+
+  <aura:attribute name="selectedIds" type="String" default="" />
+  <aura:attribute name="selectedIdsArray" type="String[]" />
+  <aura:attribute name="IsCharterAccount" type="Boolean" />
+  <aura:attribute name="IsPCL" type="Boolean" />
+  <aura:attribute name="warningShow" type="Boolean" default="false"/>
+  <aura:handler
+    name="rowEvent"
+    event="c:FileMappingEvent"
+    action="{!c.setSelectedIds}"
+  />
+
+  <lightning:navigation aura:id="navService" />
+
+  <aura:handler event="aura:waiting" action="{!c.showSpinner}" />
+  <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}" />
+  <aura:attribute name="Spinner" type="boolean" default="false" />
+
+  <!--loading spinner start... style=Brand Medium (blue dots)-->
+  <aura:if isTrue="{!v.Spinner}">
+    <div aura:id="spinnerId" class="slds-spinner_container">
+      <div
+        class="slds-spinner--brand slds-spinner slds-spinner--large slds-is-relative"
+        role="alert"
+      >
+        <span class="slds-assistive-text">Loading</span>
+        <div class="slds-spinner__dot-a"></div>
+        <div class="slds-spinner__dot-b"></div>
+      </div>
+    </div>
+  </aura:if>
+
+  <aura:method name="save" action="{!c.save}">
+    <aura:attribute name="status" type="String" default="" />
+  </aura:method>
+
+  <div style="background-color: white">
+    <lightning:layout multipleRows="false">
+      <lightning:layoutItem class="data-column-first" aura:id="myRow">
+        <aura:if isTrue="{!v.IsPCL}">
+          <a onclick="{!c.openActionItem}" styleClass="btn"
+            >{!v.ai.Opportunity_Name__c}</a
+          >
+          <aura:set attribute="else">
+            <a onclick="{!c.openActionItem}" styleClass="btn"
+              >{!v.ai.Account_Name__c}</a
+            > 
+            <aura:if isTrue="{!v.warningShow}">
+                <p style="color:red; font-size: 10px;">Warning! No Legal Assistant on CH Account. </p>
+                <p style="color:red; font-size: 10px;">Update and return if handing off to an LA.</p>
+            </aura:if>
+          </aura:set>
+        </aura:if>
+      </lightning:layoutItem>
+
+      <aura:if isTrue="{!v.cpi.Copy_Files_to_AL_PCL__c}">
+        <aura:if isTrue="{!or(v.isPCL)}"> </aura:if>
+
+        <aura:if isTrue="{!and(!v.IsPCL)}">
+          <lightning:layoutItem
+            size="1"
+            class="data-column-date"
+            aura:id="myRow"
+          >
+            <lightning:input
+              variant="label-hidden"
+              aura:id="effdate"
+              type="date"
+            />
+          </lightning:layoutItem>
+          <lightning:layoutItem
+            size="1"
+            class="data-column-date"
+            aura:id="myRow"
+          >
+            <lightning:input
+              variant="label-hidden"
+              aura:id="nadate"
+              type="date"
+            />
+          </lightning:layoutItem>
+          <lightning:layoutItem
+            size="1"
+            class="data-column-date"
+            aura:id="myRow"
+          >
+            <lightning:input
+              variant="label-hidden"
+              aura:id="cpdate"
+              type="date"
+            />
+          </lightning:layoutItem>
+          <lightning:layoutItem
+            size="1"
+            class="data-column-date"
+            aura:id="myRow"
+          >
+            <lightning:input
+              variant="label-hidden"
+              aura:id="expdate"
+              type="date"
+            />
+          </lightning:layoutItem>
+        </aura:if>
+
+        <aura:if isTrue="{!!v.IsPCL}">
+          <lightning:layoutItem class="data-column-map" aura:id="myRow">
+            <span style="padding-left: 12px">
+              <aura:if isTrue="{!and(!v.IsPCL,v.numFiles>0)}">
+                <c:ActionItemMapFilesCustomModal
+                  files="{!v.allFiles}"
+                  numFiles="{!v.numFiles}"
+                  selectedIds="{!v.selectedIdsArray}"
+                  selectedFiles="{!v.selectedFiles}"
+                  cpi="{!v.cpi}"
+                />
+              </aura:if>
+            </span>
+          </lightning:layoutItem>
+        </aura:if>
+      </aura:if>
+
+      <lightning:layoutItem size="1" class="data-column-status" aura:id="myRow">
+        <lightning:select
+          class="label-hidden small-text"
+          variant="label-hidden"
+          aura:id="status"
+          name="status"
+          required="true"
+        >
+          <option value="Review - Internal">Internal Review</option>
+          <option value="Completed">Completed</option>
+          <aura:if isTrue="{!!v.IsPCL}">
+            <option value="Legal Assistant Review">
+              Legal Assistant Review
+            </option>
+          </aura:if>
+        </lightning:select>
+      </lightning:layoutItem>
+
+      <lightning:layoutItem size="1" class="data-column" aura:id="myRow">
+        <lightning:input
+          variant="label-hidden"
+          class="data-left"
+          aura:id="includecomment"
+          checked="true"
+          type="checkbox"
+        />
+      </lightning:layoutItem>
+
+      <aura:if isTrue="{!!v.IsPCL}">
+        <!-- class="data-column-comments " -->
+
+        <lightning:textarea
+          style="width: 250px"
+          aura:id="includecsccomment"
+          name="includecsccomment"
+        />
+        <aura:if isTrue="{!v.cpi.Is_Financial__c}">
+          <lightning:layoutItem size="1" class="data-column" aura:id="myRow">
+            <lightning:input
+              variant="label-hidden"
+              name="createfinancial"
+              class="data-left"
+              aura:id="createfinancial"
+              checked="true"
+              type="checkbox"
+            />
+          </lightning:layoutItem>
+        </aura:if>
+      </aura:if>
+    </lightning:layout>
+  </div>
+</aura:component>

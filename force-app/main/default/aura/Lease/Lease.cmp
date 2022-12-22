@@ -1,0 +1,60 @@
+<aura:component >
+    <aura:attribute name="Lease" type="Lease__c" />
+    <aura:attribute name="propertyId" type="Id" />
+    <aura:attribute name="action" type="String" />
+    <aura:registerEvent name="refreshEvent" type="c:FacilitiesParentRefreshEvent"/>
+    
+	<lightning:recordViewForm recordId="{!v.Lease.Id}" objectApiName="Lease__c">
+	<lightning:layout horizontalAlign="left" verticalAlign="center" class="header-data slds-border_bottom" multipleRows="true" >  
+    	
+        <lightning:layoutItem flexibility="auto"  size="2" >
+                   <ui:inputSelect label="" aura:id='actionl' 
+                             class="select actionselect" >
+                        <option value="">Select An Action</option>
+                        <option value="leasesuite">New Lease/Suite</option>
+                        <option value="leasecompliance">New Lease Compliance</option>
+                        <option value="leaseschool">New Lease School</option>
+                    </ui:inputSelect>
+              
+                    <lightning:icon style="vertical-align:middle;" iconName="standard:output" alternativeText="Go" onclick="{!c.executeAction}"/>
+                    &nbsp;&nbsp;<a onclick="{!c.editLease}" styleClass="btn ">Edit</a>
+        </lightning:layoutItem>
+        
+        <lightning:layoutItem size="1" flexibility="auto" class="header-data">
+            <aura:if isTrue="{!v.Lease.RecordType.DeveloperName=='Sub_Lease'}">
+                <a onclick="{!c.viewLease}" styleClass="btn">Sub-Lease {!v.Lease.Name}</a>
+                <aura:set attribute="else">
+                   <a onclick="{!c.viewLease}" styleClass="btn">Lease {!v.Lease.Name}</a>
+                </aura:set>
+            </aura:if> 
+            <!-- <a onclick="{!c.viewLease}" styleClass="btn">{!v.Lease.Name}</a> -->
+        	<!-- <a onclick="{!c.viewLease}" styleClass="btn">{!v.Lease.RecordType.DeveloperName}</a> -->
+        </lightning:layoutItem>
+        
+         <lightning:layoutItem size="2" flexibility="auto" class="header-data">
+        	<!-- {!v.Lease.Tenant__r.Name} -->
+        	{!v.Lease.Tenant_Name__c}
+        </lightning:layoutItem>
+         
+         <lightning:layoutItem size="1" flexibility="auto" class="header-data">{!v.Lease.Lease_Type__c}</lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="header-data">
+             <lightning:formattedNumber value="{!v.Lease.Base_Year_Rent__c}" style="currency" currencyCode="USD"/>
+             </lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="header-data">
+             <lightning:formattedNumber value="{!v.Lease.Escalator__c/100}" style="percent"/>
+             </lightning:layoutItem>
+         <lightning:layoutItem size="1" flexibility="auto" class="header-data">
+             <lightning:outputField variant="label-hidden" fieldName="Purchase_Option__c" />
+         </lightning:layoutItem> 
+         <lightning:layoutItem size="1" flexibility="auto" class="header-data">
+             <ui:outputDate value="{!v.Lease.Escalation_Date__c}" format="MM/dd/yyyy" />
+             </lightning:layoutItem> 
+         <lightning:layoutItem size="1" flexibility="auto" class="header-data">
+             <ui:outputDate value="{!v.Lease.Lease_Expiration_Date__c}" format="MM/dd/yyyy" />
+             </lightning:layoutItem> 
+         <lightning:layoutItem size="1" flexibility="auto" class="header-data">{!v.Lease.Lease_Status__c}</lightning:layoutItem>
+        
+    </lightning:layout>
+    </lightning:recordViewForm>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+</aura:component>

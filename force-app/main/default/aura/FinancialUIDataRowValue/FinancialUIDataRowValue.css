@@ -1,0 +1,12 @@
+.THIS .hascomment {
+	text-decoration:underline;  
+    color:blue;
+}
+
+.THIS .negative {
+    background-color:salmon;
+}
+
+.THIS .positive {
+    background-color:lightgreen;
+}

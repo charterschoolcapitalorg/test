@@ -1,0 +1,16 @@
+<aura:component >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+ 
+    <aura:attribute name="items" type="string[]" />
+    <aura:attribute name="element" type="String" />
+    <aura:attribute name="condition" type="Boolean" />
+    <aura:attribute name="yesText" type="Boolean" default="True" />
+	<aura:attribute name="noText" type="Boolean" default="False" />
+    
+    <aura:if isTrue="{!v.condition}">
+        {!v.yesText}
+        <aura:set attribute="else">
+            {!v.noText}
+        </aura:set>
+    </aura:if>
+</aura:component>

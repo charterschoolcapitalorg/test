@@ -1,0 +1,87 @@
+<aura:component>
+    
+    <aura:attribute name="files" type="ContentDocument"/>
+    <aura:attribute name="selectedFiles" type="ContentDocument"/>
+    <aura:attribute name="numFiles" type="Integer"/>
+    <aura:attribute name="cpi" type="Intake_Item__c" />
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:registerEvent name="rowEvent" type="c:FileMappingEvent"/>
+    <aura:attribute name="selectedIds" type="String[]" /> 
+    <aura:handler name="render" value="{!this}" action="{!c.onRender}"/>
+    
+        <a onclick="{!c.openModel}" id="{!v.cpi.Id}">Change Mapping</a>
+                
+        <aura:if isTrue="{!v.isOpen}">
+            
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+                <div class="slds-modal__container">
+                    <!-- ###### MODAL BOX HEADER Start ######-->
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">File Mapping</h2>
+                    </header>
+                    
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        
+                        <aura:if isTrue="{!v.numFiles>0}">
+                            
+                            <div class="slds-text-title_caps" >
+                                <section class="slds-clearfix" >  
+                                    
+                                    <lightning:layout multipleRows="false" >
+                                        
+                                        <lightning:layoutItem class="background slds-p-vertical_small" size="4"><span style="margin-top:10px;padding-left:5px;">File Name</span></lightning:layoutItem>  
+                                        <lightning:layoutItem class="background slds-p-vertical_small" size="2">Date Uploaded</lightning:layoutItem>  
+                                        <lightning:layoutItem class="background slds-p-vertical_small" size="2">Uploaded By</lightning:layoutItem> 
+                                        <lightning:layoutItem class="background slds-p-vertical_small" size="2">Download File</lightning:layoutItem>  
+                                        <lightning:layoutItem class="background slds-p-vertical_small" size="2" >Map</lightning:layoutItem>  
+                                    	
+                                    </lightning:layout>
+                                        
+                                </section>
+                            </div>
+                        
+                            
+                          <lightning:layout multipleRows="true"  >
+                            <aura:iteration items="{!v.files}" var="f" >
+                                
+                                <lightning:layoutItem class="slds-truncate" size="4"><span style="padding-left:5px;vertical-align:middle;">{!f.Title}</span></lightning:layoutItem>  
+                                <lightning:layoutItem size="2"><span style="vertical-align:middle;"><lightning:formattedDateTime value="{!f.CreatedDate}" month="short" day="2-digit"/></span></lightning:layoutItem>  
+                                <lightning:layoutItem size="2"><span style="vertical-align:middle;">{!f.CreatedBy.Name}</span></lightning:layoutItem>  
+                                <lightning:layoutItem size="2"><span style="vertical-align:middle;"><a href="{!'/sfc/servlet.shepherd/document/download/'+f.Id}" target="_blank" class="wrapText">Download</a></span></lightning:layoutItem>  
+                                <lightning:layoutItem size="2"><span style="vertical-align:middle;">
+                                    
+                                        
+                                        <lightning:input aura:id='chkSelected' type='checkbox' 
+                                            value='{!f.Id}' />
+                                    </span>
+                                                       
+                                </lightning:layoutItem>  
+                             
+                              </aura:iteration>
+                            
+                          </lightning:layout>
+                        </aura:if>    
+                                        
+                    </div>
+                    
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="brand" 
+                                          label="Save And Close"
+                                          title="Save And Close"
+                                          onclick="{! c.saveClose }"/>
+                        <lightning:button variant="neutral" 
+                                          label="Close"
+                                          title="Close"
+                                          onclick="{! c.closeModel }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    
+</aura:component>

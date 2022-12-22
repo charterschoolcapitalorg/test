@@ -1,0 +1,543 @@
+<apex:page controller="FundingEstimate_InternalSummary" standardStyleSheets="false" showHeader="false" sidebar="false">
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>{!$Label.FE_IS_Title}</title>
+
+    <!-- Bootstrap core CSS -->
+
+    <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/bootstrap.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/main.css')}"/>
+
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/main.css" rel="stylesheet" />
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+    <div class="container tab" id="internalSummary">
+        <div class="row">
+            <div class="col-xs-12 page-header">
+                <div class="col-xs-12 col-md-6 left-header">
+                    <h1>{!$Label.FE_IS_Header}</h1>
+                </div>
+                <div class="col-xs-12 col-md-6 right-header">
+                    <p class="highlight">{!opp.Account.Name}
+                    </p>
+                    <p>{!$Label.FE_IS_Header_Target_Funding_Date}
+                        <span class="pull-right highlight">
+                            <Apex:outputText value="{0,date,MM/dd/yyyy}">
+                                                <apex:param value="{!opp.Funded_Date__c}" />
+                                                </Apex:outputText></span>
+                    </p>
+                    <p>{!$Label.FE_IS_Header_Target_Amount_Requested}
+                        <span class="pull-right highlight"><apex:outputText value="{0, number, $###,###}">
+                                       <apex:param value="{!opp.NET_Amount_Requested__c}"/>
+                                     </apex:outputText></span>
+                    </p>
+                </div>
+            </div>
+            <div class="col-xs-12 sub-header">
+                <span class="heading"> {!$Label.FE_IS_For} {!opp.Name}</span>
+            </div>
+            <apex:repeat value="{!listOppSchoolWrapper}" var="oppWrapper">
+            <div class="col-xs-12">
+                <h3>{!oppWrapper.oppSchoolName}
+                    <apex:outputText styleClass="h4 text-danger" rendered="{!oppWrapper.charterTermination = null}" value=" (No charter terms listed)"/>
+                    <apex:outputText styleClass="h4 text-danger CharterTerms" value=" (Charter term expires - {0,date,MM'/'dd'/'yyyy})">
+                        <apex:param value="{!oppWrapper.charterTermination}"/>
+                    </apex:outputText>
+                </h3>
+                <h4>
+                    <apex:outputText style="background-color:pink;" rendered="{!oppWrapper.purchaseDateAlert = True}" value=" Please review the highlighted receivables. The purchase date is either on the weekend or a holiday."/>
+                </h4>
+            </div>
+            <div class="col-xs-12 table-responsive table-detail">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{!$Label.FE_IS_Receivable_Name}</th>
+                            <th>{!$Label.FE_IS_Purchase_Date}</th>
+                            <th>{!$Label.FE_IS_Gross_Receivable_Amount}</th>
+                            <th>{!$Label.FE_IS_Initial_Purchase_Factor}</th>
+                            <th>{!$Label.FE_IS_Discount_Percent}</th>
+                            <th>{!$Label.FE_IS_Initial_Purchase_Amount}</th>
+                            <th>{!$Label.FE_IS_Discount}</th>
+                            <th>{!$Label.FE_IS_Upfront_Purchase_Price}</th>
+                            <th>{!$Label.FE_IS_Max_Deferred_Purchase_Price}</th>
+                            <th>{!$Label.FE_IS_Expected_Payout_Date}</th>
+                            <th>{!$Label.FE_IS_Days_Outstanding}</th>
+                            <th>{!$Label.FE_IS_Maturity_Buffer}</th>
+                            <th>{!$Label.FE_IS_Maturity_Date}</th>
+                            <th>{!$Label.FE_IS_Effective_Rate}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <apex:repeat value="{!oppWrapper.listFERForOppSchool}" var="fer" >
+                            <tr>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}">{!fer.Name}{!if(fer.Donated_Discount_Receivable__c, ' *', '')}</td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}"><apex:outputText value="{0,date,MM/dd/yyyy}">
+                                    <apex:param value="{!fer.Purchase_Date__c}"/>
+                                </apex:outputText>
+                            </td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fer.GRV_Amount__c}"/>
+                                </apex:outputText>
+                            </td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}"><apex:outputText value="{0,number,###.##}">
+                                    <apex:param value="{!fer.Initial_Purchase_Factor__c}"/>
+                                </apex:outputText>%</td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}"><apex:outputText value="{0,number,###.00}">
+                                    <apex:param value="{!fer.Discount_Rate_formula__c}"/>
+                                </apex:outputText>%</td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fer.FV_Amount__c}"/>
+                                </apex:outputText>
+                            </td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fer.Discount_Amount__c}"/>
+                                </apex:outputText>
+                            </td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fer.Upfront_Purchase_Price__c}"/>
+                                </apex:outputText>
+                            </td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fer.Max_Deferred_Purchase_Price__c}"/>
+                                </apex:outputText>
+                            </td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}"><apex:outputText value="{0,date,MM/dd/yyyy}">
+                                    <apex:param value="{!fer.Expected_Pay_Date__c}"/>
+                                </apex:outputText>
+                            </td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}">{!fer.Days_Outstanding__c} Days</td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}">{!fer.Maturity_Buffer__c} Days</td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}"><apex:outputText value="{0,date,MM/dd/yyyy}">
+                                    <apex:param value="{!fer.Maturity_Date__c}"/>
+                                </apex:outputText>
+                            </td>
+                            <td style="{!if(fer.Is_not_a_Business_Day__c=True,'background-color:pink;', '')}">
+                                <apex:outputText value="{0,number,###.##}">
+                                     <apex:param value="{!fer.Effective_Rate__c}"/>
+                                </apex:outputText>%
+                            </td>
+                            </tr>
+                        </apex:repeat>
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!oppWrapper.totalGRV}"/>
+                                </apex:outputText>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!oppWrapper.totalIPFV}"/>
+                                </apex:outputText>
+                            </td>
+                            <td><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!oppWrapper.totalDiscount}"/>
+                                </apex:outputText>
+                            </td>
+                            <td><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!oppWrapper.totalUPP}"/>
+                                </apex:outputText>
+                            </td>
+                            <td><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!oppWrapper.totalMaxDefPPrice}"/>
+                                </apex:outputText>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            </apex:repeat>
+
+            <div class="col-xs-12">
+                <div class="buffer-top"></div>
+                <div class="buffer-top"></div>
+                <div class="widget-header header-highlight small-padding">
+                    {!$Label.FE_IS_Bill_of_Sale_Information_Summary}
+                </div>
+                <div class="col-xs-12 widget buffer">
+                    <div class="col-xs-8 col-xs-offset-3 col-sm-5 col-sm-offset-0 col-md-4 summary">
+                        <span class="summary rounded">{!$Label.FE_IS_Total_Gross_Receivable_Value} <span id="sum-total">
+                                <apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fundingEst.Total_GRV_Amount__c}"/>
+                                </apex:outputText>
+                            </span>
+                        </span>
+                        <span class="summary rounded">{!$Label.FE_IS_Total_Initial_Purchase_Amount} <span id="sum-total">
+                                <apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fundingEst.Total_FV_Amount__c}"/>
+                                </apex:outputText>
+                            </span>
+                        </span>
+                        <span class="summary rounded">{!$Label.FE_IS_Total_Discount} <span id="sum-total">
+                                <apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fundingEst.Total_Discount_Amount__c}"/>
+                                </apex:outputText>
+                            </span>
+                        </span>
+
+                        <span class="summary rounded">{!$Label.FE_IS_Total_UPP} <span id="sum-total">
+                                <apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fundingEst.Total_Upfront_Purchase_Price__c}"/>
+                                </apex:outputText>
+                            </span>
+                        </span>
+
+                        <span class="summary rounded">{!$Label.FE_IS_Total_Max_Deferred_Purchase_Price} <span id="sum-total">
+                                <apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!totalMaxDefPPrice}"/>
+                                </apex:outputText>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="col-xs-12 col-sm-7 col-md-8">
+                        <table class="table">
+                            <!-- <tr>
+                                <td class="col1">{!$Label.FE_IS_Discount_Rate}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,###.##}">
+                                        <apex:param value="{!fundingEst.Discount__c}"/>
+                                    </apex:outputText>%
+                                </td>
+                            </tr> -->
+                            <tr>
+                                <td class="col1">{!$Label.FE_IS_Total_Upfront_Purchase_Price}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###}">
+                                        <apex:param value="{!fundingEst.Total_Upfront_Purchase_Price__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                            <tr style="display: {!IF(fundingEst.Program_Fees_Collected__c==0 || fundingEst.Program_Fees_Collected__c==null,'none','table-row')}">
+                                <td class="col1">{!$Label.FE_IS_Program_Fee_Collected}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###.00}">
+                                        <apex:param value="{!fundingEst.Program_Fees_Collected__c}"/>
+                                    </apex:outputText>
+                                </td>
+
+                            </tr>
+                            <tr style="display: {!IF(fundingEst.Transaction_Fee_Collected__c==0 || fundingEst.Transaction_Fee_Collected__c==null,'none','table-row')}">
+                                <td class="col1">{!$Label.FE_IS_Transaction_Fee_Collected}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###}">
+                                        <apex:param value="{!fundingEst.Transaction_Fee_Collected__c}"/>
+                                    </apex:outputText>
+                                </td>
+
+                            </tr>
+                            <tr style="display: {!IF(fundingEst.Unpaid_Balance_Receivables_Collected__c==0 || fundingEst.Unpaid_Balance_Receivables_Collected__c==null,'none','table-row')}">
+                                <td class="col1">{!$Label.FE_IS_Unpaid_Balance_Receivables_Collected}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###.00}">
+                                        <apex:param value="{!fundingEst.Unpaid_Balance_Receivables_Collected__c}"/>
+                                    </apex:outputText>
+                                    <div class="description">{!fundingEst.Description_of_Unpaid_Balance_Receivable__c}</div>
+                                </td>
+                            </tr>
+                            <tr style="display: {!IF(fundingEst.Application_Fee_Credit__c==0 || fundingEst.Application_Fee_Credit__c==null,'none','table-row')}">
+                                <td class="col1">{!$Label.FE_IS_App_Fee_Credit}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###.00}">
+                                        <apex:param value="{!fundingEst.Application_Fee_Credit__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                            <tr style="display: {!IF(fundingEst.Penalty_Interest__c==0 || fundingEst.Penalty_Interest__c==null,'none','table-row')}">
+                                <td class="col1">{!$Label.FE_IS_Penalty_Interest}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###.00}">
+                                        <apex:param value="{!fundingEst.Penalty_Interest__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                            <tr style="display: {!IF(fundingEst.Blocked_Account_Fee_Collected__c==0 || fundingEst.Blocked_Account_Fee_Collected__c==null,'none','table-row')}">
+                                <td class="col1">{!$Label.FE_IS_Blocked_Account_Fee_Collected}</td>
+                                <td class="col2"><apex:outputText value="{0,number,$###,###.00}">
+                                        <apex:param value="{!fundingEst.Blocked_Account_Fee_Collected__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                            <tr style="display: {!IF(fundingEst.Bond_or_Other_Payment__c==0 || fundingEst.Bond_or_Other_Payment__c==null,'none','table-row')}">
+                                <td class="col1">{!$Label.FE_IS_Bond_or_Other_Payment}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###.00}">
+                                        <apex:param value="{!fundingEst.Bond_or_Other_Payment__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                            <tr style="display: {!IF(fundingEst.Refund_Reimbursements__c==0 || fundingEst.Refund_Reimbursements__c==null,'none','table-row')}">
+                                <td class="col1">{!$Label.FE_IS_Refund_Reinbursements}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###.00}">
+                                        <apex:param value="{!fundingEst.Refund_Reimbursements__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col1">{!$Label.FE_IS_Net_to_School}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###.00}">
+                                        <apex:param value="{!fundingEst.Net_to_School__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                            <tr style="display: {!IF(!fundingEst.Discount_Donated_Opp__c,'none','table-row')}">
+                                <td class="col1">*{!$Label.FE_IS_Discount_Donation}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###.00}">
+                                        <apex:param value="{!fundingEst.Total_Donated_Discount_Value__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                            <tr style="display: {!IF(!fundingEst.Discount_Donated_Opp__c,'none','table-row')}">
+                                <td class="col1">*{!$Label.FE_IS_Net_After_Donation}</td>
+                                <td class="col2">
+                                    <apex:outputText value="{0,number,$###,###.00}">
+                                        <apex:param value="{!fundingEst.Net_after_Donation__c}"/>
+                                    </apex:outputText>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 right-padding">
+                <div class="buffer-top visible-xs"></div>
+                <div class="widget-header header-highlight small-padding">
+                    {!$Label.FE_IS_RPA_Summary}
+                </div>
+                <div class="widget buffer">
+                    <table class="table">
+                        <tr>
+                            <td class="col1"><strong>{!$Label.FE_IS_RPA_Face_Value}</strong></td>
+                            <td class="col2"></td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_Termination_Date}</td>
+                            <td class="col2">
+                                <apex:outputText value="{0,Date,MM/dd/yyyy}">
+                                    <apex:param value="{!opp.RPA__r.RPA_End_Date_Estimate__c}"/>
+                                </apex:outputText>
+                            </td>                          
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_Amount}</td>
+                            <td class="col2">
+                                <apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!opp.RPA__r.RPA_Face_Value_Estimate__c}"/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_Outstanding}</td>
+                            <td class="col2">
+                                <apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!opp.RPA__r.RPA_FV_Remaining_Estimate__c}"/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_This_Transaction}</td>
+                            <td class="col2">
+                                <apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fundingEst.Total_FV_Amount__c}"/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_Projected_Balance}</td>
+                            <td class="col2">
+                                <apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!RPAProjectedBalance}"/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_Percent_Funded}</td>
+                            <td class="col2">{!RPAPercentFunded}%</td>
+                        </tr>
+                        <tr>
+                            <td class="col1">&nbsp;</td>
+                            <td class="col2"></td>
+                        </tr>
+                        <tr>
+                            <td class="col1"><strong>{!$Label.FE_IS_RPA_Fees}</strong></td>
+                            <td class="col2"></td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_Program_Fee}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###.00}">
+                                    <apex:param value="{!opp.RPA__r.Program_Fee_Estimate__c}"/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_Porgram_Fee_Percent}</td>
+                            <td class="col2">{!opp.RPA__r.Program_Fee_Percent_Estimate__c}%</td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_Collected}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###.00}">
+                                    <apex:param value="{!RPAFeeCollected}"/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_Remaining}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###.00}">
+                                    <apex:param value="{!RPAFeeRemaining}"/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_RPA_Transaction_Fee_Percent}</td>
+                            <td class="col2">{!FundingEst.Transaction_Fee__c}%</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 left-padding">
+                <div class="buffer-top visible-xs"></div>
+                <div class="widget-header header-highlight small-padding">
+                    {!$Label.FE_IS_Board_Reso_Summary}
+                </div>
+                <div class="widget buffer">
+                    <table class="table">
+                        <tr>
+                            <td class="col1"><strong>{!$Label.FE_IS_GRV_Resolution}</strong></td>
+                            <td class="col2"></td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_GRV_Reso_Amount}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!opp.Account.Resolution_GRV__c}"/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_GRV_Reso_Outstanding}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!opp.Account.Resolution_GRV_Balance__c}"/>
+                                </apex:outputText></td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_GRV_Reso_This_Transaction}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fundingEst.Total_GRV_Amount__c}"/>
+                                </apex:outputText></td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_GRV_Reso_Projected_Balance}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!GRVResoProjectedBalance}"/>
+                                </apex:outputText></td>
+                        </tr>
+                        <tr>
+                            <td class="col1">&nbsp;</td>
+                            <td class="col2"></td>
+                        </tr>
+                        <tr>
+                            <td class="col1"><strong>{!$Label.FE_IS_FV_Resolution}</strong></td>
+                            <td class="col2"></td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_FV_Reso_Amount}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!opp.Account.Resolution_FV__c}"/>
+                                </apex:outputText></td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_FV_Reso_Outstanding}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!opp.Account.Resolution_FV_Balance__c}"/>
+                                </apex:outputText></td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_FV_Reso_This_Transaction}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!fundingEst.Total_FV_Amount__c}"/>
+                                </apex:outputText></td>
+                        </tr>
+                        <tr>
+                            <td class="col1">{!$Label.FE_IS_FV_Reso_Projected_Balance}</td>
+                            <td class="col2"><apex:outputText value="{0,number,$###,###}">
+                                    <apex:param value="{!FVResoProjectedBalance}"/>
+                                </apex:outputText></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row top-margin">
+            <div class="pull-right">
+                <button class="step1-save-btn btn btn-primary pull-right right-margin" onClick="window.location.href='/apex/FundingEstimateCalculator?id={!fundingEst.Id}';">{!$Label.FE_IS_Button_Funding_Est}</button>
+                <button class="step1-save-btn btn btn-primary pull-right right-margin" onClick="window.location.href='/{!opp.Id}';">{!$Label.FE_IS_Button_Opportunity}</button>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+    <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery-1.10.2.min.js" />
+    <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery.formatCurrency-1.4.0.min.js" />
+    <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/bootstrap.min.js" />
+    <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery-ui-1.10.4.custom.min.js" />
+
+    <script>
+        //2017.02.09 J Caughie - Added for Charter Termination info
+        var previousOnload = window.onload;
+        window.onload = function() { 
+            if (previousOnload) { 
+                previousOnload();
+            }
+            [].forEach.call(document.querySelectorAll('.CharterTerms'), function (el) {
+              let charterTerminationString = el.innerHTML.match(/\d+\/\d+\/\d+/);
+              //console.log(charterTerminationString);
+              if(charterTerminationString != null){
+                var charterTerminationDate = Date.parse(charterTerminationString[0]);
+              }
+              //let charterTerminationDate = Date.parse(charterTerminationString[0]);
+              //console.log(charterTerminationDate);
+              let sixMonthsOut = new Date();
+              sixMonthsOut.setMonth(sixMonthsOut.getMonth() + 6);
+              if(charterTerminationDate == null || charterTerminationDate > sixMonthsOut){            //only show if the Terms expire before 6 months from now
+                el.style.visibility = 'hidden';
+              }
+            }); 
+        }
+        //2017.02.09 J Caughie - Added for Charter Termination info
+    </script>
+  </body>
+</html>
+</apex:page>

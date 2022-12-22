@@ -1,0 +1,223 @@
+<apex:page standardController="Opportunity" extensions="FacilitiesReviewExt" standardStylesheets="false" showHeader="false" sidebar="false" >
+
+
+    <title>{!$Label.FE_IS_Title}</title>
+
+    <!-- Bootstrap core CSS -->
+
+    <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/bootstrap.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/main.css')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.JQuery, '/js/jquery-1.9.1.min.js')}"  />
+    <apex:includeScript value="{!URLFOR($Resource.JQueryTablesort, '/ts/jquery.tablesorter.min.js')}"  />
+
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" media='screen,print'/>
+    <link href="css/main.css" rel="stylesheet" media='screen,print'/>
+
+    <script >
+        $(document).ready(function()
+        {
+                $("[id$='accsTable']").tablesorter({sortList: [[0,0]]});
+                $("[id$='finTable']").tablesorter({sortList: [[0,0]]});
+        });
+    </script>
+    <script type="text/javascript" language="javascript">
+        if(jQuery) {
+            jQuery.noConflict();
+        }
+    </script>
+
+<body>
+        <div class= "container">
+
+            <div class="well col-xs-12 col-md-12 page-header ">
+                <h1>{!Opportunity.Name} - {!Opportunity.Account.Name}</h1>
+            </div>
+            
+            <div class="col-xs-12 sub-header">
+                <span class="heading">Facilities Opportunity Summary</span>
+            </div>
+            
+            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+            <div><p class="text-right"><sup><em>Charter School Capital Confidential.</em></sup></p></div> 
+            
+            <div class="col-md-6" id ="section">
+                <apex:outputText >Opportunity sourced by: {!Opportunity.Owner.Name}</apex:outputText><br/>
+                <apex:outputText value=" {0,date,MM/dd/YYYY}">Date sourced: <apex:param value="{!Opportunity.Date_Submitted__c}"/></apex:outputText><br/>
+                <apex:outputText >Deal Specialist: {!Opportunity.Deal_Specialist__r.Name}</apex:outputText>
+            </div>
+            <div class="col-md-6" id ="section">
+                <apex:outputText value="{0,date,MM/dd/YYYY}">Close Date: <apex:param value="{!Opportunity.CloseDate}"/></apex:outputText><br/>
+                <apex:outputText >Notes: {!Opportunity.Close_Date_Notes__c}</apex:outputText>
+            </div>
+            <div class="clearfix"></div>
+            <br/>
+            <strong>School Information</strong>
+            <br/>            
+            <div class="col-md-6" id ="section">
+                <apex:repeat value="{!PrimaryContact}" var="con" rendered="{!PrimaryContact != null}">
+                    <apex:panelGrid columns="1">
+                        <apex:outputText > Name: {!con.Salutation} {!con.Name}</apex:outputText>
+                        <apex:outputText > Email: {!con.email}</apex:outputText>
+                        <apex:outputText > Phone: {!con.Phone}</apex:outputText> 
+                        <apex:outputText rendered="{!(NOT(ISBLANK(con.MobilePhone)))}" > Mobile: {!con.MobilePhone}</apex:outputText>
+                    </apex:panelGrid>
+                </apex:repeat>
+                <apex:outputText rendered="{!PrimaryContact = null}" styleClass="bg-danger" value="No Primary Contact is listed in the Contact Roles related list!"/>    
+            </div>
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText value="{!Opportunity.Account.Name}"/ >
+                    <apex:outputText value="{!Opportunity.Account.BillingStreet}"/>
+                    <apex:outputText value="{!Opportunity.Account.BillingCity}"/>
+                    <apex:outputText value="{!Opportunity.Account.BillingState}"/>
+                    <apex:outputText >Grades: {!Opportunity.Grades__c}</apex:outputText>
+                </apex:panelGrid>
+                        
+            </div>
+
+            <div class="clearfix"></div>
+            <hr/>
+
+            <strong>Management Organization Details </strong>
+            <br/>
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText > Management Corp: {!IF(ISBLANK(Opportunity.Management_Organization__c), "-",Opportunity.Management_Organization__c)} </apex:outputText>
+                    <apex:outputText > Contact: {!IF(ISBLANK(Opportunity.Management_Org_Contact__c), "-",Opportunity.Management_Org_Contact__c)} </apex:outputText>
+                </apex:panelGrid>
+                        
+            </div>
+
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText > Phone: {!IF(ISBLANK(Opportunity.Management_Org_Contact_Phone__c), "-",Opportunity.Management_Org_Contact_Phone__c)} </apex:outputText> 
+                    <apex:outputText > Email: {!IF(ISBLANK(Opportunity.Management_Org_Contact_Email__c), "-",Opportunity.Management_Org_Contact_Email__c)}</apex:outputText>
+                </apex:panelGrid>
+            </div>
+            <div class="clearfix"></div>
+            <hr/>
+            
+            <strong>New Site Details </strong>
+            <br/>
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputField label="Name" value="{!Opportunity.Address__c}"> </apex:outputField>
+                    <apex:outputText > Sales Price: <apex:outputText value="{0, number, $###,###}"><apex:param value="{!Opportunity.Purchase_Price__c}"/></apex:outputText></apex:outputText>
+                </apex:panelGrid>
+            </div>
+
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText > Current Occupier: {!IF(Opportunity.Occupied_by_school__c, "Yes", "No")}</apex:outputText>
+                    <!--apex:outputText > Current Owner: {!Opportunity.Building_Current_Owner__c}</apex:outputText-->
+                    <apex:outputText > Current Owner: {!IF((ISBLANK(Opportunity.Building_Current_Owner__c)),Opportunity.Seller__r.Name ,Opportunity.Building_Current_Owner__c)}</apex:outputText>
+                </apex:panelGrid>
+            </div>
+            <div class="clearfix"></div>
+            <br/>
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText rendered="{!NOT(ISBLANK(Opportunity.Current_Lease__c))}"> Current Monthly Rent: <apex:outputText value="{0, number, $###,###}"><apex:param value="{!Opportunity.Current_Lease__c}"/></apex:outputText></apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISBLANK(Opportunity.Existing_Site_Square_Footage__c))}"> Existing Sq. Footage: <apex:outputText value="{0, number, ###,###}"><apex:param value="{!Opportunity.Existing_Site_Square_Footage__c}"/></apex:outputText></apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISBLANK(Opportunity.Additional_Sq_Footage__c))}"> Additional Sq. Footage: <apex:outputText value="{0, number, ###,###}"><apex:param value="{!Opportunity.Additional_Sq_Footage__c}"/></apex:outputText></apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISBLANK(Opportunity.Purchase_Price__c))}"> Purchase Price: <apex:outputText value="{0, number, $###,###}"><apex:param value="{!Opportunity.Purchase_Price__c}"/></apex:outputText></apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISBLANK(Opportunity.Tenant_Improvements__c))}"> Cost of Improvement: <apex:outputText value="{0, number, $###,###}"><apex:param value="{!Opportunity.Tenant_Improvements__c}"/></apex:outputText></apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISBLANK(Opportunity.Total_Price__c))}"> Total Price: <apex:outputText value="{0, number, $###,###}"><apex:param value="{!Opportunity.Total_Price__c}"/></apex:outputText></apex:outputText>              
+                </apex:panelGrid>
+            </div>
+            
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText rendered="{!NOT(ISBLANK(Opportunity.Lease_Escalator__c))}"> Lease Escalator: <apex:outputText value="{0, number, 0.00%}"><apex:param value="{!Opportunity.Lease_Escalator__c/100}"/></apex:outputText></apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISBLANK(Opportunity.Lease_Cap_Rate__c))}"> Lease Cap Rate: <apex:outputText value="{0, number, #.00%}"><apex:param value="{!Opportunity.Lease_Cap_Rate__c/100}"/></apex:outputText></apex:outputText>
+                    <apex:outputText rendered="{!NOT(ISBLANK(Opportunity.Expected_Improvements__c))}"> Expected Improvements: {!Opportunity.Expected_Improvements__c} </apex:outputText>
+                </apex:panelGrid>
+            </div>
+            <div class="clearfix"></div>
+            <hr/>
+
+            <strong>Attendance/School Information </strong>
+            <br/>
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText > Authorizer: {!Opportunity.Authorizer__c}</apex:outputText>
+                    <apex:outputText > Year Opened: {!Opportunity.Year_Opened__c}</apex:outputText>
+                </apex:panelGrid>
+            </div>
+
+            <div class="col-md-6" id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputText value="{0,date, MM/dd/YYYY}">Charter Renewal Date: <apex:param value="{!Opportunity.Charter_Renewal_Date__c}"/></apex:outputText>
+                    <apex:outputText > School Type: {!Opportunity.School_Type__c}</apex:outputText>
+                </apex:panelGrid>
+            </div>
+
+
+            <br/><br/><br/>
+            <!--Section for Attendance Summary-->
+            <div id ="section" class="col-xs-8">
+            <i>Attendance/Enrollment Overview </i><br/>
+                        <apex:dataTable rendered="{!Opportunity.Analyses__r <> null}" width="80%" value="{!Opportunity.Analyses__r}" var="a" id="accsTable" styleClass="tablesorter table-hover" headerClass="text-center" rowClasses="text-center" align="center" rules="all">
+                            <!--apex:column styleClass="tablesorter" headerValue="Name" > <apex:outputLink value="/{!a.Id}" target="_blank" >{!a.Name}</apex:outputLink></apex:column-->
+                            <apex:column styleClass="tablesorter " headerValue="Fiscal Year" value="{!a.Fiscal_Year__c}"/>
+                            <apex:column styleClass="tablesorter" headerValue="Enrollment" value="{!a.Total_Enrollment_Attendance__c}"/>
+                            <apex:column styleClass="tablesorter" headerValue="Waiting List" value="{!a.Waiting_List__c}"/>
+                        </apex:dataTable>
+                        <apex:outputText rendered="{!Opportunity.Analyses__r == null}" styleClass="bg-danger" value="No attendance records listed!"/> 
+            </div>           
+  
+            <div class="clearfix"></div>
+            <hr/>
+
+            <strong>Other Information (Overview) </strong>
+
+            <p>
+                <div class="col-md-12" id ="section">
+                        <apex:outputField title="Overview" value="{!Opportunity.Overview__c}"></apex:outputField>
+    
+                            
+                </div>
+            </p>
+            
+            <div class="clearfix"></div>
+            
+            <br/>
+            <strong>Internal Review</strong>
+            <br/><br/>
+            <!--Section for Attendance Summary-->
+            <div class="col-xs-8" id ="section">
+                <i>Financial Review</i>
+                <apex:dataTable width="80%" value="{!Opportunity.Analyses__r}" var="a" id="finTable" styleClass="tablesorter table-hover" headerClass="text-center" rowClasses="text-center" align="center" rules="all">
+                    <apex:column styleClass="tablesorter " headerValue="Fiscal Year" value="{!a.Fiscal_Year__c}"/>
+                    <apex:column styleClass="tablesorter " headerValue="Rent to Revenue" value="{!a.Rent_to_Revenue__c}"/>
+                    <apex:column styleClass="tablesorter" headerValue="Coverage Ratio" value="{!a.Coverage_Ratio__c}"/>
+                    <apex:column styleClass="tablesorter" headerValue="Annual Lease Payment" value="{!a.Annual_Lease_Payment__c}"/>
+                </apex:dataTable>            
+            </div>
+            <div class="clearfix"></div> 
+            <br/>
+            <div class="col-md-12" id ="section">
+                    <apex:outputText > Academic Performance: {!Opportunity.Academic_Performance__c}</apex:outputText><br/>
+                    <apex:outputText > Corporate Standing &amp; UCC Search: {!Opportunity.Corporate_Standing_UCC__c}</apex:outputText><br/>
+                    <apex:outputText > Google Search: {!Opportunity.Google_Search__c}</apex:outputText><br/>                       
+            </div>            
+            
+            <hr/>
+
+        <!--Closing div-->
+        </div>
+        
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery-1.10.2.min.js" />
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery.formatCurrency-1.4.0.min.js" />
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/bootstrap.min.js" />
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery-ui-1.10.4.custom.min.js" />
+
+  </body>
+
+</apex:page>

@@ -1,0 +1,3 @@
+<design:component label="Lease Amendment">
+   <design:attribute name="recordId" label="Lease Record Id" required="true" description="The Id of the lease being amended."/>
+</design:component>

@@ -1,0 +1,41 @@
+.THIS.blue_title_section {
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 90%;
+    height: 40px;
+    
+}
+
+.THIS .vertical-align-text {
+    position: relative;
+    top: 50%;
+    transform: perspective(1px) translateY(-50%);
+    display: flex;
+    /*justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+}
+
+.THIS.banner{
+    font-size: 16px;
+    color: #8493a8;
+}
+
+.THIS .hr {
+    border: 0;
+    clear:both;             
+    background-color:#a1dee9;
+    height: 1px;
+    margin-top: 0px;
+    margin-bottom:0px;
+}
+
+.THIS .home_button_style {
+    background-color:#a2b427;
+    color:white;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 0px 24px
+}

@@ -1,0 +1,13 @@
+<apex:page standardController="FC_Form__c" extensions="FC_Submit_Pre_Approval_Ctrl" action="{!create}">
+	<apex:pageMessages />
+	
+	<apex:form >
+	  	<apex:pageBlock >
+		     
+			    <apex:commandButton value="Submit For Pre FC Approval" action="{!create}" rendered="{!cancreate}"/>
+			    <apex:commandButton value="Exit" action="{!back}" />
+     
+		</apex:pageBlock>
+	</apex:form>
+	     
+</apex:page>

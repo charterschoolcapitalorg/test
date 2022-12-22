@@ -1,0 +1,90 @@
+<aura:component>
+    <aura:attribute name="opportunity" type="object" />
+    <aura:attribute name="indexNumber" type="String" />
+
+    <tbody>
+        <tr class="slds-hint-parent">
+
+            <!-- 1 -->
+            <td data-label="Num" class="slds-text-align_left" style="width:20px">
+                <lightning:formattedNumber value="{!v.indexNumber + 1}"/>
+            </td>
+
+            <!-- 2 -->
+            <td data-label="Close Date" class="slds-text-align_left" style="width:65px">
+                <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.opp.CloseDate}" format="MMM-DD"/>
+            </td>
+
+            <!-- 3 -->
+            <td data-label="Created" class="slds-text-align_left" style="width:70px">
+                <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.createdDate}" format="MMM-DD"/>
+            </td>
+
+            <!-- 4 -->
+            <td data-label="BD Until Close" class="slds-text-align_right" style="width:50px; text-align:center">
+                <lightning:formattedNumber value="{!v.opportunity.businessDaysToClose}" maximumFractionDigits="0" class="slds-truncate"/>
+            </td>
+
+            <!-- 5 -->
+            <td data-label="Opp Name" class="slds-text-align_left slds-truncate" style="max-width:180px;">
+                <lightning:formattedUrl target="_blank" value="{!'/' + v.opportunity.opp.Id}" label="{!v.opportunity.opp.Name}"/>
+            </td>
+
+            <!-- 6 -->
+            <td data-label="EM Channel" class="slds-text-align_left" style="width:90px; text-align:center">
+                <lightning:formattedText value="{!v.opportunity.opp.Referral_Source__c}"/>
+            </td>
+
+            <!-- 6 -->
+            <td data-label="Pipeline" class="slds-text-align_left" style="width:90px; text-align:center">
+                <lightning:formattedText value="{!v.opportunity.opp.Pipeline_Stage__c}"/>
+            </td>
+
+            <!-- 7 -->
+            <td data-label="State" class="slds-text-align_left" style="width:50px; text-align:center">
+                <lightning:formattedText value="{!v.opportunity.opp.STATE__c}"/>
+            </td>
+
+            <!-- 8 -->
+            <td data-label="Opp Value" class="slds-text-align_right" style="width:90px; text-align:center">
+                <lightning:formattedNumber value="{!v.opportunity.opp.Estimate_EM_Project_Value__c}" maximumFractionDigits="0" class="slds-truncate"/>
+            </td>
+
+            <!-- 9 -->
+            <td data-label="Fee Structure" class="slds-text-align_left" style="width:70px">
+                <lightning:formattedNumber value="{!v.opportunity.opp.Fee_Structure_Type__c}"/>
+            </td>
+
+            <!-- 10 -->
+            <!-- preQualInfo -->
+            <td class="slds-text-align_left" style="background-color:#ededed; text-align:center;">
+                <c:EnrollmentMarketingMilestoneCell item="{!v.opportunity.preQualInfo}" helpText=""/>
+            </td>
+
+            <!-- 11 -->
+            <!-- pitchDeck-->
+            <td class="slds-text-align_left" style="text-align:center">
+                <c:EnrollmentMarketingMilestoneCell item="{!v.opportunity.pitchDeck}" helpText="Pre FC"/>
+            </td>
+
+            <!-- 12 -->
+            <!-- approveContracting -->
+            <td class="slds-text-align_left" style="background-color:#ededed; text-align:center">
+                <c:EnrollmentMarketingMilestoneCell item="{!v.opportunity.approveContracting}" helpText="LOI Sent"/>
+            </td>
+
+            <!-- 13 -->
+            <!-- signedContract -->
+            <td class="slds-text-align_left" style="text-align:center">
+                <c:EnrollmentMarketingMilestoneCell item="{!v.opportunity.signedContract}" helpText="LOI Signed"/>
+            </td>
+
+            <!-- 14 -->
+            <td data-label="Opportunity Owner" class="slds-text-align_left" style="width:80px">
+                <lightning:formattedText value="{!v.opportunity.opp.Owner.LastName}"/>
+            </td>
+
+        </tr>
+    </tbody>
+
+</aura:component>

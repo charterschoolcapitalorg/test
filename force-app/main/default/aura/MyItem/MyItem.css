@@ -1,0 +1,51 @@
+.THIS .header-column {
+    width:120px;
+}
+.THIS .header-column-due {
+    width:90px;
+}
+.THIS .header-column-action {
+    width:140px;
+}
+.THIS .header-column-one {
+    width:330px;
+}
+.THIS .header-column-two {
+    width:330px;
+}
+.THIS .header-column-preview {
+    width:160px;
+}
+.THIS .header-column-assigned {
+    width:100px;
+    padding-left:15px;
+}
+.THIS .header-column-comments {
+    width:345px;
+    padding-left:15px;
+    padding-right:15px;
+}
+.THIS .header-column-instruction {
+    width:30px;
+    background-color:#ff0000;
+}
+.THIS .myItem {
+    margin-left:20px;
+}
+.THIS .mySubrowHeader {
+    background-color:#a1dee9;
+    color:#FFFFFF;
+    margin-top:10px;
+}
+.THIS .myWhiteBackground {
+    color:#FFFFFF;
+}
+
+.THIS .slds-text-title_caps{
+    color:white;
+    font-size:13px;
+}
+
+.THIS .opener{
+    color:white !important;
+}

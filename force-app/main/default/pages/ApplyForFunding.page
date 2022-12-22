@@ -1,0 +1,88 @@
+<apex:page controller="ApplyForFundingController" action="{!init}" docType="html-5.0" showHeader="false" sidebar="false" standardStylesheets="false" title="Apply For Funding" cache="false" id="applyForFundingPage">
+	<apex:composition template="PortalTemplate">
+		<apex:define name="body">
+			<apex:includeScript value="{!URLFOR($Resource.CSC, 'js/jquery-1.9.1.min.js')}" />
+			<apex:includeScript value="{!URLFOR($Resource.CSC, 'js/applyForFunding.js')}" />
+			<apex:stylesheet value="{!URLFOR($Resource.CSC, 'css/applyForFunding.css')}" />
+			
+			<apex:form id="applyForFundingForm">
+				<apex:pageMessages id="messages" />
+				<apex:actionFunction name="saveApplicant" action="{!saveApplicant}" status="spinner" rerender="messages,formContainer" />
+				<apex:actionStatus id="spinner">
+					<apex:facet name="start">
+						<div class="spinnerContainer">
+							<div class="spinner"></div>
+						</div>
+					</apex:facet>
+				</apex:actionStatus>
+				
+				<apex:outputPanel id="formContainer" layout="block" rendered="{!OR(ISBLANK(applicant.Lead__c), applicant.Application_Status__c == 1)}">
+					<div class="sectionHeader">
+						<h2>Section 1: Individual Responsible for Application</h2>
+					</div>
+					<table class="cscForm">
+						<tbody>
+							<c:ApplyForFundingFormRow id="applicantName" applicant="{!applicant}" firstField="First_Name__c" firstRequired="true" secondField="Last_Name__c" secondRequired="true" />
+							<c:ApplyForFundingFormRow id="applicantTitle" applicant="{!applicant}" firstField="Title__c" firstRequired="true" />
+							<c:ApplyForFundingFormRow id="applicantEmail" applicant="{!applicant}" firstField="Email__c" firstRequired="true" />
+							<c:ApplyForFundingFormRow id="applicantPhone" applicant="{!applicant}" firstField="Phone__c" firstRequired="true" />
+							<c:ApplyForFundingFormRow id="applicantCompany" applicant="{!applicant}" firstField="Company__c" firstRequired="true" firstLabel="Name of School, Organization or Company?" />
+							<c:ApplyForFundingFormRow id="applicantRole" applicant="{!applicant}" firstField="Role__c" firstRequired="true" firstLabel="What best describes your role?" note="You must select an item from the drop down menu for your account to be accepted." />
+						</tbody>
+					</table>
+					
+					<apex:outputPanel layout="block" rendered="{!ISBLANK(applicant.Lead__c)}">
+						<div class="sectionHeader"></div>
+						<div class="buttonContainer">
+							<apex:commandButton value="Next" styleClass="nextButton btn" />
+						</div>
+					</apex:outputPanel>
+					
+					<apex:outputPanel rendered="{!NOT(ISBLANK(applicant.Lead__c))}">
+						<div class="sectionHeader">
+							<h2>Section 2: Direct Contact at School</h2>
+						</div>
+						<table class="cscForm">
+							<tbody>
+								<c:ApplyForFundingFormRow id="orgName" org="{!org}" firstField="DC_First_Name__c" firstRequired="true" firstLabel="First Name" secondField="DC_Last_Name__c" secondRequired="true" secondLabel="Last Name" />
+								<c:ApplyForFundingFormRow id="orgEmail" org="{!org}" firstField="Email__c" firstRequired="true" />
+								<c:ApplyForFundingFormRow id="orgPhone" org="{!org}" firstField="Phone__c" firstRequired="true" />
+							</tbody>
+						</table>
+							
+						<div class="sectionHeader">
+							<h2>Section 3: School / Site Information</h2>
+						</div>
+						<table class="cscForm">
+							<tbody>
+								<c:ApplyForFundingFormRow id="schoolName" org="{!org}" firstField="School_Name__c" firstRequired="true" />
+								<c:ApplyForFundingFormRow id="schoolAddress" org="{!org}" firstField="Street__c" firstRequired="true" firstLabel="School Address" />
+								<c:ApplyForFundingFormRow id="schoolCity" org="{!org}" firstField="City__c" firstRequired="true" />
+								<c:ApplyForFundingFormRow id="schoolState" org="{!org}" firstField="State__c" firstRequired="true" />
+								<c:ApplyForFundingFormRow id="schoolZipCode" org="{!org}" firstField="Zip_Code__c" firstRequired="true" />
+								<c:ApplyForFundingFormRow id="schoolMain" org="{!org}" firstField="Main_Phone__c" />
+								<c:ApplyForFundingFormRow id="schoolEnrollment" org="{!org}" firstField="Current_Enrollment__c" firstRequired="true" note="NOTE: If you have multiple sites that operate under a single charter, and you are applying for funding for more than one site, you may provide combined enrollment data." />
+							</tbody>
+						</table>
+						
+						<div class="sectionHeader">
+							<h2>Section 9: Submission</h2>
+							<div class="description">I acknowledge by submitting this application, that the information provided is, to the best of my knowledge, truthful and accurate.</div>
+						</div>
+						<div class="buttonContainer">
+							<apex:commandButton value="Submit" action="{!save}" styleClass="btn" />
+						</div>
+					</apex:outputPanel>
+				</apex:outputPanel>
+				
+				<apex:outputPanel rendered="{!applicant.Application_Status__c == 2}">
+					Some super swell copy about the application being in progress goes here!
+				</apex:outputPanel>
+				
+				<apex:outputPanel rendered="{!applicant.Application_Status__c == 3}">
+					How about that, here's another point where we could use some super swell copy, but this time it's for the completed application.
+				</apex:outputPanel>
+			</apex:form>
+		</apex:define>
+	</apex:composition>
+</apex:page>

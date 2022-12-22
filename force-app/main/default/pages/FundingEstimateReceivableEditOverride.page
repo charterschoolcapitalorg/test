@@ -1,0 +1,7 @@
+<apex:page standardController="Funding_Estimate_Receivable__c" >
+<script>
+window.onload = function(){
+	window.location.href= '/apex/FundingEstimateCalculator?id={!funding_Estimate_Receivable__c.Funding_Estimate__c}';
+}
+</script>
+</apex:page>

@@ -1,0 +1,32 @@
+<apex:page lightningStylesheets="true" standardController="Account" extensions="Send_Community_Invite_Controller" >
+<apex:form >
+    <apex:pageMessages />
+    
+    <apex:pageBlock id="invites" >  
+       <apex:pageBlockTable value="{!consWrapper}" var="c" id="con" >
+            
+            <apex:column headerValue="Select">
+                <apex:inputCheckbox value="{!c.selected}"/>
+            </apex:column>
+            
+            <apex:column headerValue="Name">
+                <apex:outputText value="{!c.conName}"/>
+            </apex:column>
+            
+            <apex:column headerValue="Email">
+                <apex:outputText value="{!c.con.EMail}"/>
+            </apex:column>
+            
+            <apex:column headerValue="Role">
+                <apex:selectList value="{!c.role}" size="1" >
+                  <apex:selectOptions value="{!roleOptions}"/>
+          	    </apex:selectList>
+            </apex:column>
+            
+       </apex:pageBlockTable>
+            
+    </apex:pageBlock>
+    <apex:commandButton value="Create" action="{!save}" />
+    <apex:commandButton value="Done" action="{!back}" />     
+ </apex:form>    
+</apex:page>

@@ -1,0 +1,56 @@
+<aura:component >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+	<aura:registerEvent name="removeRecordEvent" type="c:RemoveRecord" />
+	<aura:attribute name="person" type="Working_Group_List__c"/>
+	<aura:attribute name="positions" type="String[]"/>
+	<aura:attribute name="isVacant" type="boolean" default="false"/>
+	<aura:attribute name="row" type="Integer"/>
+	<aura:attribute name="hideTerms" type="boolean" default="false"/>
+
+    <!--tr-->
+    	<td>
+	    	<lightning:select value="{!v.person.Position__c}" name="pos" label="Position" required="true" >
+	            <option value=""></option>
+	            <aura:iteration items="{!v.positions}" var="ps">
+	                <option value="{!ps}">{!ps}</option>
+	                <!-- selected="{!st==v.pqForm.Mailing_State_Province__c}" -->
+	            </aura:iteration>
+	    	</lightning:select>
+	    </td>
+
+    	<td>
+	    	<lightning:input label="Vacant" variant="label-hidden" type="checkbox" class="slds-size_1-of-1" value="{!v.person.Vacant_Position__c}" checked="{!v.person.Vacant_Position__c}" title="(Check if position is vacant)" onchange="{!c.handleClick}"/>
+	    </td>
+
+    	<td>
+		    <lightning:input aura:id="firstName" label="First Name" variant="label-hidden" type="text" class="slds-size_1-of-1" placeholder="First Name" value="{!v.person.First_Name__c}" readonly="{!v.isVacant}"/>
+		</td>
+
+	    <td>
+		    <lightning:input aura:id="lastName" label="Last Name" variant="label-hidden" type="text" class="slds-size_1-of-1" placeholder="Last Name" value="{!v.person.Name}" required="true" readonly="{!v.isVacant}"/>
+		</td>
+
+		<td>
+			<lightning:input aura:id="address" label="Address" variant="label-hidden" type="text" class="slds-size_1-of-1" placeholder="Address" value="{!v.person.Address__c}" readonly="{!v.isVacant}"/>
+		</td>
+
+		<td>
+			<lightning:input aura:id="phone" label="Phone" variant="label-hidden" type="tel" class="slds-size_1-of-1" placeholder="Phone" value="{!v.person.Phone__c}" pattern="[0-9]{10}|[0-9]{3}-[0-9]{3}-[0-9]{4}" messageWhenPatternMismatch="Enter a valid Phone number" readonly="{!v.isVacant}"/>
+		</td>
+
+		<td>
+			<lightning:input aura:id="email" label="Email" variant="label-hidden" type="email" class="slds-size_1-of-1" placeholder="Email" value="{!v.person.Email__c}" messageWhenTypeMismatch="Enter a valid Email" readonly="{!v.isVacant}"/>
+		</td>
+
+		<aura:if isTrue="{!!v.hideTerms}">
+			<td>
+				<lightning:input aura:id="term" label="Term Of Office" variant="label-hidden" type="text" class="slds-size_1-of-1" placeholder="Beginning &amp; ending date" value="{!v.person.Term_of_Office_Board_Member__c}" required="true" readonly="{!v.isVacant}"/>
+			</td>
+		</aura:if>
+
+	    <td>
+	    	<button class="slds-button slds-button_destructive" id="{!v.person.Position__c}" onclick="{!c.deleteMember}">X</button>
+	    </td>
+	<!--/tr-->
+
+</aura:component>

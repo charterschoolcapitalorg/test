@@ -1,0 +1,100 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,flexipage:availableForRecordHome,force:hasRecordId" 
+                controller="CreateFacilitiesObjectsCtrl">
+	
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="Opp" type="Opportunity" />
+    <aura:attribute name="Property" type="Account" />
+    <aura:attribute name="searchText" type="String" default=""/>
+    <aura:attribute name="FoundProps" type="Account[]" />
+    <aura:attribute name="numFoundProps" type="Integer" default="0" />
+    <aura:attribute name="createAccount" type="Boolean" default="false" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <lightning:navigation aura:id="navService"/>
+    
+    <aura:handler event="force:showToast" action="{!c.doInit}"/>
+    
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
+    <aura:attribute name="maxRowSelection" type="Integer" default="5"/>
+    
+    <aura:handler name="onSaveSuccess" event="force:recordSaveSuccess" action="{!c.doInit}"/>
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+
+    <aura:if isTrue="{!!v.createAccount}">
+        <aura:if isTrue="{!v.Opp.Property__c == null}">
+            <div onkeyup="{!c.search}">
+            <b>No Property Found For this Opp.  Please review your process checklist before proceeding … You can:</b>
+            <br/>
+            <br/>
+            <a onclick="{!c.createProperty}"  target="_blank" class="wrapText">Create New Property</a>
+            <br/>
+            <br/>
+            ... Or 
+            <br/>
+            <br/>
+            <ui:inputText value="{!v.searchText}" class="slds-lookup__search-input slds-input" placeholder="Search Text" />
+            <lightning:button variant="neutral" class="slds-button--neutral slds-button--small" label="Search"  onclick="{!c.search}"/> 
+                <!-- lightning:buttonIcon iconName="utility:search" variant="bare" onclick="{! c.search }" alternativeText="Search" class="slds-input__icon" /> -->
+                
+            <br/>
+            </div>
+            
+            <aura:if isTrue="{!v.numFoundProps>0}">
+                
+            
+                <lightning:layout multipleRows="false" class="mySubrowHeader header-column">
+                
+                    <lightning:layoutItem size="3" class="mySubrowHeader header-column">Name</lightning:layoutItem>
+                    <lightning:layoutItem size="3" class="mySubrowHeader header-column">Address</lightning:layoutItem>
+                    <lightning:layoutItem size="3" class="mySubrowHeader header-column">Property Type</lightning:layoutItem>
+                    <lightning:layoutItem size="3" class="mySubrowHeader header-column"></lightning:layoutItem>
+                </lightning:layout>
+                
+                <aura:iteration items="{!v.FoundProps}" var="p" indexVar="indx">
+                    <c:FoundProperty Property="{!p}" OppId="{!v.Opp.Id}"/>
+                    
+                    <!-- lightning:layout class="header-data" multipleRows="true" >
+                                    <lightning:layoutItem class="header-data"  size="4" >
+                                        <a style="color:#a8ad00;" onclick="{!c.viewProperty}" styleClass="btn">{!p.Name}</a>
+                                        
+                                    </lightning:layoutItem>
+                                    <lightning:layoutItem class="header-data"  size="4" >{!p.BillingStreet} {!p.BillingCity} {!p.BillingState} </lightning:layoutItem>
+                                    <lightning:layoutItem class="header-data"  size="4" >{!p.Property_Type__c}</lightning:layoutItem>
+                    </lightning:layout> -->
+                </aura:iteration>
+            </aura:if>
+            
+            
+        </aura:if>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.createAccount}">
+        
+        <lightning:recordEditForm objectApiName="Account"
+                                    onsubmit="{!c.insertProperty}"
+                                    onsuccess="{!c.handleSuccess}"
+                                    onerror="{!c.handleError}"
+                                    aura:id="propertyRecord">
+            
+            <b>Create Property</b>
+            <!-- <lightning:spinner aura:id="insertSpinner" variant="brand" size="medium" class="slds-hide"/> -->
+            <lightning:spinner variant="brand" size="medium" class="{!((v.showSpinner)? '': 'slds-hide')}"/>
+            <br/><br/>
+            <lightning:inputField fieldName="Name" required="true"/>
+            <lightning:inputField fieldName="Nick_Name__c" required="true" />
+            <lightning:inputField fieldName="Equity_Investor__c" />
+            <lightning:inputField fieldName="BillingStreet" required="true" />
+            <lightning:inputField fieldName="BillingCity" required="true" />
+            <lightning:inputField fieldName="BillingState" required="true" />
+            <lightning:inputField fieldName="BillingPostalCode" required="true" />
+            <lightning:inputField fieldName="Purchase_Price__c" required="true" value="{!v.Opp.Total_Price__c}"/>
+            <lightning:inputField fieldName="Acquisition_Date__c" required="true" value="{!v.Opp.CloseDate}"/>
+            <lightning:messages />
+            <lightning:button aura:id="submitButton" class="slds-m-top_small" type="submit" label="Create new" />
+            <br/><br/>
+        </lightning:recordEditForm>
+    </aura:if> 
+
+    <!-- <lightning:workspaceAPI aura:id="workspace"/> -->
+
+</aura:component>

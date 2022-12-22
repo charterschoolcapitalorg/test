@@ -1,0 +1,5 @@
+<design:component label="CSC Header">
+	<design:attribute name="header" label="Header" />
+    <design:attribute name="subheading" label="SubHeader" />
+    <design:attribute name="banner" label="Banner" />
+</design:component>

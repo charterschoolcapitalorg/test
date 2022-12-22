@@ -1,0 +1,45 @@
+<aura:component>
+    <aura:attribute name="recordType" type="ItemsByOppRecType" />
+    <aura:attribute name="showList" type="Boolean" default="false"/>
+    <aura:attribute name="showItemList" type="Boolean" default="false"/>
+    <aura:handler name="docUploadedToTop" event="c:FireDocUploadedToTop" action="{!c.handleDocUploaded}"/>
+    
+    <div class="slds-p-around--x-small">
+        <div class="slds-page-header slds-text-title_caps" style="background-color:#77c5d5;">
+            <section class="slds-clearfix">
+                <div class="slds-float--left" style="margin-top:-7px;">
+                  <lightning:button variant="base" class="opener" aura:id="opener"  iconName="utility:add" iconPosition="left" onclick="{!c.toggleSection}" /> 
+                </div>
+               
+                  
+                <div class="myWhiteBackground tableHeader slds-m-left--small">{!v.recordType.recordtypename}</div>
+                		<aura:if isTrue="{!v.showList == true}">
+                              <table class="slds-table slds-table--bordered slds-table--cell-buffer slds-table--striped slds-max-medium-table--stacked-horizontal"
+                                   role="grid">
+                                <tbody>
+                                    <aura:iteration items="{!v.recordType.itemList}" var="i" indexVar="indx">
+                                        <tr class="slds-hint-parent">
+                                            
+                                            
+                                            <td role="gridcell" class="slds-cell-wrap" style="max-width:250px;width:200px;">
+                                                {!i.name}
+                                            </td>
+                                            
+                                            <td role="gridcell" class="slds-cell-wrap" style="text-align:left;">
+                                                <lightning:button variant="neutral" name="{!i.name}" label="Upload Documents" onclick="{!c.handleClick}"/>
+                                            </td> 
+                                            <td role="gridcell" class="slds-cell-wrap">
+                                                <b>{!i.numPending} of {!i.numItems} Documents Pending </b>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>
+                            </table> 
+
+                      </aura:if>
+                
+            </section>
+        </div>
+    </div>
+	<lightning:overlayLibrary aura:id="overlayLib"/>
+</aura:component>

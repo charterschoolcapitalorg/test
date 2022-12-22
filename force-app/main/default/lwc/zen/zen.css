@@ -1,0 +1,19 @@
+.image {
+    text-align: center;
+    display: block;
+    margin: 0 auto 0 auto;
+    max-width:90%;
+    height:auto;
+}
+
+.zenText {
+    font-size: 20px;
+    text-align: center;
+    max-width:90%;
+    word-wrap: break-word;
+  }
+
+h4 {
+    display: table;
+    margin: 0 auto;
+}

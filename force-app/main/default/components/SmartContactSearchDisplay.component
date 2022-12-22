@@ -1,0 +1,127 @@
+<apex:component >
+ <apex:attribute name="c" type="SmartContactSearchExtension" description="instance of class" />    
+ <apex:attribute name="OtherPageCalling" assignTo="{!OtherPageCalling}" type="String" description="instance of class" />
+<script>
+    function sortContactDataJS(sortField) {
+            var txtContactFirstName ='{!c.contactFirstNameToSearch}'; //document.getElementById("pg:frm:txtContactFName").value;
+            var txtContactLastName ='{!c.contactLastNameToSearch}'; // document.getElementById("pg:frm:txtContactLName").value;
+            var txtContactEmailToSearch = '{!c.contactEmail}'; //document.getElementById("pg:frm:txtContactEmail").value;
+            
+            var isValid = 'No';
+               
+            if(fncTrim(txtContactFirstName).length >= searchCharacterLimit){
+               isValid = 'Yes';
+            }
+           
+            if(fncTrim(txtContactLastName).length >= searchCharacterLimit){
+               isValid = 'Yes';
+            }
+            if(fncTrim(txtContactEmailToSearch).length >= searchCharacterLimit){
+               isValid = 'Yes';
+            }
+            if(isValid == 'Yes') {
+                sortcontactData(sortField);
+            }
+    }
+
+    
+    function createNewcontact(){   
+     if({!c.isDuplicateCreatePermission}==true){             
+            var txtContactFirstName     = encodeURIComponent('{!c.contactFirstNameToSearch}');
+            var txtContactLastName      = encodeURIComponent('{!c.contactLastNameToSearch}');
+            var txtContactEmailToSearch = encodeURIComponent('{!c.contactEmail}');         
+            var txtContactAccountToSearch = encodeURIComponent('{!c.contactAccount}');            
+            //jazzyrocksr: Make the url dynamic using describe call and Page global variables    
+            window.location.href = "../{!c.contactPrefix}/e?retURL={!$Page.SmartContactSearch}&nooverride=1{!IF($CurrentPage.parameters.accid != '','&accid=' + $CurrentPage.parameters.accid, '')}"
+                                 + "&name_firstcon2=" + txtContactFirstName
+                                 + "&name_lastcon2="  + txtContactLastName
+                                 + "&con15="          + txtContactEmailToSearch
+                                 + "&con4="          + txtContactAccountToSearch;
+            return false; 
+            }
+        else{
+            alert('You do not have rights to create duplicate Leads,Please contact system administrator');
+            return false;
+        }       
+    } 
+     
+</script>
+
+
+<apex:actionFunction action="{!c.sortData}" name="sortcontactData" reRender="resultBlock,pnlDisplayMsg" status="status" >
+    <apex:param name="sortField" assignTo="{!c.sortField}" value="" />
+</apex:actionFunction>
+
+<apex:actionFunction name="nextcontactPage" action="{!c.nextcontactPage}" reRender="resultBlock,pnlDisplayMsg" status="status" />
+<apex:actionFunction name="previouscontactPage" action="{!c.previouscontactPage}" reRender="resultBlock,pnlDisplayMsg" status="status" />
+
+
+<apex:outputPanel id="pnlDisplayMsg">
+    <apex:pageMessages />
+</apex:outputPanel>
+
+<apex:pageBlock id="resultBlock" title="Contacts {!IF((c.searchCount==0), '', ' [' + TEXT(c.searchCount) + ']')}">    
+    <apex:pageBlockButtons rendered="{!c.showAllContactButton}" >  
+              <apex:commandButton value="{!$Label.New_Contact}" onclick="return createNewcontact();" disabled="{!IF(c.showContactButton = true, false, true)}"/>
+            <apex:commandButton action="{!c.cancel}" value="{!$Label.Cancel}"   onclick="return goToBack();"/>        
+          <apex:actionStatus id="status">
+                <apex:facet name="start">
+                  <span style="color:red;">{!$Label.Loading}</span> <img src="/img/loading.gif" />
+                </apex:facet>
+            </apex:actionStatus>            
+    </apex:pageBlockButtons>
+    <apex:pageBlockTable value="{!c.contacts}" var="contObj">
+            <apex:repeat value="{!$ObjectType.Contact.FieldSets.contact_search_result}" var="item" >
+                <apex:column headerValue="{!$ObjectType.Contact.Fields[item].label}" >
+                    <apex:variable value="{!$ObjectType.Contact.Fields[item].Name}" var="fieldAPIName2"/>
+                    <apex:outputLink value="/{!contObj.Id}" target="_blank" rendered="{!IF(fieldAPIName2='Name',true,false)}">{!contObj.Name}</apex:outputLink>                    
+                    <apex:outputlabel value="{!contObj[item]}" rendered="{!IF(fieldAPIName2 <>'Name',true,false)}"/>
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                        <apex:variable value="{!$ObjectType.Contact.Fields[item].Name}" var="fieldAPIName"/>
+                            <apex:outputLink value="javascript:void(0);" onclick="sortContactDataJS('{!$ObjectType.Contact.Fields[item].Name}');">{!$ObjectType.Contact.Fields[item].label}
+                                <img src="{!IF(c.sortField = fieldAPIName,IF(c.isAsc = true,'/img/sort_asc_arrow.gif','/img/sort_desc_arrow.gif'),'/s.gif')}" />
+                            </apex:outputLink>                                                              
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:column>               
+            </apex:repeat>
+                <apex:column headerValue="Account Name">                     
+                    <apex:outputlink value="/{!contObj.Account.Id}" target="_blank">{!contObj.Account.Name}</apex:outputlink>                  
+            </apex:column>
+            <apex:column headerValue="{!$ObjectType.Contact.Fields.OwnerId.Label}">
+                    <apex:outputlabel value="{!contObj.Owner.Name}"/>
+                    <apex:facet name="header">
+                        <apex:outputPanel >
+                            <apex:outputLink value="javascript:void(0);" onclick="sortContactDataJS('Owner.Name');">{!$ObjectType.Account.Fields.OwnerId.Label}
+                                <img src="{!IF(c.sortField = 'Owner.Name',IF(c.isAsc = true,'/img/sort_asc_arrow.gif','/img/sort_desc_arrow.gif'),'/s.gif')}" />    
+                            </apex:outputLink>                                                              
+                        </apex:outputPanel>
+                    </apex:facet>
+            </apex:column>
+    </apex:pageBlockTable>
+    <apex:outputPanel id="errorBlock" rendered="{!(c.searchCount==0)}"><span style="color:red;">{!c.searchStatus}</span></apex:outputPanel>
+     <apex:outputPanel rendered="{!NOT(c.searchCount==0)}">
+                 <hr/>
+                 <table width="100%" >
+                  <tr>
+                   <td align="left" width="33%">
+                        <div id="pagelinkblock" >
+                           <div id="curstate"> {!c.showingFrom}-{!c.showingTo} of {!c.totalResults} </div>
+                        </div>
+                   </td>
+                   <td align="center" width="33%" style="vertical-align:middle;">
+                       <apex:outputLink value="javascript:void(0);"  rendered="{!c.hasPrevious}" onclick="previouscontactPage();">&lt;&lt;{!$Label.Previous}</apex:outputLink>
+                       <span id="div_mid1" >&nbsp;<apex:outputLabel rendered="{!c.hasPrevious && c.hasNext}" value="|"  /> &nbsp;</span>
+                        <apex:outputLink value="javascript:void(0);" rendered="{!c.hasNext}" onclick="nextcontactPage();">Next&gt;&gt;</apex:outputLink>
+                   </td>   
+                   <td align="right" width="33%" style="vertical-align:middle;">
+                        <div id="pagenumber"> {!$Label.Page} &nbsp;<apex:inputText value="{!c.requestedPage}" style="width:40px"/> of {!c.totalPage} <apex:commandButton value="Go" action="{!c.requestedcontactPage}" reRender="resultBlock,pnlDisplayMsg" status="status" /></div>
+                   </td>
+                 </tr>
+                </table> 
+    </apex:outputPanel>
+  </apex:pageBlock>
+  
+
+</apex:component>

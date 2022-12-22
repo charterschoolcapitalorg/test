@@ -1,0 +1,12 @@
+<apex:page >
+  <apex:includeLightning />
+    <div  id="compContainer" />
+  <script>
+     $Lightning.use("c:EnrollmentMarketingMilestoneApp", function() {
+         $Lightning.createComponent("c:EMMilestoneReport",
+             {},
+             "compContainer"
+         );
+     });
+  </script>
+</apex:page>

@@ -1,0 +1,43 @@
+<aura:component description="IntakeBulkUpload" controller="IntakeCommunityItemsCtrl" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    
+    <aura:attribute name="rectypelist" type="ItemsByOppRecType" />
+    <aura:registerEvent name="showOpportunities" type="c:DisplayModalOppList" />
+    
+    <div class="slds-tabs_default">
+        <ul class="slds-tabs_default__nav" role="tablist">
+            <li class="slds-tabs_default__item slds-is-active" title="Open Transactions" role="presentation">
+              <a class="slds-tabs_default__link" onclick="{!c.LoadOpenTxns}" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Open Transactions</a>
+            </li>
+            <li class="slds-tabs_default__item" title="Closed Transactions" role="presentation">
+              <a class="slds-tabs_default__link" onclick="{!c.LoadClosedTxns}" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Closed Transactions</a>
+            </li>
+            <li class="slds-tabs_default__item" title="Buli Upload" role="presentation">
+              <a class="slds-tabs_default__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item">Bulk Upload Documents</a>
+            </li>
+          </ul>
+         
+        <!--
+        <button class="tablinks" onclick="{!c.LoadOpenTxns}">Open Transactions</button>
+        <button class="tablinks" onclick="{!c.LoadClosedTxns}">Closed Transactions</button>
+  		<button class="tablinks" >Bulk Upload Documents</button>
+		-->
+    </div>
+    <!--
+	<div id="Bulk Upload Documents" class="tabcontent">
+        <aura:iteration items="{!v.rectypelist}" var="o">	
+                 <c:RectypeMenu recordType="{!o}"/> 
+     </aura:iteration>
+	</div>
+    -->
+    <div id="tab-default-3" class="slds-tabs_default__content slds-hide" role="tabpanel" aria-labelledby="tab-default-3__item">
+        HERE IS CONTENT
+        <aura:iteration items="{!v.rectypelist}" var="o">	
+                 <c:RectypeMenu recordType="{!o}"/> 
+     </aura:iteration>
+        
+    </div>
+     
+    
+</aura:component>

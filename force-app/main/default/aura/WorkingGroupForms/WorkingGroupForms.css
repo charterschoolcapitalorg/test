@@ -1,0 +1,56 @@
+/**
+ * Created by Ivan Garcia on 4/12/2018.
+ */
+.THIS .slds-form-element__label {
+      display : none;
+      visibility : hidden;
+}
+
+.THIS .slds-accordion__summary-heading {
+	background-color: #00558C;
+	height:50px;
+	color: white;
+}
+
+.THIS .slds-accordion__summary-heading:hover {
+	background-color: #00558C;
+	height:50px;
+	color: white;
+}
+
+.THIS .sectionHeader {
+	background-color: #00558C;
+	height:50px;
+	color: white;
+}
+
+.THIS .banner{
+    font-size: 16px;
+    color: #8493a8;
+}
+
+.THIS .hr {
+    border: 0;
+    clear:both;             
+    background-color:#77c5d5;
+    height: 1px;
+    margin-top: 0px;
+    margin-bottom:0px;
+}
+
+.THIS .tableHeader {
+	background-color:#77c5d5;
+	color: white;
+}
+
+.THIS button:hover{
+	color:white;
+}
+
+.THIS .slds-icon-text-default{
+	fill: white;
+}
+
+.THIS .customModal{
+	--sds-c-modal-color-border: forestgreen;
+}

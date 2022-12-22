@@ -1,0 +1,5 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes" access="global" >
+    <div class="slds-align_absolute-center slds-m-top--large">
+        <lightning:button variant="brand" class="home_button" label="Return to Home" onclick="{!c.handleReturn}"/>
+    </div>
+</aura:component>

@@ -1,0 +1,25 @@
+<aura:component controller="FC_MasterComponent_Ctrl" implements="force:hasRecordId,force:lightningQuickActionWithoutHeader">
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="title" type="String" default="Refresh Data"/>
+    <aura:attribute name="body" type="String"/>
+
+    <lightning:card>
+        <aura:set attribute="title">
+            {! v.title }
+        </aura:set>
+        <aura:set attribute="footer">
+            <lightning:button variant="success" label="Refresh" title="Refresh data" onclick="{!c.handleRefresh}"/>
+            <lightning:button variant="destructive" label="Exit" title="Exit process" onclick="{!c.handleExit}"/>
+        </aura:set>
+        <br/><br/>
+        <div class="slds-box slds-theme--warning slds-theme--alert-texture">
+            <lightning:icon iconName="utility:warning" title="Warning" size="x_small"/>
+            <br/>
+            <p>{! v.body}</p>
+            <br/>
+            <p>**** Do not click Refresh if you do not want them refreshed</p>
+            <br/>
+        </div>
+    </lightning:card>
+</aura:component>

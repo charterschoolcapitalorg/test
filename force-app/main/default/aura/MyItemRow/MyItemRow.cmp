@@ -1,0 +1,272 @@
+<aura:component controller="MyItemRowCtlr" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+	<aura:html tag="style">
+           
+           .slds-modal__container{ 
+			 vertical-align: middle;
+        	 top: -2%;
+        	 width: 50%; 
+        	 height: 50%;
+			
+           }
+           .modal-body{ 
+             height : 100vh !important; 
+             max-height: 100vh !important; 
+           } 
+        </aura:html>
+    
+    
+    <aura:attribute name="intakeItem" type="IntakeItemWrapper" />
+    <aura:attribute name="intakeItems" type="IntakeItemWrapper[]" />
+    <aura:attribute name="isChild" type="Boolean" default="false" />
+    <aura:attribute name="showProject" type="Boolean" default="false" />
+    <aura:attribute name="parentId" type="String" />
+    <aura:attribute name="showList" type="Boolean" default="false" />
+    <aura:attribute name="isRendered" type="Boolean" default="false" />
+    <aura:attribute name="fundRectType" type="Id" />
+    <aura:attribute name="five5DFRectType" type="Id" />
+    <aura:attribute name="facRecType" type="Id" />
+    <aura:attribute name="idx" type="Integer" />
+    
+    <aura:attribute name="isOnlyOpp" type="Boolean" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="docUploaded" event="c:FireDocUpload" action="{!c.handleDocUploaded}"/>
+    <aura:registerEvent name="docUploaded" type="c:FireDocUpload"/>  
+    
+    <aura:attribute name="intakeItemCC" type="String"/>
+    <aura:attribute name="numDocsAvail" type="Integer" default="0"/>
+    
+    <div style="font-size:1rem;">
+    <div style="{!v.idx%2 == 0 ? 'background-color:#fafaf9' : 'background-color:#FFFFFF;'}" class="{!v.showProject ? 'show-project' : ''}">
+    
+       
+    <lightning:layout multipleRows="false">  
+        	<!--   -->
+        
+                <lightning:layoutItem size="12" class="{!and(v.intakeItem.hasChildren,v.showList) ? ' isExpandedLeft data-column-one slds-truncate' : 'data-column-one slds-truncate'}" aura:id="myRow" title="{!v.intakeItem.item.Client_Facing_Item_Name__c}">
+                 <aura:if isTrue="{!v.intakeItem.hasChildren}">  
+                    <span style="vertical-align:top;position:relative;top:-8px;">
+                        
+                        <aura:if isTrue="{!(v.parentId != null &amp;&amp; v.intakeItem.item.Id == v.parentId) || v.showList}">
+                            <lightning:button variant="base" aura:id="opener" iconName="utility:dash" iconPosition="left" onclick="{!c.toggleSection}" />
+                            <aura:set attribute="else">
+                            	<lightning:button variant="base" aura:id="opener" iconName="utility:add" iconPosition="left" onclick="{!c.toggleSection}" />
+                            </aura:set>                        
+                        </aura:if>
+                     </span>
+                     <span style="vertical-align:top;">
+                         <!-- FireDetailEvent -->
+                         <a style="color:#a8ad00;" onclick="{!c.openItemDetail}" id="{!v.intakeItem.item.Id}">{!v.intakeItem.item.Client_Facing_Item_Name__c}</a>
+                     </span>
+                     <aura:set attribute="else">
+                             <span style="" class="slds-grid slds-has-flexi-truncate">
+                                 <a style="color:#a8ad00;" class="slds-truncate data-column-one" title="{!v.intakeItem.item.Client_Facing_Item_Name__c}" onclick="{!c.openItemDetail}" id="{!v.intakeItem.item.Id}">{!v.intakeItem.item.Client_Facing_Item_Name__c}</a></span>
+                    </aura:set>     
+                    </aura:if>
+                </lightning:layoutItem>
+
+                <aura:if isTrue="{!v.showProject}">
+                    <lightning:layoutItem size="12" class="{!and(v.intakeItem.hasChildren,v.showList) ? ' isExpandedLeft data-column-project slds-truncate' : 'data-column-project slds-truncate'}" title="{!if(empty(v.intakeItem.item.Opportunity__r.Client_Facing_Opportunity_Name__c), v.intakeItem.item.Account_Name__r.Name, v.intakeItem.item.Opportunity__r.Client_Facing_Opportunity_Name__c)}">
+                        {!if(empty(v.intakeItem.item.Opportunity__r.Client_Facing_Opportunity_Name__c), v.intakeItem.item.Account_Name__r.Name, v.intakeItem.item.Opportunity__r.Client_Facing_Opportunity_Name__c)}
+                    </lightning:layoutItem>
+                </aura:if>
+        
+               	<lightning:layoutItem size="12" class="{!and(v.intakeItem.hasChildren,v.showList) ? ' isExpandedLeft data-column-due' : 'data-column-due'}" aura:id="myRow">
+                   
+                        <aura:if isTrue="{!v.intakeItem.item.Client_Due__c}"> 
+                            <span class="centerText"><ui:outputDate class="rowFlag" value="{!v.intakeItem.item.Due_Date__c}" format="MMM d"/></span>
+                        <aura:set attribute="else">
+                            <span class="centerText"><ui:outputDate value="{!v.intakeItem.item.Due_Date__c}" format="MMM d"/></span>
+                        </aura:set>
+                        </aura:if>
+                   
+                </lightning:layoutItem>  
+                <lightning:layoutItem size="12" class="{!and(v.intakeItem.hasChildren,v.showList) ? ' isExpandedLeft data-column' : 'data-column'}" aura:id="myRow">
+                    
+                    <aura:if isTrue="{!v.intakeItem.item.Client_Due__c || v.intakeItem.item.Status__c=='Additional Input Needed'}"> 
+                    <span class="rowFlag centerText">
+                        <aura:if isTrue="{!v.intakeItem.hasChildren}">
+                            <aura:if isTrue="{!!v.showList}">
+                                
+                                <aura:if isTrue="{!v.intakeItem.allChildrenAccepted}">
+                                		Accepted
+                                    <aura:set attribute="else">
+                                        {!v.intakeItem.numUnsubmittedDocs} Docs Pending
+                                    </aura:set>
+                                </aura:if>
+                            	
+                            </aura:if>
+                        </aura:if>
+                        <aura:if isTrue="{!!v.intakeItem.hasChildren}">
+                            {!v.intakeItem.clientFriendlyStatus}
+                        </aura:if>
+                    </span>
+                        <aura:set attribute="else">
+                        	<span class="centerText">
+                                <aura:if isTrue="{!v.intakeItem.hasChildren}">
+                                    <aura:if isTrue="{!!v.showList}">
+                                    	<aura:if isTrue="{!v.intakeItem.allChildrenAccepted}">
+                                                <div style="vertical-align:middle;">Accepted</div>
+                                            <aura:set attribute="else">
+                                                {!v.intakeItem.numUnsubmittedDocs} Docs Pending
+                                            </aura:set>
+                                        </aura:if>
+                                    </aura:if>
+                                </aura:if>
+                                <aura:if isTrue="{!!v.intakeItem.hasChildren}">
+                                    {!v.intakeItem.clientFriendlyStatus}
+                                </aura:if>
+                            </span>
+                        </aura:set>
+                    </aura:if>     
+                </lightning:layoutItem> 
+        		<!--
+		        <lightning:layoutItem size="12" class="data-column slds-truncate" aura:id="myRow" title="{!v.intakeItem.item.Status_Reason__c}">
+                    <span style="vertical-align:middle;">
+                        <ui:outputRichText class="slds-truncate data-column-one" value="{!v.intakeItem.item.Status_Reason__c}" />
+                    </span>
+                </lightning:layoutItem>
+        		-->
+        
+        		<lightning:layoutItem size="12" class="{!and(v.intakeItem.hasChildren,v.showList) ? ' isExpandedLeft data-column-comments slds-truncate' : 'data-column-comments slds-truncate'}" aura:id="myRow" title="{!v.intakeItem.item.Client_Comments__c}">
+                	
+                        <aura:if isTrue="{!!v.intakeItem.hasChildren}"> 
+                        
+                        <aura:if isTrue="{!and(v.intakeItem.item.Status__c=='Additional Input Needed',
+                                             !v.intakeItem.item.Status_Reason__c!=null)}"> 
+                                <a style="color:#a8ad00;" onclick="{!c.openComments}" styleClass="btn">See Special Instructions</a>
+                        <aura:set attribute="else">
+                            
+                            <aura:if isTrue="{!v.intakeItem.item.Client_Comments__c!=null}"> 
+                            <a style="color:#a8ad00;" onclick="{!c.openComments}" styleClass="btn">
+                                <aura:unescapedHtml value="{!v.intakeItemCC}"/></a>
+                                <aura:set attribute="else">
+                                    <aura:if isTrue="{!v.intakeItem.item.Comment_Required__c}"> 
+                                        <a style="color:#a8ad00;" onclick="{!c.openComments}" styleClass="btn">Add Comment</a>
+                                        &nbsp;&nbsp;
+                                        <a style="color:#a8ad00;" onclick="{!c.nochanges}" styleClass="btn">No Changes</a>
+                                        <aura:set attribute="else">
+                                            <a style="color:#a8ad00;" onclick="{!c.openComments}" styleClass="btn">Optional Comment</a>
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:set>
+                            </aura:if>
+                        </aura:set>
+                      </aura:if>
+                     </aura:if>
+                    
+            </lightning:layoutItem>
+    
+        	<!-- action -->
+        	
+        	<lightning:layoutItem size="12" class="{!and(v.intakeItem.hasChildren,v.showList) ? ' isExpandedLeft data-column-action' : 'data-column-action'}" aura:id="myRow">
+                <span style="vertical-align:middle;">
+                    <!-- Action Buttons -->
+                    <aura:if isTrue="{!!v.intakeItem.isReadOnly}">
+                        <aura:if isTrue="{!v.intakeItem.item.Is_Document__c}">                            
+                                <aura:if isTrue="{!and(v.intakeItem.isActionDetail, v.intakeItem.item.Is_Document__c == true)}">
+                                	<span style="position:relative;top:0px;z-index:100;"><a style="color:#a8ad00;" onclick="{!c.openItemDetail}" >See Instructions</a></span>
+                                <span style="position:relative;top:-20px;z-index:1;">
+                                    <lightning:fileUpload aura:id="fupload" class="slds-modal_small" 
+                                          name="fileUploader" multiple="true" 
+                                          recordId="{!v.intakeItem.item.Id}" 
+										  onuploadfinished="{!c.handleUploadFinished}" />
+                                 </span>      
+                               <aura:set attribute="else">                                
+                             <span style="position:relative;top:-10px;z-index:1;">
+                                <lightning:fileUpload aura:id="fupload" class="uploader"  name="fileUploader" multiple="true" recordId="{!v.intakeItem.item.Id}" onuploadfinished="{!c.handleUploadFinished}" />
+                             </span>   
+                            </aura:set>
+                           </aura:if>  
+                        </aura:if>    
+                        <aura:if isTrue="{!and(v.intakeItem.isActionEditDetail, v.intakeItem.item.Status__c != 'Accepted')}">
+                            <span style="position:relative;top:10px;z-index:1;"><lightning:button label="Approve" variant="neutral" onclick="{!c.approveStatus}" /></span>
+                        </aura:if>
+                        <aura:if isTrue="{!v.intakeItem.isInfoSheet}">
+                            <span style="position:relative;top:10px;z-index:1;"><lightning:button label="Submit Form" variant="neutral" onclick="{!c.fireWorkingGroups}" /></span>
+                        </aura:if>
+                        <aura:if isTrue="{!and(v.intakeItem.isActionDetail, v.intakeItem.item.Is_Document__c == false)}">
+                            <span style="position:relative;top:12px;z-index:1;"> <a style="color:#a8ad00;" onclick="{!c.openItemDetail}">See Instructions</a></span>
+                        </aura:if>    
+                        <aura:if isTrue="{!!v.intakeItem.isReadOnly}">
+                            <aura:if isTrue="{!v.intakeItem.isPQ}">
+                                <aura:if isTrue="{!!v.intakeItem.isPQSubmitted}">
+                                    <aura:if isTrue="{!v.intakeItem.item.RecordTypeId == v.fundRectType}">
+                                        <span><lightning:button class="submit_button" aura:id="fireEvent" label="Submit PQ" variant="neutral" name="complete" onclick="{!c.fireEvent}" /></span>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.intakeItem.item.RecordTypeId == v.five5DFRectType}">
+                                        <span><lightning:button class="submit_button" aura:id="fireEvent" label="Submit PQ" variant="neutral" name="complete" onclick="{!c.fireEvent}" /></span>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.intakeItem.item.RecordTypeId == v.facRecType}">
+                                        <span><lightning:button class="submit_button" aura:id="faceEvent" label="Submit PQ" variant="neutral" name="complete" onclick="{!c.fireFacEvent}" /></span>
+                                    </aura:if>                                
+                                </aura:if>
+                            </aura:if>
+                        </aura:if>
+                    </aura:if>
+                    <!-- End Action Buttons -->
+                </span>
+                </lightning:layoutItem>                     
+        
+        	<!-- review files -->
+        
+        		<lightning:layoutItem size="12" class="{!and(v.intakeItem.hasChildren,v.showList) ? ' isExpandedLeft data-column-preview' : 'data-column-preview'}" aura:id="myRow" title="Preview Files">
+                    <span style="vertical-align:middle;"> 
+                    <aura:if isTrue="{!v.numDocsAvail > 0}">
+                        
+                    <a onclick="{!c.reviewfile}" style="color:#a8ad00;" styleClass="btn">Preview</a>
+                    |
+                    <a onclick="{!c.downloadfile}" style="color:#a8ad00;" styleClass="btn">Download</a>
+                        
+                    </aura:if>
+                    </span>
+                </lightning:layoutItem> 
+                    
+                <aura:if isTrue="{!not(v.showProject)}">
+                    <lightning:layoutItem size="12" class="{!and(v.intakeItem.hasChildren,v.showList) ? ' isExpandedLeft data-column-assigned slds-truncate' : 'data-column-assigned slds-truncate'}" aura:id="myRow" title="{!v.intakeItem.assignedToName}">
+                        <span style="vertical-align:middle;">
+                            <aura:if isTrue="{!!v.intakeItem.hasChildren}">
+                                <aura:if isTrue="{!v.intakeItem.item.Assigned_To__c == 'CSC'}">
+                                    CSC
+                                    <aura:set attribute="else">
+                                        <c:auraIfContains yesText="CSC" noText="Client" items="{!v.intakeItem.item.Assigned_To__c}" element="CSC"> 
+                                            
+                                        </c:auraIfContains>
+                                                                                   
+                                    </aura:set>
+                                </aura:if>
+                                <!-- ui:outputRichText value="{!v.intakeItem.assignedToName}" />   -->
+                                <!--{!v.intakeItem.assignedToName}-->
+                            </aura:if>
+                        </span>
+                    </lightning:layoutItem>  
+                </aura:if>
+        
+                <!--
+                <lightning:layoutItem size="12" class="data-column-instruction centerText" aura:id="myRow">
+                    <span style="vertical-align:middle;" class="slds-align_absolute-center">
+                        <lightning:icon iconName="utility:info_alt" size="small" title="{!v.intakeItem.item.Comments__c}" class="helpIcon slds-current-color"/>
+                    </span>
+                		
+        		</lightning:layoutItem> 
+				-->
+        
+    </lightning:layout>
+      
+    </div>
+    </div>
+    
+    <aura:if isTrue="{!or(v.showList, and(v.parentId != null &amp;&amp; v.intakeItem.item.Id == v.parentId))}"> 
+        <aura:if isTrue="{!v.intakeItem.hasChildren}">             
+            <div style="#DCDCDC;border-width:2px;border-bottom-style:solid;border-color:#A9A9A9;margin-left:10px;">
+            <aura:iteration items="{!v.intakeItem.children}" var="i" indexVar="idx">
+                <c:MyItemRow intakeItem="{!i}" isChild="true" idx="{!idx}" showProject="{!v.showProject}"/>
+            </aura:iteration>
+            </div>    
+        </aura:if>
+        <!-- </div> -->
+    </aura:if>    
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+</aura:component>

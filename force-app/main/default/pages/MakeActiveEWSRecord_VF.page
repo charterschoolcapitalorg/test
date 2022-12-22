@@ -1,0 +1,8 @@
+<apex:page standardController="EWS__c" extensions="EWS_Ext" action="{!updateRecordStatus}">
+	<apex:outputPanel style="display:none" >
+		{!EWS__c.Account__c}
+		{!EWS__c.RecordTypeId}
+		{!EWS__c.Active__c}
+		{!EWS__c.RecordType.DeveloperName}
+	</apex:outputPanel>
+</apex:page>

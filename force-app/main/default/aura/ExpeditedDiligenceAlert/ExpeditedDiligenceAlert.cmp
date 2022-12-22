@@ -1,0 +1,61 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" controller="ExpeditedDiligenceAlertController">
+    <aura:handler name='init' value='{!this}' action='{!c.doInit}'/>
+    <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
+    <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
+    <aura:attribute name='users' type='User[]'/>
+    <aura:attribute name="data" type="User[]"/>
+    <aura:attribute name="columns" type="List"/>
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    <aura:attribute name="confirm" type="boolean" default="false" />
+    <aura:attribute name="noContacts" type="boolean" default="false" />
+    <aura:attribute name="success" type="boolean" default="false" />
+    <aura:attribute name="sending" type="boolean" default="false" />
+    <aura:attribute name="selectedUsers" type="User[]" />
+
+    <!-- spinner -->
+    <aura:if isTrue="{!v.spinner}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand slds-spinner slds-spinner--medium" role="alert">
+                <span class="slds-assistive-text">Sending Alerts</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <!-- end spinner -->
+
+    <h1 class="slds-text-heading_medium slds-m-bottom_small">Send Expedited Diligence Alert</h1>
+
+    <aura:if isTrue="{!v.confirm}">
+        <div>
+            <p class="slds-m-bottom_small">The following contacts will be sent an Expedited Diligence Alert email:</p>
+            <lightning:datatable
+                                 keyField="id"
+                                 data="{!v.data }"
+                                 columns="{!v.columns }"
+                                 hideCheckboxColumn="false"
+                                 onrowselection="{!c.handleSelect}"/>
+        </div>
+        
+        <div id="buttons" class="slds-float_right slds-m-top_large">
+            <lightning:button label="Cancel" title="Cancel" onclick="{! c.handleCancel }"/>
+            <lightning:button variant="success" label="Send Alerts" title="Base action" onclick="{! c.handleSend }"/>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!v.success}">
+        <div>
+            <p class="slds-text-heading_small slds-text-align_left slds-notify slds-notify_alert slds-alert_success" role="alert">Success. Email alerts have been sent for this account.</p>
+        </div>
+        <div class="slds-float_right slds-m-top_large">
+            <lightning:button label="Close" title="Close" onclick="{! c.handleCancel }"/>
+        </div>
+    </aura:if>
+    <div class="slds-hide" aura:id="failure">
+        <div>
+            <p class="slds-text-heading_small slds-text-align_left slds-notify slds-notify_alert slds-alert_error" role="alert">There are no portal enabled contacts associated with this account. No email alerts have been sent.</p>
+        </div>
+        <div class="slds-float_right slds-m-top_large">
+            <lightning:button label="Close" title="Close" onclick="{! c.handleCancel }"/>
+        </div>
+    </div>
+</aura:component>

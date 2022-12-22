@@ -1,0 +1,13 @@
+<apex:page controller="AuthorizeBoxController" action="{!redirectOnCallback}">
+
+    <apex:outputPanel rendered="{!NOT(hasToken)}"><a href='{!authUrl}'>Login</a></apex:outputPanel>
+    
+    <apex:outputPanel rendered="{!hasToken}">Already has token</apex:outputPanel>
+    <apex:outputPanel rendered="{!hasToken}"><a href='{!authUrl}'>Force Refresh</a></apex:outputPanel>
+    
+    <!-- 
+	<apex:form>
+		<apex:commandButton value="Force Refresh" action="{!forceRefresh}" />
+	</apex:form>
+	  -->
+</apex:page>

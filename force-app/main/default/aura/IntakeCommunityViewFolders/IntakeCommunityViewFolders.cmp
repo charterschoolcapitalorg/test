@@ -1,0 +1,62 @@
+<!--
+ - Created by Ivan Garcia on 3/26/2018.
+ -->
+
+<aura:component description="IntakeCommunityViewFolders" controller="IntakeCommunityViewFoldersCtrl" implements="forceCommunity:availableForAllPageTypes,force:appHostable" access="global">
+    <aura:attribute name="res" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="communityContactRoleData" type="Community_Contact_Role__c"/>
+    <aura:attribute name="folderList" type="Box_Read_Only_Shares__c"/>
+    
+    
+        
+    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <thead>
+        <tr class="slds-text-title_caps">
+            <th scope="col" style="background-color:Orange;">
+                <div class="slds-truncate" title="Opportunity Name">Transaction Name</div>
+            </th>
+            
+            <th scope="col" style="background-color:Orange;">
+                <div class="slds-truncate" title="Opportunity Link">Transaction Link</div>
+            </th>
+            <th scope="col" style="background-color:Orange;">
+                <div class="slds-truncate" title="Documents">Documents</div>
+            </th>
+           
+        </tr>
+        </thead>
+        <tbody>
+        <!--Repeat-->
+        <aura:iteration items="{!v.folderList}" var="folder">
+            <tr>
+
+                <td data-label="Opportunity Name">
+                    <div class="slds-truncate">{!folder.Opportunity__r.Name}</div>
+                </td>
+                 
+                <td data-label="Box URL">
+                    <div style="color:#008FD5" class="slds-truncate">
+                        <a style="color:#008FD5" onclick="{!c.FireOppEvent}" id="{!folder.Opportunity__r.Id}" >
+                            
+                            <p style="color:#008FD5">View Transaction</p>
+                        </a>
+						
+
+                    </div>
+                </td>
+                                                    
+                                                
+                <td data-label="Box URL">
+                    <div style="color:#008FD5" class="slds-truncate">
+                        <a style="color:#008FD5" href="{!folder.Box_URL__c}" target="_blank">
+                        <p style="color:#008FD5">View Documents</p></a>
+                    </div>
+                </td>
+            </tr>
+        </aura:iteration>
+        <!--Repeat-->
+        </tbody>
+    </table>
+
+</aura:component>

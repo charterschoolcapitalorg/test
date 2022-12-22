@@ -1,0 +1,240 @@
+<apex:page standardController="Account" extensions="CharterSummaryExt" standardStylesheets="false" showHeader="false" sidebar="false"> <!--Add extension for attendance, schools, WC Transactions -->
+
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <title>{!$Label.FE_IS_Title}</title>
+
+    <!-- Bootstrap core CSS -->
+
+    <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/bootstrap.min.css')}"/>
+    <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/main.css')}"/>
+
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" media='screen,print'/>
+    <link href="css/main.css" rel="stylesheet" media='screen,print'/>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+  </head>
+
+    <body>
+        <div class= "container">
+
+            <div class="well col-xs-12 col-md-12 page-header ">
+                <h1>{!Account.Name}</h1>
+            </div>
+            
+            <div class="col-xs-12 sub-header">
+                <span class="heading">Client Profile</span>
+            </div>
+            
+            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+            <div><p class="text-center"><sup><em>Charter School Capital Confidential.</em></sup></p></div> 
+            
+            <div id ="section">
+                <apex:panelGrid columns="1">
+                    <apex:outputLink value="/{!account.id}" >{!account.Name}<span> </span><apex:outputLink value="/acc/account_hierarchy.jsp?id={!account.id}" ><em>(Hierarchy)</em></apex:outputLink></apex:outputLink>               
+                    <apex:outputText >{!account.BillingStreet}</apex:outputText>
+                    <apex:outputText >{!account.BillingCity}</apex:outputText>
+                    <apex:outputText >{!account.BillingState} {!account.BillingPostalCode}</apex:outputText>
+                </apex:panelGrid>
+            
+                <p><br/>
+                    <em>Last closed/won opportunity: </em><apex:outputText value="{0,date,MM/dd/YYYY}"><apex:param value="{!account.Last_funded_date__c}"/></apex:outputText>
+                </p>
+                <br/>
+            
+                <h4><strong>Snapshot</strong></h4>            
+                <p>{!account.Snapshot__c}</p>
+                <br/>
+                                    
+                <h4><strong>Key Contacts</strong></h4>
+                           
+                <strong>Primary Contact: </strong>
+                <apex:outputText >{!account.Primary_Contact__r.Name} - {!account.Primary_Contact__r.Phone}</apex:outputText>    
+                
+                <br/>
+                
+                <strong>Secondary Contact: </strong>
+                <apex:outputText >{!account.Secondary_Contact__r.Name} - {!account.Secondary_Contact__r.Phone}</apex:outputText> 
+                
+                <hr/>
+                
+                <strong>BOP: </strong>
+                <apex:outputText >{!bop} </apex:outputText><br/>
+                <strong> Contact: </strong>
+                <apex:outputText >{!account.BOP_Contact__r.Name} - {!account.BOP_Contact__r.Phone}</apex:outputText>
+                
+                <hr/>
+               
+                <strong>Motivator: </strong>
+                <apex:outputText >{!account.Motivator__c}</apex:outputText>  
+                <br/>
+                <br/>
+                <apex:outputText >
+                    <strong>Enrollment Data (Consolidated)</strong>    <br/>
+                    <small>Should be used as a guide only as all attendance records may not be in the system. The information here is calculated based on the final attendance record for each school per calendar year. </small>
+                </apex:outputText>
+                <br/>
+                <br/>
+            
+                <div class="col-xs-4">             
+                    <apex:dataTable value="{!SchoolAtt}" var="sa" width="200px" rules="all" styleClass="text-center" headerClass="text-center">
+                        <apex:column >
+                            <apex:facet name="header">Year</apex:facet>
+                            {!sa['yr']} 
+                        </apex:column>
+                    
+                        <apex:column >
+                            <apex:facet name="header">Total</apex:facet>
+                            {!sa['total']} 
+                        </apex:column>
+                    </apex:dataTable>
+                </div>
+    
+                <div class="clearfix"></div>
+    
+                <hr/>
+    
+                <strong>Plans: </strong>
+                <p>{!account.outlook__c}</p>
+                  
+                <hr/>
+            
+                <table class="col-xs-12 table table-hover">
+                  <thead>
+                      <tr>
+                          <th  class= "text-center" colspan = "5" >Contract Terms</th>
+                      </tr>
+                   </thead>
+    
+                  <tbody>
+                  
+                      <tr>
+                          <td>Acknowledgement Resolution</td>
+                          <td class= "text-right"><apex:outputText value="{0, number, $###,###}"><apex:param value="{!account.Resolution_GRV__c}"/></apex:outputText></td>
+                          <td>(Gross Value)</td>
+                          <td class= "text-right"><apex:outputText value="{0, number, $###,###}"><apex:param value="{!account.Resolution_FV__c}"/></apex:outputText> </td>
+                          <td>(Face Value)</td>
+                      </tr>
+    
+                      <tr>
+                          <td>Receivable Purchase Agreement (RPA)</td>
+                          <td class= "text-right"><apex:outputText value="{0, number, $###,###}"><apex:param value="{!account.RPA_GRV__c}"/></apex:outputText></td>
+                          <td>(Gross Value)</td>
+                          <td class= "text-right"><apex:outputText value="{0, number, $###,###}"><apex:param value="{!account.RPA_FV__c}"/></apex:outputText> </td>
+                          <td>(Face Value)</td>
+                      </tr>
+                      
+                      <tr>
+                          <td>RPA Balance Remaining</td>
+                          <td class= "text-right"><apex:outputText value="{0, number, $###,###}"><apex:param value="{!account.RPA_GRV_Balance__c}"/></apex:outputText></td>
+                          <td>(Gross Value)</td>
+                          <td class= "text-right"><apex:outputText value="{0, number, $###,###}"><apex:param value="{!account.RPA_FV_Balance__c}"/></apex:outputText> </td>
+                          <td>(Face Value)</td>
+                      </tr>
+            
+                      <tr>
+                          <td>Program Fee</td>
+                          <td class= "text-right"><apex:outputText value="{0, number, $###,###}"><apex:param value="{!account.Total_Program_Fee__c}"/></apex:outputText></td>
+                          <td>{!account.Program_Fee_Percent__c} %</td>
+                          <td colspan = "2"></td>                      
+                      </tr>
+            
+                      <tr>
+                          <td>Program Fee Balance</td>
+                          <td class= "text-right"><apex:outputText value="{0, number, $###,###}"><apex:param value="{!account.Program_Fee_to_Collect__c}"/></apex:outputText></td>
+                          <td colspan = "3"></td>
+                      </tr>
+            
+                      <tr>
+                          <td>Contract Expiration Date</td>
+                          <td class= "text-right"><apex:outputText value="{0,date,MM/dd/YYYY}"><apex:param value="{!account.Max_RPA_End_Date__c}"/></apex:outputText></td>
+                          <td colspan = "3"></td>
+                      </tr>
+                                                                  
+                  </tbody>
+                  
+                </table>      
+                
+                <br/><br/><br/><br/>
+                                
+                <table class="col-xs-12 table table-detail table-hover" >
+    
+                    <thead>
+                   
+                        <tr>
+                            <th class= "text-center" colspan = "8" >Working Capital Transaction Summary</th>
+                        </tr>                
+                        
+                        <tr>
+                            <th class="text-right">Year</th>
+                            <th class="text-right">Gross Value ($)</th>
+                            <th class="text-right">Face Value ($)</th>
+                            <th class="text-right">Purchase Price ($)</th>
+                            <th class="text-right">Cost to School ($)</th>
+                            <th class="text-right">Amount Received ($)</th>
+                            <th class="text-right">FV Remaining ($)</th>
+                            <th class="text-right">MDPP ($)</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody class="text-right">
+                        <apex:repeat value="{!FundedRecSummary}" var="fr">
+                            <tr>
+                                <td><apex:outputText value="{0,number,####}" ><apex:param value="{!fr['yr']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!fr['grv']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!fr['fv']}" /> </apex:outputText> </td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!fr['pp']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!fr['disc']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!fr['paid']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!fr['open']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!fr['mdpp']}" /> </apex:outputText></td>
+                            </tr>
+                        </apex:repeat>
+                
+                    </tbody>
+                   
+                    <tfoot>
+                        <apex:repeat value="{!CharterRecSummary}" var="ch">
+                            <tr class="text-right">
+                                <td>Total</td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!ch['grv']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!ch['fv']}" /> </apex:outputText> </td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!ch['pp']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!ch['disc']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!ch['paid']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!ch['open']}" /> </apex:outputText></td>
+                                <td><apex:outputText value="{0,number,###,###}" ><apex:param value="{!ch['mdpp']}" /> </apex:outputText></td>
+                            </tr>
+                        </apex:repeat> 
+                    </tfoot>
+                    
+                </table>
+            </div>
+
+        </div>
+        
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery-1.10.2.min.js" />
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery.formatCurrency-1.4.0.min.js" />
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/bootstrap.min.js" />
+        <apex:includeScript value="{!$Resource.FundingEstimateCalculator}/js/jquery-ui-1.10.4.custom.min.js" />
+    
+  </body>
+      
+</apex:page>

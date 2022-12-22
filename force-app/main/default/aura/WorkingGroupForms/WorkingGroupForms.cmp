@@ -1,0 +1,469 @@
+<!--
+ - Created by Ivan Garcia on 4/3/2018.
+ -->
+
+<aura:component description="WorkingGroupForms" controller="WorkingGroupFormsCtrl" implements="forceCommunity:availableForAllPageTypes" access="global">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler action="{!c.handleDeleteMember}" event="c:RemoveRecord" name="removeRecordEvent"/>
+    <aura:attribute name="loadedData" type="Working_Group_List__c[]"/>
+    <aura:attribute name="goodData" type="Working_Group_List__c[]"/>
+    <aura:attribute name="accountId" type="string"/>
+    <aura:attribute name="opportunityId" type="string"/>
+    <aura:attribute name="accountState" type="string"/>
+    <aura:attribute name="intakeId" type="string"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="modalMessage" type="String"/>
+    <aura:attribute name="listToDelete" type="Working_Group_List__c"/>
+    <aura:attribute name="boardpositions" access="public" type="String[]"/>
+    <aura:attribute name="corporatepositions" access="public" type="String[]"/>
+    <aura:attribute name="governingpositions" access="public" type="String[]"/>
+    <aura:attribute name="administratorpositions" access="public" type="String[]"/>
+    <aura:attribute name="activeSections" type="List" default="['contacts','wire']" />
+    <!-- <lightning:tabset selectedTabId="contacts" variant="vertical"> -->
+    <lightning:accordion aura:id="accordion" allowMultipleSectionsOpen="true" activeSectionName="{! v.activeSections }">
+        <lightning:accordionSection name="contacts" label="Contact Information" class="accordionHeader">    
+        <!-- <lightning:tab label="Contact Information" id="contacts"> -->
+            <!-- Board Members -->
+            <div class="slds-section slds-is-open">
+                <div class="slds-text-align_center banner">
+                    Please detail the board members, corporate officers, legal contracts and wire transfer information below. <br/>Use “add member” to reveal a new member line. Save your section before submitting the full form.
+                </div>
+                <div class="slds-var-m-top_large">
+                    <h3 class="slds-section__title slds-theme_shade">
+                        <c:ClearSubHeader header_text="Board Members"/>
+                    </h3>
+                    <hr class="hr"/>
+                </div>
+                <div aria-hidden="false" class="slds-section__content">
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Position (Chair/Member)">
+                                        Position<br/>(Chair/Member)
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Vacant (Check if position is vacant)">
+                                        Vacant
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="First Name">
+                                        First Name
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Last Name">
+                                        Last Name
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Address">
+                                        Residential Address
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Phone">
+                                        Phone
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Email">
+                                        Email
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Term Of Office">
+                                        Term Of Office
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Delete">
+                                        Delete
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.loadedData}" var="data" indexVar="rowCnt">
+                                <aura:if isTrue="{!data.Board_Member__c}">
+                                    <tr>
+                                        <c:InfoSheetPosition person="{!data}" positions="{!v.boardpositions}" row="{!rowCnt}" hideTerms="false"/>
+                                    </tr>
+                                </aura:if>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="slds-align_absolute-center banner">
+                    <p>(If an individual is both a director and an officer, they should be listed under both sections.)</p>
+                </div>
+                <div class="slds-align_absolute-center">
+                    <lightning:button variant="brand" label="Add Member" onclick="{!c.handleNewMemberRecord}" />
+
+                </div>
+            </div>
+
+            <!-- Governing Body - Arizona only -->
+            <aura:if isTrue="{!v.accountState == 'AZ'}">
+                <div class="slds-section slds-is-open">
+                    <div class="slds-var-m-top_large">
+                        <h3 class="slds-section__title slds-theme_shade">
+                            <c:ClearSubHeader header_text="Governing Body"/>
+                        </h3>
+                        <hr class="hr"/>
+                    </div>
+                    <div aria-hidden="false" class="slds-section__content">
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                            <thead>
+                                <tr class="slds-text-title_caps">
+                                    <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="Position (Chair/Member)">
+                                            Position (Chair/Member)
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="Vacant (Check if position is vacant)">
+                                            Vacant
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="First Name">
+                                            First Name
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="Last Name">
+                                            Last Name
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="Address">
+                                            Residential Address
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="Phone">
+                                            Phone
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="Email">
+                                            Email
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="Term Of Office">
+                                            Term Of Office
+                                        </div>
+                                    </th>
+                                    <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="Delete">
+                                            Delete
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.loadedData}" var="data" indexVar="rowCnt">
+                                    <aura:if isTrue="{!data.Governing_Body__c}">
+                                        <tr>
+                                            <c:InfoSheetPosition person="{!data}" positions="{!v.governingpositions}" row="{!rowCnt}" hideTerms="false"/>
+                                        </tr>
+                                    </aura:if>
+                                </aura:iteration>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="slds-align_absolute-center banner">
+                        <p>(If an individual is both a director and an officer, they should be listed under both sections.)</p>
+                    </div>
+                    <div class="slds-align_absolute-center">
+                        <lightning:button variant="brand" label="Add Member" onclick="{!c.handleNewGoverningBody}" />
+
+                    </div>
+                </div>
+            </aura:if>
+
+            <!-- Corporate Officers -->
+            <div class="slds-section slds-is-open">
+                <div class="slds-var-m-top_large">
+                    <h3 class="slds-section__title slds-theme_shade">
+                        <c:ClearSubHeader header_text="Corporate Officers"/>
+                    </h3>
+                    <hr class="hr"/>
+                </div>
+                <div aria-hidden="false" class="slds-section__content">
+
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Title">
+                                        Title
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="Vacant (Check if position is vacant)">
+                                            Vacant
+                                        </div>
+                                    </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="First Name">
+                                        First Name
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Last Name">
+                                        Last Name
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Address">
+                                        Residential Address
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Phone">
+                                        Phone
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Email">
+                                        Email
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Term Of Office">
+                                        Term Of Office
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Delete">
+                                        Delete
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.loadedData}" var="data" indexVar="rowCnt">
+                                <aura:if isTrue="{!data.Corporate_Officer__c}">
+                                    <tr>
+                                        <c:InfoSheetPosition person="{!data}" positions="{!v.corporatepositions}" row="{!rowCnt}" hideTerms="false"/>
+                                    </tr>
+                                </aura:if>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+                <br/>
+                <div class="slds-align_absolute-center">
+                    <lightning:button variant="brand" label="Add Officer" onclick="{!c.handleNewCorporateRecord}" />
+                </div>
+            </div>
+
+            <!-- School Administrators -->
+            <div class="slds-section slds-is-open">
+                <div class="slds-var-m-top_large">
+                    <h3 class="slds-section__title slds-theme_shade">
+                        <c:ClearSubHeader header_text="School Administrators"/>
+                    </h3>
+                    <hr class="hr"/>
+                </div>
+                <div aria-hidden="false" class="slds-section__content">
+
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Title">
+                                        Title
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                        <div class="slds-truncate" title="Vacant (Check if position is vacant)">
+                                            Vacant
+                                        </div>
+                                    </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="First Name">
+                                        First Name
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Last Name">
+                                        Last Name
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Address">
+                                        Address
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Phone">
+                                        Phone
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Email">
+                                        Email
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Delete">
+                                        Delete
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.loadedData}" var="data" indexVar="rowCnt">
+                                <aura:if isTrue="{!data.School_Administrator__c}">
+                                    <tr>
+                                        <c:InfoSheetPosition person="{!data}" positions="{!v.administratorpositions}" row="{!rowCnt}" hideTerms="true"/>
+                                    </tr>
+                                </aura:if>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+                <br/>
+                <div class="slds-align_absolute-center">
+                    <lightning:button variant="brand" label="Add School Administrator" onclick="{!c.handleNewAdministratorRecord}" />
+                </div>
+            </div>
+
+            <!-- Legal Contact -->
+            <div class="slds-section slds-is-open">
+<!--                 <h3 class="slds-section__title slds-theme_shade">
+                    <span class="slds-truncate slds-p-horizontal_small" title="Legal Contacts">Legal Contact</span>
+                </h3> -->
+                <div class="slds-var-m-top_large">
+                    <h3 class="slds-section__title slds-theme_shade">
+                        <c:ClearSubHeader header_text="Legal Contact"/>
+                    </h3>
+                    <hr class="hr"/>
+                </div>                
+                <div aria-hidden="false" class="slds-section__content">
+
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="First Name">
+                                        First Name
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Last Name">
+                                        Last Name
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Address">
+                                        Address
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Phone">
+                                        Phone
+                                    </div>
+                                </th>
+                                <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Email">
+                                        Email
+                                    </div>
+                                </th>
+                                <!-- <th scope="col" class="tableHeader">
+                                    <div class="slds-truncate" title="Delete">
+                                        Delete
+                                    </div>
+                                </th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.loadedData}" var="data">
+                                <aura:if isTrue="{! data.Legal_Contact__c}">
+                                    <tr>
+                                        <td data-label="First Name">
+                                            <lightning:input aura:id="Contact" label="First Name" variant="label-hidden" type="text" class="slds-size_1-of-1" placeholder="First Name" value="{!data.First_Name__c}" />
+                                        </td>
+                                        <td data-label="Last Name">
+                                            <lightning:input aura:id="Contact" label="Last Name" variant="label-hidden" type="text" class="slds-size_1-of-1" placeholder="Last Name" value="{!data.Name}" required="true"/>
+                                        </td>
+                                        <td data-label="Address">
+                                            <lightning:input aura:id="Contact" label="Address" variant="label-hidden" type="text" class="slds-size_1-of-1" placeholder="Address" value="{!data.Address__c}"/>
+                                        </td>
+                                        <th data-label="Phone">
+                                            <lightning:input aura:id="Contact" label="Phone" variant="label-hidden" type="tel" class="slds-size_1-of-1" placeholder="Phone" value="{!data.Phone__c}" pattern="[0-9]{10}|[0-9]{3}-[0-9]{3}-[0-9]{4}" messageWhenPatternMismatch="Enter a valid Phone number"/>
+                                        </th>
+                                        <td data-label="Email" >
+                                            <lightning:input aura:id="Contact" label="Email" variant="label-hidden" type="email" class="slds-size_1-of-1" placeholder="Email" value="{!data.Email__c}" messageWhenTypeMismatch="Enter a valid Email"/>
+                                        </td>
+                                        <!-- <td data-label="Delete">
+                                            <button class="slds-button slds-button_destructive" id="{!data.Name}" onclick="{!c.deleteContact}">X</button>
+                                        </td> -->
+                                    </tr>
+                                </aura:if>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="slds-align_absolute-center">
+                    <!--lightning:button variant="brand" label="Add Contact" onclick="{!c.handleNewContactRecord}" /-->
+                </div>
+            </div>
+            <br/>
+
+            <!-- Buttons -->
+            <div class="slds-align_absolute-center">
+                <lightning:button variant="brand" label="Return" onclick="{!c.handleReturn}"/>
+                <lightning:button variant="brand" label="Save and Submit Contact Information" onclick="{!c.handleSaveAndSubmitUpdated}" />
+            </div>
+
+            <!--Modal msg-->
+            <aura:if isTrue="{!v.isOpen}">
+
+                <div role="dialog" tabindex="-1" aria-labelledby="header99" class="slds-modal slds-fade-in-open customModal">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Records updated.</h2>
+                            <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModel}">
+                                X
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                        </header>
+                        <div class="slds-modal__content slds-var-p-around_medium" align="center">
+                            <p>
+                                <b>
+                                        {!v.modalMessage}
+                                </b>
+                            </p>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="destructive" label="Close" onclick="{!c.closeModel}"/>
+                        </footer>
+                    </div>
+                </div>
+                <!-- <div class="slds-backdrop slds-backdrop- -open"></div> -->
+            </aura:if>
+            <!--Modal msg-->
+        <!-- </lightning:tab> -->
+        </lightning:accordionSection>
+        <br/>
+        <br/>
+        <br/>
+        <!-- Wire Information Section -->
+        <lightning:accordionSection name="wire" label="Wire Transfer Information">
+            <aura:if isTrue="{!v.opportunityId}">
+                <c:PortalBankDetails oppId="{!v.opportunityId}"/>
+            </aura:if>
+        </lightning:accordionSection>
+        
+    <!-- </lightning:tabset> -->
+    </lightning:accordion>
+
+
+</aura:component>

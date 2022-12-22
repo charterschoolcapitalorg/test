@@ -1,0 +1,6 @@
+<aura:documentation>
+	<aura:description>Documentation</aura:description>
+	<aura:example name="LegalDisclaimer" ref="standardDiclaimer" label="Label">
+		Standard legla disclaimer.
+	</aura:example>
+</aura:documentation>

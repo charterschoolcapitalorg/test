@@ -1,0 +1,307 @@
+<apex:page standardController="Opportunity" extensions="OppSchoolBankDetailsExt" showHeader="true" sidebar="false" tabStyle="School_Attendance__c">
+
+    <apex:slds />
+    <apex:includeScript value="{!URLFOR($Resource.JQuery, '/js/jquery-1.9.1.min.js')}"  />
+    <apex:includeScript value="{!URLFOR($Resource.JQueryTablesort, '/ts/jquery.tablesorter.min.js')}"  />
+
+    <script >
+        $(document).ready(function()
+        {
+                $("[id$='accsTable']").tablesorter();
+        });
+    </script>
+
+    <style>
+        .tablesorter-blue .headerSortUp,
+        .tablesorter-blue .tablesorter-headerSortUp,
+        .tablesorter-blue .tablesorter-headerAsc {
+            background-color: #9fbfdf !important;
+        }
+        .tablesorter-blue .headerSortDown,
+        .tablesorter-blue .tablesorter-headerSortDown,
+        .tablesorter-blue .tablesorter-headerDesc {
+            background-color: #8cb3d9 !important;
+        }
+
+        .tablesorter-blue .dataCell{
+            border-bottom-width: 1px !important;
+        }
+        .bPageTitle{
+            background-color: #e6ffe6 !important;
+        }
+    </style>
+
+    <!--Section for the Charter Holder associated with this opportunity-->
+            <apex:sectionHeader subtitle="Opportunity {!Opportunity.Name}" title="{!Opportunity.Account.Name}" />
+
+            <apex:pageBlock title="Opportunity Information" >
+                <apex:pageBlockSection >
+                    <apex:outputField value="{!Opportunity.StageName}"/>
+                    <apex:outputField value="{!Opportunity.Funded_Date__c}"/>
+                    <apex:outputField value="{!Opportunity.NET_Amount_Requested__c}"/>
+                    <apex:outputField value="{!Opportunity.CloseDate}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock> 
+            
+            <apex:pageBlock title="Charter Information" >
+                <apex:pageBlockSection >
+                    <apex:outputText label="Charter Name"><a href="/{!Opportunity.Account}" target="_blank">{!Opportunity.Account.Name}</a></apex:outputText>
+                    <apex:outputField value="{!Opportunity.Account.Legal_Name__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.BillingStreet}"/>
+                    <apex:outputField value="{!Opportunity.Account.Nick_Name__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.BillingCity}"/>
+                    <apex:outputField value="{!Opportunity.Account.Legal_Type__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.BillingState}"/>
+                    <apex:outputField value="{!Opportunity.Account.Client_Since__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.BillingPostalCode}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>       
+
+            <apex:pageBlock title="CMO Information" rendered="{!NOT(ISBLANK(Opportunity.Account.CMO__c))}">
+                <apex:pageBlockSection >
+                    <apex:outputText label="CMO Name"><a href="/{!Opportunity.Account.CMO__c}" target="_blank">{!Opportunity.Account.CMO__r.Name}</a></apex:outputText>
+                    <apex:outputField label="Incorporation State" value="{!Opportunity.Account.CMO__r.Incorporation_State__r.State_Name__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.CMO__r.BillingStreet}"/>
+                    <apex:outputField value="{!Opportunity.Account.CMO__r.Legal_Name__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.CMO__r.BillingCity}"/>
+                    <apex:outputField value="{!Opportunity.Account.CMO__r.Legal_Type__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.CMO__r.BillingState}"/>
+                    <apex:outputField value="{!Opportunity.Account.CMO__r.SOS_Org_Num__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.CMO__r.BillingPostalCode}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+
+            <apex:pageBlock title="Charter Client Alerts" tabStyle="{!IF(OppCharterClientAlerts.size = 0, 'School_Attendance__c', 'Opportunity')}">
+                <apex:outputText rendered="{!IF(OppCharterClientAlerts.size = 0, TRUE, FALSE)}">No active alerts on this Charter.</apex:outputText>
+                <apex:pageBlockSection title="Charter Alerts" columns="1" rendered="{!IF(OppCharterClientAlerts.size != 0, TRUE, FALSE)}">
+                    <apex:pageBlockTable value="{!OppCharterClientAlerts}" var="s" >
+                        <apex:column headerValue="Name" > <apex:outputLink value="/{!s.Id}" target="_blank" >{!s.Name}</apex:outputLink></apex:column>
+                        <apex:column value="{!s.Type__c}" />
+                        <apex:column headerValue="Alert" >
+                            <apex:outputText style="border-bottom-width: 0px" escape="false" value="{!s.Client_Alert_Details__c}"/>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+
+            <apex:pageBlock title="Board Resolution" >
+                <apex:pageBlockSection >
+                    <apex:outputField value="{!Opportunity.Account.Resolution_GRV__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.Resolution_FV__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.Resolution_GRV_Balance__c}"/>
+                    <apex:outputField value="{!Opportunity.Account.Resolution_FV_Balance__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+            
+            <apex:pageBlock title="RPA" >
+                <apex:pageBlockSection >
+                    <apex:outputText label="RPA Ref#"><a href="/{!Opportunity.RPA__r.Id}" target="_blank">{!Opportunity.RPA__r.Name}</a></apex:outputText>
+                    <apex:outputField value="{!Opportunity.RPA__r.RPA_Date__c}"/>
+                    <apex:outputField value="{!Opportunity.RPA__r.RPA_Gross_Value__c}"/>
+                    <apex:outputField value="{!Opportunity.RPA__r.RPA_GRV_Remaining__c}"/>
+                    <apex:outputField value="{!Opportunity.RPA__r.RPA_Face_Value__c}"/>
+                    <apex:outputField value="{!Opportunity.RPA__r.RPA_FV_Remaining__c}"/>
+                    <apex:outputField value="{!Opportunity.RPA__r.Program_Fee__c}"/>
+                    <apex:outputField value="{!Opportunity.RPA__r.Remaining_Fee_to_Collect__c}"/>
+                    <apex:outputField value="{!Opportunity.RPA__r.Status__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>   
+
+            <apex:pageBlock title="Terms Letter" >
+                <apex:pageBlockSection >
+                    <apex:outputText label="TL Ref#"><a href="/{!Opportunity.Terms_Letter__r.Id}" target="_blank">{!Opportunity.Terms_Letter__r.Name}</a></apex:outputText>
+                    <apex:outputField value="{!Opportunity.Terms_Letter__r.TL_Date__c}"/>
+                    <apex:outputField value="{!Opportunity.Terms_Letter__r.Initial_Close_Date__c}"/>
+                    <apex:outputField value="{!Opportunity.Terms_Letter__r.Termination_Date__c}"/>
+                    <apex:outputField value="{!Opportunity.Terms_Letter__r.RPA_Gross_Value__c}"/>
+                    <apex:outputField value="{!Opportunity.Terms_Letter__r.RPA_Face_Value__c}"/>
+                    <apex:outputField value="{!Opportunity.Terms_Letter__r.Status__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>  
+
+    <!--Section for each school under the Charter Holder-->
+        <apex:repeat value="{!OppSchoolsDetails}" var="sch">
+            <apex:sectionHeader subtitle="{!sch.Name}"/>
+
+            <apex:pageBlock >
+                <apex:pageBlockSection title="School Information" columns="2">
+                    <apex:outputText label="School Name"><a href="/{!sch.Id}" target="_blank">{!sch.Name} </a> </apex:outputText> 
+                    <apex:outputField value="{!sch.Legal_Name__c}"/>
+                    <apex:outputField value="{!sch.Grade_Level_Served__c}"/>
+                    <apex:outputField value="{!sch.Date_Opened__c}"/>
+                    <apex:outputField value="{!sch.School_District__c}"/>
+                    <apex:outputField value="{!sch.COE__c}"/>
+                    <apex:outputField value="{!sch.Authorizer_A__c}"/>
+                    <apex:outputField value="{!sch.EWS_Level_visual__c}"/>
+                </apex:pageBlockSection>
+            </apex:pageBlock>         
+
+            <!--Section for School Alerts-->
+            <apex:pageBlock tabStyle="{!IF(sch.Client_Alerts__r.size = 0, 'School_Attendance__c', 'Opportunity')}">
+                <apex:pageBlockSection title="School Alerts" columns="1">
+                    <apex:outputText rendered="{!IF(sch.Client_Alerts__r.size = 0, TRUE, FALSE)}">No active alerts on this school.</apex:outputText>
+                    <apex:pageBlockTable rendered="{!IF(sch.Client_Alerts__r.size > 0, TRUE, FALSE)}" value="{!sch.Client_Alerts__r}" var="s" >
+                        <apex:column headerValue="Name" > <apex:outputLink value="/{!s.Id}" target="_blank" >{!s.Name}</apex:outputLink></apex:column>
+                        <apex:column value="{!s.Type__c}" />
+                        <apex:column headerValue="Alert">
+                            <apex:outputText escape="false" style="border-bottom-width: 0px" value="{!s.Client_Alert_Details__c}"/>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+
+
+            <!--Section for Active Charter Terms-->
+            <apex:pageBlock >       
+                <apex:pageBlockSection title="Active Charter Terms">
+                    <apex:outputText rendered="{!IF(sch.Terms__r.size = 0, TRUE, FALSE)}">No active records.</apex:outputText>
+                    <apex:pageBlockTable value="{!sch.Terms__r}" var="t" rendered="{!IF(sch.Terms__r.size > 0, TRUE, FALSE)}">
+                        <apex:column headerValue="Name" > <apex:outputLink value="/{!t.Id}" target="_blank" >{!t.Name}</apex:outputLink></apex:column>
+                        <apex:column headerValue="Authorizer">{!IF(ISBLANK(t.Authorizer__r.Name),'None Listed', t.Authorizer__r.Name)} </apex:column>
+                        <apex:column value="{!t.Start_Date__c}"/>
+                        <apex:column value="{!t.End_Date__c}"/>
+                        <apex:column value="{!t.Term__c}"/>
+                        <apex:column value="{!t.Status__c}"/>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+
+            <!--Section for Active Leases-->
+            <apex:pageBlock >           
+                <apex:pageBlockSection title="Active Leases" columns="1">
+                    <apex:outputText rendered="{!IF(sch.Leases__r.size = 0, TRUE, FALSE)}">No active records.</apex:outputText>
+                    <apex:pageBlockTable rendered="{!IF(sch.Leases__r.size > 0, TRUE, FALSE)}" value="{!sch.Leases__r}" var="l" >
+                        <apex:column headerValue="Name" width="50"> <apex:outputLink value="/{!l.Id}" target="_blank" >{!l.Name}</apex:outputLink></apex:column>
+                        <apex:column value="{!l.Type__c}" />
+                        <apex:column value="{!l.Landlord__c}" width="150"/>
+                        <apex:column value="{!l.Start_Date__c}"/>
+                        <apex:column value="{!l.End_Date__c}"/>
+                        <apex:column value="{!l.Location__c}"/>
+                        <apex:column value="{!l.Comments__c}"/>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+
+            <!--Section for Active Attendances-->
+            <apex:pageBlock >       
+                <apex:pageBlockSection title="Active Attendance">
+                    <apex:pageBlockTable value="{!sch.School_Attendance__r}" var="a" >
+                        <apex:column headerValue="Name" > <apex:outputLink value="/{!a.Id}" target="_blank" >{!a.Name}</apex:outputLink></apex:column>
+                        <apex:column value="{!a.Attendance_Type__c}"/>
+                        <apex:column value="{!a.Fiscal_Year__c}"/>
+                        <apex:column value="{!a.Report_Date__c}"/>
+                        <apex:column value="{!a.Total_Attendance__c}"/>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:pageBlock>       
+
+            <!--Section for Active Enrollments-->
+            <apex:pageBlock >       
+                <apex:pageBlockSection title="Recent Enrollments" >
+                    <apex:outputText rendered="{!IF(ISNULL(sch.Enrollments__r.size), TRUE, IF(sch.Enrollments__r.size = 0, TRUE, FALSE))}">None available.</apex:outputText>
+                    <apex:pageBlockTable rendered="{!IF(ISNULL(sch.Enrollments__r.size), FALSE, IF(sch.Enrollments__r.size > 0, TRUE, FALSE))}" value="{!sch.Enrollments__r}" var="e" >
+                        <apex:column headerValue="Name" > <apex:outputLink value="/{!e.Id}" target="_blank" >{!e.Name}</apex:outputLink></apex:column>
+                        <apex:column value="{!e.Description__c}"/>
+                        <apex:column value="{!e.Fiscal_Year__c}"/>
+                        <apex:column value="{!e.Total_Enrollment__c}"/>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+
+            <!--Section for Active Receivables-->
+            <apex:pageBlock >       
+                <apex:pageBlockSection columns="1" title="Active Funded Receivables" >
+                    <apex:outputText rendered="{!IF(ISNULL(sch.Funded_Receivables__r.size), TRUE, IF(sch.Funded_Receivables__r.size = 0, TRUE, FALSE))}">No receivables outstanding.</apex:outputText>         
+                    <apex:pageBlockTable value="{!sch.Funded_Receivables__r}" var="f" id="accsTable" styleClass="tablesorter" headerClass="tablesorter-blue" rowClasses="tablesorter-blue" rendered="{!IF(ISNULL(sch.Funded_Receivables__r.size), FALSE, IF(sch.Funded_Receivables__r.size > 0, TRUE, FALSE))}">
+                        <apex:column headerValue="Name" > <apex:outputLink value="/{!f.Id}" target="_blank" >{!f.Purchase_ID__c}</apex:outputLink></apex:column>
+                        <apex:column value="{!f.School__r.Name}"/>
+                        <apex:column value="{!f.Name}"/>
+                        <apex:column value="{!f.Purchase_Date__c}"/>
+                        <apex:column value="{!f.FV_Amount__c}"/>
+                        <apex:column value="{!f.FV_Amount_Due__c}"/>
+                        <apex:column value="{!f.Expected_Pay_Date__c}"/>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+
+            <!--Section for Bank Usage-->
+            <apex:pageBlock >
+                <apex:pageBlockSection title="Active Bank Details" >
+                    <apex:pageBlockTable value="{!sch.Bank_Usage1__r}" var="b" rendered="{!$ObjectType.Bank_Usage__c.accessible}" >
+                        <apex:column headerValue="Name" > <apex:outputLink value="/{!b.Id}" target="_blank" >{!b.Name}</apex:outputLink></apex:column>
+                        <apex:column value="{!b.Bank__r.Name}"/>
+                        <apex:column value="{!b.Account_Number__c}"/>
+                        <apex:column value="{!b.Routing_Number__c}"/>
+                    </apex:pageBlockTable>            
+                </apex:pageBlockSection>
+                <apex:pageBlockSection rendered="{!NOT($ObjectType.Bank_Usage__c.accessible)}">
+                    Access to this section is not available.
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:repeat>
+
+        <!--Section for Charter CMO Action Items Management Company-->
+        <!--
+        <apex:pageBlock title="CMO Management Company Review" rendered="{!OppCharterCMOActionItems.size > 0}">
+            <apex:pageBlockSection columns="1" title="Management Company - {!Opportunity.Account.CMO__r.Name}">  
+                <apex:pageBlockTable rendered="{!IF(ISNULL(OppCharterCMOActionItems.size), FALSE, IF(OppCharterCMOActionItems.size > 0, TRUE, FALSE))}" value="{!OppCharterCMOActionItems}" var="i" id="accsTable" styleClass="tabSorter" headerClass="tablesorter-blue" rowClasses="tablesorter-blue">
+                    <apex:column headerValue="Name" > <apex:outputLink value="/{!i.Id}" target="_blank" >{!i.Name}</apex:outputLink></apex:column>
+                    <apex:column value="{!i.Order__c}" />
+                    <apex:column value="{!i.Action_Item_Name__c}" />
+                    <apex:column value="{!i.Date_Requested__c}"/>
+                    <apex:column value="{!i.Received_Date__c}"/>
+                    <apex:column value="{!i.Review_Date__c}"/>
+                    <apex:column value="{!i.Expiration_Date__c}"/>
+                    <apex:column value="{!i.Next_Action_Date__c}"/>
+                    <apex:column value="{!i.Assigned_To__r.Name}"/>
+                    <apex:column value="{!i.Status__c}"/>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        -->
+
+        <!--Section for Charter Action Items File Review-->
+        <!--
+        <apex:pageBlock title="Charter File Review" >
+            <apex:pageBlockSection columns="1" title="File Review Action Items - {!Opportunity.Account.Name}">
+                <apex:outputText rendered="{!IF(ISNULL(OppCharterActionItems.size), TRUE, IF(OppCharterActionItems.size = 0, TRUE, FALSE))}">No charter File Review list.</apex:outputText>     
+                <apex:pageBlockTable rendered="{!IF(ISNULL(OppCharterActionItems.size), FALSE, IF(OppCharterActionItems.size > 0, TRUE, FALSE))}" value="{!OppCharterActionItems}" var="i" id="accsTable" styleClass="tabSorter" headerClass="tablesorter-blue" rowClasses="tablesorter-blue">
+                    <apex:column headerValue="Name" > <apex:outputLink value="/{!i.Id}" target="_blank" >{!i.Name}</apex:outputLink></apex:column>
+                    <apex:column value="{!i.Order__c}" />
+                    <apex:column value="{!i.Action_Item_Name__c}" />
+                    <apex:column value="{!i.Date_Requested__c}"/>
+                    <apex:column value="{!i.Received_Date__c}"/>
+                    <apex:column value="{!i.Review_Date__c}"/>
+                    <apex:column value="{!i.Expiration_Date__c}"/>
+                    <apex:column value="{!i.Next_Action_Date__c}"/>
+                    <apex:column value="{!i.Assigned_To__r.Name}"/>
+                    <apex:column value="{!i.Status__c}"/>
+                </apex:pageBlockTable>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        -->
+
+        <!--Section for School Action Items File Review-->
+        <!--
+        <apex:repeat value="{!OppSchoolActionLists}" var="list">
+            <apex:pageBlock title="Charter School File Review" >
+                <apex:pageBlockSection columns="1" title="School File Review - {!list.Account__r.Name}">
+                    <apex:outputText rendered="{!IF(ISNULL(list.CSC_Action_Items__r.size), TRUE, IF(list.CSC_Action_Items__r.size = 0, TRUE, FALSE))}">No school File Review list.</apex:outputText>     
+                    <apex:pageBlockTable rendered="{!IF(ISNULL(list.CSC_Action_Items__r.size), FALSE, IF(list.CSC_Action_Items__r.size > 0, TRUE, FALSE))}" value="{!list.CSC_Action_Items__r}" var="i" id="accsTable" styleClass="tablesorter" headerClass="tablesorter-blue" rowClasses="tablesorter-blue">
+                        <apex:column headerValue="Name" > <apex:outputLink value="/{!i.Id}" target="_blank" >{!i.Name}</apex:outputLink></apex:column>
+                        <apex:column value="{!i.Order__c}" />
+                        <apex:column value="{!i.Action_Item_Name__c}" />
+                        <apex:column value="{!i.Date_Requested__c}"/>
+                        <apex:column value="{!i.Received_Date__c}"/>
+                        <apex:column value="{!i.Review_Date__c}"/>
+                        <apex:column value="{!i.Expiration_Date__c}"/>
+                        <apex:column value="{!i.Next_Action_Date__c}"/>
+                        <apex:column value="{!i.Assigned_To__r.Name}"/>                        
+                        <apex:column value="{!i.Status__c}"/>
+                    </apex:pageBlockTable>
+                </apex:pageBlockSection>
+            </apex:pageBlock>
+        </apex:repeat>
+        -->
+
+</apex:page>

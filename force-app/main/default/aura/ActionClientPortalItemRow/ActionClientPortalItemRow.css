@@ -1,0 +1,82 @@
+.THIS .label-hidden > label {
+    display: none;
+}
+
+.THIS .topmargin {
+margin-top:5px;
+}
+
+
+.THIS .small-text {
+font-size: 12px;
+}
+
+.THIS .slds-textarea {
+    height:37px !important;
+    width:200px;
+}
+
+.THIS.slds-spinner_container {  
+  z-index: 10000;
+  position: fixed;   
+}
+
+.THIS .data-left {
+	padding-left:12px;
+    vertical-align:top;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.THIS .data-column-comments {
+    color:#000000;
+	vertical-align:top;
+    width:250px;
+    margin-top:5px; 
+    height: 50rem;
+}
+
+.THIS .data-column {
+    color:#000000;
+    word-wrap: break-word;
+    margin-top:5px;
+    vertical-align:top;
+}
+.THIS .data-column-first {
+    color:#000000;
+    word-wrap: break-word;
+    padding-left:12px;
+	vertical-align:top;
+    margin-top:5px;
+    width:300px;
+}
+.THIS .data-column-date {
+    color:#000000;
+    word-wrap: break-word;
+    padding-left:6px;
+	vertical-align:top;
+    margin-top:5px;
+}
+.THIS .data-column-small {
+    color:#000000;
+    word-wrap: break-word;
+    margin-top:5px;
+    vertical-align:top;
+    width:125px;
+}
+.THIS .data-column-map {
+    color:#000000;
+    word-wrap: break-word;
+    margin-top:5px;
+    vertical-align:top;
+    width:145px;
+}
+.THIS .data-column-status {
+    color:#000000;
+    word-wrap: break-word;
+    margin-top:5px;
+    vertical-align:top;
+    padding-left:12px;
+    width:175px;
+}
