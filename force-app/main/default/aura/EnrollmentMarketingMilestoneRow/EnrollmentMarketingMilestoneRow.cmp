@@ -12,12 +12,12 @@
 
             <!-- 2 -->
             <td data-label="Close Date" class="slds-text-align_left" style="width:65px">
-                <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.opp.CloseDate}" format="MMM-DD"/>
+                <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.opp.CloseDate}" format="MM/DD/YY"/>
             </td>
 
             <!-- 3 -->
             <td data-label="Created" class="slds-text-align_left" style="width:70px">
-                <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.createdDate}" format="MMM-DD"/>
+                <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.createdDate}" format="MM/DD/YY"/>
             </td>
 
             <!-- 4 -->

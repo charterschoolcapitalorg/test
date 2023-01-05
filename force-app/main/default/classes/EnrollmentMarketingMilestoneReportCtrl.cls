@@ -9,13 +9,17 @@
  * Date Modified                Modified By                  Description of the update
  * [MON DD, YYYY]             	[FirstName LastName]		 [Short description for changes]
  * Dec 19, 2022                 Slava Krel                   Split per channel not need the at this point
+ * Dec 28, 2022                 Slava Krel                   Adding pipeline report on the page
  =====================================================================*/
 
 public class EnrollmentMarketingMilestoneReportCtrl {
 
     public List<OpportunityWrapper> oppsToExport {get;set;}
-    // remove the split per channel
-    // public List<OppByPipelineStageWrapper> oppPipelineStage {get;set;}
+    // remove the split per channel per Kirt
+
+    // this is for pipeline table
+    public List<OppByPipelineStageWrapper> oppPipeline {get;set;}
+
     public OppByPipelineStageWrapper oppPipelineStage {get;set;}
     public OppByPipelineStageWrapper oppPipelineTotals {get;set;}
     public Integer oppTotal {get;set;}
@@ -24,6 +28,7 @@ public class EnrollmentMarketingMilestoneReportCtrl {
         oppsToExport = getEnrollmentMarketingMilestone();
         oppPipelineStage = getPipelineData(oppsToExport);
         oppTotal = getTotalNunberOpps(oppsToExport);
+        oppPipeline = getPipeline(oppsToExport);
     }
 
     @AuraEnabled
@@ -193,6 +198,67 @@ public class EnrollmentMarketingMilestoneReportCtrl {
     public static OppByPipelineStageWrapper getPipelineData(List<OpportunityWrapper> opportunityToDisplay) {
         OppByPipelineStageWrapper pipeline = new OppByPipelineStageWrapper();
         return pipeline;
+    }
+
+    // get pipeline totals (top table)
+    public static List<OppByPipelineStageWrapper> getPipeline(List<OpportunityWrapper> opportunityToDisplay) {
+        List<OppByPipelineStageWrapper> pipelineList = new List<OppByPipelineStageWrapper>();
+        OppByPipelineStageWrapper pipeline = new OppByPipelineStageWrapper();
+        pipeline.wonOppCount = 0;
+        pipeline.convertedOppCount = 0;
+        pipeline.proposedOppCount = 0;
+        pipeline.sourcedOppCount = 0;
+        pipeline.createdOppCount = 0;
+        pipeline.wonOppAmount = 0;
+        pipeline.convertedOppAmount = 0;
+        pipeline.proposedOppAmount = 0;
+        pipeline.sourcedOppAmount = 0;
+        pipeline.createdOppAmount = 0;
+        if(!opportunityToDisplay.isEmpty()) {
+            for(OpportunityWrapper oppItem : opportunityToDisplay) {
+                if(oppItem.signedContract != null && oppItem.signedContract == 'Completed') {
+                    pipeline.wonOppCount = pipeline.wonOppCount + 1;
+                    if(oppItem.estimatedCost != null) {
+                        pipeline.wonOppAmount = pipeline.wonOppAmount + oppItem.estimatedCost;
+                    }
+                }
+                if(oppItem.approveContracting != null && oppItem.approveContracting == 'Completed' && oppItem.signedContract == 'Incomplete') {
+                    pipeline.convertedOppCount = pipeline.convertedOppCount + 1;
+                    if(oppItem.estimatedCost != null) {
+                        pipeline.convertedOppAmount = pipeline.convertedOppAmount + oppItem.estimatedCost;
+                    }
+                }
+                if(oppItem.pitchDeck != null && oppItem.pitchDeck == 'Completed' && oppItem.signedContract == 'Incomplete' && oppItem.approveContracting == 'Incomplete') {
+                    pipeline.proposedOppCount = pipeline.proposedOppCount + 1;
+                    if(oppItem.estimatedCost != null) {
+                        pipeline.proposedOppAmount = pipeline.proposedOppAmount + oppItem.estimatedCost;
+                    }
+                } else {
+                    if(oppItem.oppPipelineStage != null 
+                    && oppItem.preQualInfo != null 
+                    && oppItem.preQualInfo == 'Completed' 
+                    && oppItem.pitchDeck == 'Incomplete' 
+                    && oppItem.signedContract == 'Incomplete' 
+                    && oppItem.approveContracting == 'Incomplete') {
+                        pipeline.sourcedOppCount = pipeline.sourcedOppCount + 1;
+                        if(oppItem.estimatedCost != null) {
+                            pipeline.sourcedOppAmount = pipeline.sourcedOppAmount + oppItem.estimatedCost;
+                        }
+                    } 
+                    if(oppItem.preQualInfo == 'Incomplete' 
+                    && oppItem.pitchDeck == 'Incomplete' 
+                    && oppItem.signedContract == 'Incomplete' 
+                    && oppItem.approveContracting == 'Incomplete') {
+                        pipeline.createdOppCount = pipeline.createdOppCount + 1;
+                        if(oppItem.estimatedCost != null) {
+                            pipeline.createdOppAmount = pipeline.createdOppAmount + oppItem.estimatedCost;
+                        }
+                    }
+                }
+            }
+        }
+        pipelineList.add(pipeline);
+        return pipelineList;
     }
 
     // split per channel -- not needed at this point
@@ -458,9 +524,11 @@ public class EnrollmentMarketingMilestoneReportCtrl {
         public Integer convertedOppCount {get;set;}
         public Integer proposedOppCount {get;set;}
         public Integer sourcedOppCount {get;set;}
+        public Integer createdOppCount {get;set;}
         public Decimal wonOppAmount {get;set;}
         public Decimal convertedOppAmount {get;set;}
         public Decimal proposedOppAmount {get;set;}
         public Decimal sourcedOppAmount {get;set;}
+        public Decimal createdOppAmount {get;set;}
     }
 }

@@ -1,4 +1,6 @@
 <apex:page controller="EnrollmentMarketingMilestoneReportCtrl" contentType="application/vnd.ms-excel#EM_Milestone_Report.xls" cache="true">
+
+    <!-- for PC -->
     <!-- <apex:pageBlock title="EM Milestone Report">
         <apex:pageBlockTable value="{!oppsToExport}" var="opp" border="1px solid black">
             <apex:column value="{!opp.opp.CloseDate}"/>
@@ -21,6 +23,8 @@
         </apex:pageBlockTable>
     </apex:pageBlock> -->
 
+
+    <!-- milestone table -->
     <apex:dataTable value="{!oppsToExport}" var="opp" border="1px solid black">
         <!-- Close Date -->
         <apex:column>
@@ -99,6 +103,57 @@
             <apex:facet name="header">Owner Last Name</apex:facet>
             <apex:outputText value="{!opp.opp.Owner.LastName}"/>
         </apex:column>
+        <!-- milestone table -->
+    </apex:dataTable>
 
+
+        <!-- pipeline table -->
+    <apex:dataTable value="{!oppPipeline}" var="opp" border="1px solid black">
+        <!-- Created -->
+        <apex:column>
+            <apex:facet name="header">Created Count</apex:facet>
+            <apex:outputText value="{!opp.createdOppCount}"/>
+        </apex:column>
+        <apex:column>
+            <apex:facet name="header">Created Dollar</apex:facet>
+            <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.createdOppAmount}" /></apex:outputText>
+        </apex:column>
+        <!-- Sourced -->
+        <apex:column>
+            <apex:facet name="header">Sourced Count</apex:facet>
+            <apex:outputText value="{!opp.sourcedOppCount}"/>
+        </apex:column>
+        <apex:column>
+            <apex:facet name="header">Sourced Dollar</apex:facet>
+            <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.sourcedOppAmount}" /></apex:outputText>
+        </apex:column>
+        <!-- Proposed -->
+        <apex:column>
+            <apex:facet name="header">Proposed Count</apex:facet>
+            <apex:outputText value="{!opp.proposedOppCount}"/>
+        </apex:column>
+        <apex:column>
+            <apex:facet name="header">Proposed Dollar</apex:facet>
+            <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.proposedOppAmount}" /></apex:outputText>
+        </apex:column>
+        <!-- Converted -->
+        <apex:column>
+            <apex:facet name="header">Converted Count</apex:facet>
+            <apex:outputText value="{!opp.convertedOppCount}"/>
+        </apex:column>
+        <apex:column>
+            <apex:facet name="header">Converted Dollar</apex:facet>
+            <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.convertedOppAmount}" /></apex:outputText>
+        </apex:column>
+        <!-- Won -->
+        <apex:column>
+            <apex:facet name="header">Won Count</apex:facet>
+            <apex:outputText value="{!opp.wonOppCount}"/>
+        </apex:column>
+        <apex:column>
+            <apex:facet name="header">Won Dollar</apex:facet>
+            <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.wonOppAmount}" /></apex:outputText>
+        </apex:column>
+        <!-- pipeline table -->
     </apex:dataTable>
 </apex:page>

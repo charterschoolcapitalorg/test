@@ -24,6 +24,36 @@
                 // total contracted opps
                 let returnTotalContracted = helper.totalContracted(component, items);
                 component.set("v.oppsSignedContract", returnTotalContracted);
+
+                //total Sourced
+                let returnTotalSourcedCount = helper.totalSourced(component, items);
+                component.set("v.totalSourced", returnTotalSourcedCount);
+                let returnTotalDollarSourced = helper.totalDollarSourced(component, items);
+                component.set("v.totalDollarSourced", returnTotalDollarSourced);
+
+                //total Won
+                let returnTotalWonCount = helper.totalWon(component, items);
+                component.set("v.totalWon", returnTotalWonCount);
+                let returnTotalDollarWon = helper.totalDollarWon(component, items);
+                component.set("v.totalDollarWon", returnTotalDollarWon);
+
+                //total Proposed
+                let returnTotalProposedCount = helper.totalProposed(component, items);
+                component.set("v.totalProposed", returnTotalProposedCount);
+                let returnTotalDollarProposed = helper.totalDollarProposed(component, items);
+                component.set("v.totalDollarProposed", returnTotalDollarProposed);
+
+                //total Converted
+                let returnTotalConvertedCount = helper.totalConverted(component, items);
+                component.set("v.totalConverted", returnTotalConvertedCount);
+                let returnTotalDollarConverted = helper.totalDollarConverted(component, items);
+                component.set("v.totalDollarConverted", returnTotalDollarConverted);
+
+                //total Created
+                let returnTotalCreatedCount = helper.totalCreated(component, items);
+                component.set("v.totalCreated", returnTotalCreatedCount);
+                let returnTotalDollarCreated = helper.totalDollarCreated(component, items);
+                component.set("v.totalDollarCreated", returnTotalDollarCreated);
             }
         });
         $A.enqueueAction(action);
@@ -71,7 +101,7 @@
         var cloneData = data.slice(0);
         console.log('*** clickedField = ' + clickedField);
 
-        if (clickedField === 'estimatedCost' || clickedField === 'capRate') {
+        if (clickedField === 'businessDaysToClose' || clickedField === 'capRate') {
             if (sortDirection == "ASC") {
                 cloneData.sort(function (a, b) {
                     return a[clickedField] - b[clickedField]

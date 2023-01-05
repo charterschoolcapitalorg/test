@@ -13,6 +13,22 @@
     <aura:attribute name="sortField" type="String" access="private"/>
     <aura:attribute name="sortDirection" type="String" default="ASC" access="private"/>
 
+    <!-- Sourced -->
+    <aura:attribute name="totalSourced" type="String" />
+    <aura:attribute name="totalDollarSourced" type="String" />
+    <!-- Proposed -->
+    <aura:attribute name="totalProposed" type="String" />
+    <aura:attribute name="totalDollarProposed" type="String" />
+    <!-- Converted -->
+    <aura:attribute name="totalConverted" type="String" />
+    <aura:attribute name="totalDollarConverted" type="String" />
+    <!-- Won -->
+    <aura:attribute name="totalWon" type="String" />
+    <aura:attribute name="totalDollarWon" type="String" />
+    <!-- Created -->
+    <aura:attribute name="totalCreated" type="String" />
+    <aura:attribute name="totalDollarCreated" type="String" />
+
     <!--Header-->
     <div class="slds-col slds-theme_shade heading ">
         <lightning:card class="heading">
@@ -21,7 +37,9 @@
                 - <lightning:formattedDateTime value="{!v.today}"/>
                 - <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital.vf.force.com/apex/EMMilestoneReportDownloadExcel">⤓ Download *.xls</a>
                 <!--SB - https://charterschoolcapital- -cscfull- -c.sandbox.vf.force.com/apex/EMMilestoneReportDownloadExcel -->
-                - <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital--cscfull--c.sandbox.vf.force.com/apex/EMMilestonePipelineReport">Pipeline</a>
+                <!-- - <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital.vf.force.com/apex/EMMilestonePipelineReport">Pipeline</a> -->
+                <br/>
+            <p style="font-size:12px; margine: left 50px;">This report shows EM Opportunities for 'This Season' which is defined as either currently open and uncontracted, or Contract Signed Date is This FY</p>
             </aura:set>
             <aura:set attribute="actions">
                 <lightning:layout multipleRows="false">
@@ -36,8 +54,8 @@
                 <!-- <p style="font-size:11px"># Open Uncontracted Opps:</p> <lightning:formattedNumber value="{!v.totalRecords}"/> (all opps on the list below) <br/>
                 <p style="font-size:11px"># Contracted Opps This FY:</p> <lightning:formattedNumber value="{!v.totalRecords}"/> -->
 
-                <span style="color: black; font-size:11px"> Open Uncontracted Opps: </span> <lightning:formattedNumber value="{!v.totalRecords}"/> <br/>
-                <span style="color: black; font-size:11px"> Contracted Opps This FY: </span> <lightning:formattedNumber value="{!v.oppsSignedContract}"/> 
+                <span style="color: black;"> Open Uncontracted Opps: </span> <lightning:formattedNumber value="{!v.totalRecords}"/> <br/>
+                <span style="color: black;"> Contracted Opps This FY: </span> <lightning:formattedNumber value="{!v.oppsSignedContract}"/> 
             </aura:set>
             <aura:set attribute="actions">
                 <lightning:layout multipleRows="false">
@@ -68,28 +86,27 @@
                         </header>
 
                         <div class="slds-modal__content slds-p-around_medium alignLeft" id="modal-content-id-1">
-                            <h1 class="slds-text-heading--medium" style="font-weight:100; text-align:center">Facilities Milestone Report</h1>
+                            <h1 class="slds-text-heading--medium" style="font-weight:100; text-align:center">EM Milestone Report</h1>
                             <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EM milestone report displays all opportunity 
-                                records in the pipeline ...</p>
+                                records in the pipeline for this season, which is Contract Signed Date = This FY OR (Contract Signed is Blank and Opp is Open).</p>
                             <br/>
-                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(1) - Button Deck. Use to search for the opportunity Close Date, User, and State. Select Start date and/or End date, click Search. </p>
-                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2) - Total Values Table. Displays total number of Completed records and the total Estimated Project Cost for them. Appling filters does NOT change these numbers.</p>
-                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(3) - Ultimate Totals. Total Estimated Project Cost and Total number of opportunities pulled into the Facilities Milestone Report. Appling filters does NOT change these numbers.</p>
-                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(4) - Report Columns. Sortable. Hover over the column header for 3 seconds to view help text related to symbols.</p>
-                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(5) - Download Link. Click this link to download the Facilities Milestone Report as *.xls</p>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The picture below shows some of the key features:</p>
+                            <br/>
+                            <img src="{!$Resource.EMMilestoneReportHelpImage}"/>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(1) - Button Deck. Use to refresh and access help. </p>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2) - Pipeline Table. Displays total number of Completed records per pipeline stage. Appling filters does NOT change these numbers.</p>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(3) - Report Columns. Sortable. Hover over the column header for 3 seconds to view help text related to symbols.</p>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(4) - Download Link. Click this link to download the EM Milestone Report as *.xls</p>
+                            <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(5) - Filter. Isolate records by State or Opp Owner (User).</p>
                             <br/>
                             <h1 class="slds-text-heading--medium" style="font-weight:100; text-align:center">Symbols</h1>
                             <p style="font-size:medium">
                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<lightning:icon iconName="action:close" alternativeText="Close" title="Approved" size="xx-small" style="zoom:0.5"/>
-                                <span style="color: black"> - Incomplete, </span>
+                                <span style="color: black"> - Incomplete (Date Completed is Blank), </span>
                                 <lightning:icon iconName="action:approval" alternativeText="Approved" title="Approved" size="xx-small" style="zoom:0.5"/>
-                                <span style="color: black"> - Complete, </span>
+                                <span style="color: black"> - Completed (Date Completed is Populated) </span>
                             </p>
                             <br/>
-                            <h1 class="slds-text-heading--medium" style="font-weight:100; text-align:center">When Click The "Search" Button</h1>
-                            <br/>
-                            <h1 class="slds-text-heading--medium" style="font-weight:100; text-align:center">To Learn More</h1>
-                            <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital.lightning.force.com/lightning/r/Case/5004u00002hVwSUAA0/view">More info...</a>
                         </div>
                         <footer class="slds-modal__footer">
                             <lightning:button label="Close" variant="brand" class="slds-m-top--medium" onclick="{!c.closeHelp}"/>
@@ -99,6 +116,36 @@
             </div>
         </aura:if>
         <!---->
+    </div>
+
+    <!--Totals-->
+    <div class="slds-col slds-theme_shade heading slds-p-around_medium">
+        <table style="width:100%" border="1px solid black">
+            <tr>
+            <th> </th>
+            <th class="slds-text-align_center" >Created</th>
+            <th class="slds-text-align_center" >Sourced</th>
+            <th class="slds-text-align_center" >Proposed</th>
+            <th class="slds-text-align_center" >Converted</th>
+            <th class="slds-text-align_center" >Won</th>
+            </tr>
+            <tr>
+            <th style="width:25%;">Total Count</th>
+            <td class="slds-text-align_center" ><lightning:formattedNumber value="{!v.totalCreated}"/></td>
+            <td class="slds-text-align_center" ><lightning:formattedNumber value="{!v.totalSourced}"/></td>
+            <td class="slds-text-align_center" ><lightning:formattedNumber value="{!v.totalProposed}"/></td>
+            <td class="slds-text-align_center" ><lightning:formattedNumber value="{!v.totalConverted}"/></td>
+            <td class="slds-text-align_center" ><lightning:formattedNumber value="{!v.totalWon}"/></td>
+            </tr>
+            <tr>
+            <th >Total $ Value</th>
+            <td class="slds-text-align_center" ><lightning:formattedNumber value="{!v.totalDollarCreated}"/></td>
+            <td class="slds-text-align_center" ><lightning:formattedNumber value="{!v.totalDollarSourced}"/></td>
+            <td class="slds-text-align_center" ><lightning:formattedNumber value="{!v.totalDollarProposed}"/></td>
+            <td class="slds-text-align_center" ><lightning:formattedNumber value="{!v.totalDollarConverted}"/></td>
+            <td class="slds-text-align_center" ><lightning:formattedNumber value="{!v.totalDollarWon}"/></td>
+            </tr>
+        </table>
     </div>
 
     <!--Table itself-->
@@ -112,7 +159,7 @@
                         <!-- # -->
                         <th scope="col" style="width:10%">
                             <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                <div class="slds-truncate" title="Has CP Item">#</div>
+                                <div class="slds-truncate" title="Index Number">#</div>
                                 <span class="slds-icon_container slds-icon-utility-arrowdown">
                                     <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                 </span>    
@@ -124,7 +171,7 @@
                         <th scope="col" style="width:25%" class="{!'slds-is-resizable slds-is-sortable ' + (v.closeDate=='closeDate'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
                             <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="closeDate" onclick="{!c.handleSort}">
                                 <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                    <div class="slds-truncate" title="portfolio Owner">Close<br/>Date</div>
+                                    <div class="slds-truncate" title="Close Date on Opportunity">Close<br/>Date</div>
                                     <span class="slds-icon_container slds-icon-utility-arrowdown">
                                         <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                     </span>    
@@ -137,7 +184,7 @@
                         <th scope="col" style="width:25%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='createdDate'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
                             <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="createdDate" onclick="{!c.handleSort}">
                                 <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                    <div class="slds-truncate" title="Property Name">Created</div>
+                                    <div class="slds-truncate" title="Date Opportunity Created">Created</div>
                                     <span class="slds-icon_container slds-icon-utility-arrowdown">
                                         <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                     </span>    
@@ -147,13 +194,15 @@
 
                         <!-- 4 -->
                         <!-- Business Days To Close -->
-                        <th scope="col" style="width:25%">
-                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                <div class="slds-truncate" title="Account">Until<br/>Close</div>
-                                <span class="slds-icon_container slds-icon-utility-arrowdown">
-                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
-                                </span>    
-                            </div>
+                        <th scope="col" style="width:25%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='businessDaysToClose'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="businessDaysToClose" onclick="{!c.handleSort}">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <div class="slds-truncate" title="Business Days Until Close">Until<br/>Close</div>
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                    </span>    
+                                </div>
+                            </a>
                         </th>
 
                         <!-- 5 -->
@@ -161,7 +210,7 @@
                         <th scope="col" style="width:100%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='oppName'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
                             <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="oppName" onclick="{!c.handleSort}">
                                 <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                    <div class="slds-truncate" title="Assigned To">Opportunity Name</div>
+                                    <div class="slds-truncate" title="Opportunity Name">Opportunity Name</div>
                                     <span class="slds-icon_container slds-icon-utility-arrowdown">
                                         <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                     </span>    
@@ -173,7 +222,7 @@
                         <!-- EM Channel -->
                         <th scope="col" style="width:45%">
                             <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                <div class="slds-truncate" title="Assigned">EM Channel</div>
+                                <div class="slds-truncate" title="EM Channel">EM Channel</div>
                                 <span class="slds-icon_container slds-icon-utility-arrowdown">
                                     <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                 </span>
@@ -182,23 +231,25 @@
 
                         <!-- 6 -->
                         <!-- Pipeline Stage -->
-                        <th scope="col" style="width:30%">
-                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                <div class="slds-truncate" title="Assigned">Pipeline<br/>Stage</div>
-                                <span class="slds-icon_container slds-icon-utility-arrowdown">
-                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
-                                </span>    
-                            </div>
+                        <th scope="col" style="width:30%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='oppPipelineStage'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="oppPipelineStage" onclick="{!c.handleSort}">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <div class="slds-truncate" title="Pipeline Stage: Sourced, Proposed, Converted or Won">Pipeline<br/>Stage</div>
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                    </span>
+                                </div>
+                            </a>
                         </th>
 
                         <!-- 7 -->
                         <!-- State -->
                         <th scope="col" style="width:20%">
                             <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                <div class="slds-truncate" title="Has CP Item">State</div>
+                                <div class="slds-truncate" title="State">State</div>
                                 <span class="slds-icon_container slds-icon-utility-arrowdown">
                                     <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
-                                </span>    
+                                </span>
                             </div>
                         </th>
 
@@ -206,7 +257,7 @@
                         <!-- Opportunity Value -->
                         <th scope="col" style="width:30%">
                             <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                <div class="slds-truncate" title="Visible to Client">Opp<br/>Value</div>
+                                <div class="slds-truncate" title="Opportunity Value is Estimated Cost">Opp<br/>Value</div>
                                 <span class="slds-icon_container slds-icon-utility-arrowdown">
                                     <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                 </span>    
@@ -217,7 +268,7 @@
                         <!-- Fee structure -->
                         <th scope="col" style="width:30%">
                             <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                <div class="slds-truncate" title="Visible to Client">Fee<br/>Structure</div>
+                                <div class="slds-truncate" title="Fee structure">Fee<br/>Structure</div>
                                 <span class="slds-icon_container slds-icon-utility-arrowdown">
                                     <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                 </span>
@@ -229,7 +280,7 @@
                         <th scope="col" style="width:35%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='preQualInfo'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
                             <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="preQualInfo" onclick="{!c.handleSort}">
                                 <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                    <div class="slds-truncate" title="Due Date CP">Pre-Qual Info</div>
+                                    <div class="slds-truncate" title="Status: ✓ - Completed, x - Incomlete. Sourced when completed. Completed when date completed is not blank.">Pre-Qual Info</div>
                                     <span class="slds-icon_container slds-icon-utility-arrowdown">
                                         <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                     </span>
@@ -242,7 +293,7 @@
                         <th scope="col" style="width:35%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='pitchDeck'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
                             <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="pitchDeck" onclick="{!c.handleSort}">
                                 <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                    <div class="slds-truncate" title="Submitted Date CP">Pitch Deck</div>
+                                    <div class="slds-truncate" title="Status: ✓ - Completed, x - Incomlete. Proposed when completed. Completed when date completed is not blank.">Pitch Deck</div>
                                     <span class="slds-icon_container slds-icon-utility-arrowdown">
                                         <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                     </span>    
@@ -255,7 +306,7 @@
                         <th scope="col" style="width:35%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='approveContracting'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
                             <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="approveContracting" onclick="{!c.handleSort}">
                                 <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                    <div class="slds-truncate" title="Approved Date CP">Approve<br/>Contracting</div>
+                                    <div class="slds-truncate" title="Status: ✓ - Completed, x - Incomlete. Converted when completed. Completed when date completed is not blank.">Approve<br/>Contracting</div>
                                     <span class="slds-icon_container slds-icon-utility-arrowdown">
                                         <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                     </span>
@@ -268,7 +319,7 @@
                         <th scope="col" style="width:35%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='signedContract'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
                             <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="signedContract" onclick="{!c.handleSort}">
                                 <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                    <div class="slds-truncate" title="Comment">Signed<br/>Contract</div>
+                                    <div class="slds-truncate" title="Status: ✓ - Completed, x - Incomlete. Won when completed. Completed when date completed is not blank.">Signed<br/>Contract</div>
                                     <span class="slds-icon_container slds-icon-utility-arrowdown">
                                         <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
                                     </span>
@@ -278,13 +329,15 @@
 
                         <!-- 14 -->
                         <!-- Opportunity Owner -->
-                        <th scope="col" style="width:30%">
-                            <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
-                                <div class="slds-truncate" title="Comment">Opp<br/>Owner</div>
-                                <span class="slds-icon_container slds-icon-utility-arrowdown">
-                                    <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
-                                </span>
-                            </div>
+                        <th scope="col" style="width:30%" class="{!'slds-is-resizable slds-is-sortable ' + (v.sortField=='oppOwner'?'slds-is-sorted '+(v.sortDirection=='ASC'?'slds-is-sorted_asc':'slds-is-sorted_desc'):'slds-is-sorted_asc')}">
+                            <a class="slds-th__action slds-text-link_reset" href="javascript:void(0);" role="button" data-sortfield="oppOwner" onclick="{!c.handleSort}">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-has-flexi-truncate">
+                                    <div class="slds-truncate" title="Opp Owner">Opp<br/>Owner</div>
+                                    <span class="slds-icon_container slds-icon-utility-arrowdown">
+                                        <lightning:icon iconName="utility:arrowdown" size="xx-small" class="slds-icon slds-icon-text-default slds-is-sortable__icon"/>
+                                    </span>
+                                </div>
+                            </a>
                         </th>
 
                     </tr>

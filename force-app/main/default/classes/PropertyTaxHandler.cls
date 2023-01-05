@@ -42,7 +42,7 @@ public with sharing class PropertyTaxHandler {
             && (oldPropTax.Property_Tax_Status__c == 'Draft' || oldPropTax.Property_Tax_Status__c == 'In Review')) {
 
                 if(propTax.Non_School_Occupied__c == false) {
-                    Lease__c lease = [SELECT id, name FROM lease__c WHERE property__c =: propTax.Property__c LIMIT 1];
+                    Lease__c lease = [SELECT id, name FROM lease__c WHERE recordtype.developername = 'Facilities_Asset_Leases' AND property__c =: propTax.Property__c LIMIT 1];
                     Lease_School__c leaseSchool;
                     try {
                         leaseSchool = [SELECT id, name, Account_School__r.ParentId, Account_School__c FROM Lease_School__c WHERE lease__c =:lease.id LIMIT 1];
@@ -60,14 +60,6 @@ public with sharing class PropertyTaxHandler {
                             accountId = leaseSchool.Account_School__c;
                         }
                     }
-
-                    system.debug('@@@ accountId = ' + accountId);
-
-                    // if(leaseSchool.Account_School__r.ParentId != null) {
-                    //     accountId = leaseSchool.Account_School__r.ParentId;
-                    // } else if(leaseSchool.Account_School__c != null) {
-                    //     accountId = leaseSchool.Account_School__c;
-                    // }
                         
                     List<CSC_Action_Item__c> actionItems = [SELECT Id, 
                                                             Next_Action_Date__c,

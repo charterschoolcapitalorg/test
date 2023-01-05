@@ -28,6 +28,7 @@ public with sharing class PropertyTaxHandlerTest {
 
         Lease__c lease = TestDiligenceUtils.getLease(prop);
         lease.Lease_Status__c = 'Active';
+        lease.recordtypeid = '0120g000000l48pAAA';
         insert lease;
 
         Lease_School__c leaseSchool = TestDiligenceUtils.getLeaseSchool(lease, schoolAcct);
