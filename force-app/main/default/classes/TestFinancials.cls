@@ -128,6 +128,7 @@
             FinancialCtrl.getCurrFY();
             FinancialCtrl.getData('True', a.Id, 'Quarterly/Annual', 'All', 'Q1', 'Q4', '18', '20');
         	FinancialCtrl.getFiscalYears();
+            FinancialCtrl.getActualBudgetComments('1', '["Q3"]', '18-20');
             
         
 		Test.stoptest();

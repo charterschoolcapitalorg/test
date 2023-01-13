@@ -1,5 +1,6 @@
-<apex:page controller="EnrollmentMarketingMilestoneReportCtrl" contentType="application/vnd.ms-excel#EM_Milestone_Report.xls" cache="true">
+<!-- <apex:page controller="EnrollmentMarketingMilestoneReportCtrl" contentType="application/vnd.ms-excel#EM_Milestone_Report.xls" cache="true"> -->
 
+<apex:page controller="EnrollmentMarketingMilestoneReportCtrl" contentType="application/vnd.ms-excel#{!fileName}.xls" cache="true">
     <!-- for PC -->
     <!-- <apex:pageBlock title="EM Milestone Report">
         <apex:pageBlockTable value="{!oppsToExport}" var="opp" border="1px solid black">

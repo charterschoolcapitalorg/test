@@ -315,6 +315,7 @@
                 var state = response.getState();
                 if (state === "SUCCESS") {
                     component.set("v.data", response.getReturnValue());
+                    console.log('@@@ data = ' + JSON.stringify(response.getReturnValue()));
                     component.set("v.columns", response.getReturnValue()[0].columns);
                     component.set("v.columnwrappers", response.getReturnValue()[0].columnobjects);
                     console.log('columns size ' + response.getReturnValue()[0].screensize);

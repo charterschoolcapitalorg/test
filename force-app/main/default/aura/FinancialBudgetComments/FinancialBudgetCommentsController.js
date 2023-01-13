@@ -16,6 +16,7 @@
             }
         }
 		console.log('quarters== '+JSON.stringify(quarters));
+        console.log('quarters== '+quarters);
         let action = component.get("c.getActualBudgetComments");
         action.setParams({
             clientId : accId,

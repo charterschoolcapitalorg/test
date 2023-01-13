@@ -14,6 +14,9 @@
 
 public class EnrollmentMarketingMilestoneReportCtrl {
 
+    // add dinamic file name
+    public string fileName {get;set;}
+
     public List<OpportunityWrapper> oppsToExport {get;set;}
     // remove the split per channel per Kirt
 
@@ -29,6 +32,14 @@ public class EnrollmentMarketingMilestoneReportCtrl {
         oppPipelineStage = getPipelineData(oppsToExport);
         oppTotal = getTotalNunberOpps(oppsToExport);
         oppPipeline = getPipeline(oppsToExport);
+
+        fileName = getFileName();
+    }
+
+    @AuraEnabled
+    public static String getFileName() {
+        String name = 'EM Milestone Report' + '_' + String.valueOf(Date.today().year()) + '-' + String.valueOf(Date.today().month()) + '-' + String.valueOf(Date.today().day());
+        return name;
     }
 
     @AuraEnabled

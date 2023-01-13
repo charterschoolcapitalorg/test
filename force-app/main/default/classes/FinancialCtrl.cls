@@ -1,4 +1,18 @@
-public class FinancialCtrl {
+/**=====================================================================
+ * Charter School Capital
+ * Name: FinancialCtrl
+ * Test Class: TestFinancials
+ * Description: financial information button
+ * Created Date: ???
+ * Created By: ??? 
+ *
+ * Date Modified                Modified By                  Description of the update
+ * [MON DD, YYYY]             	[FirstName LastName]		 [Short description for changes]
+ *  Jan 11, 2023				Slava Krel				     Add new fields 
+
+ =====================================================================*/
+
+ public class FinancialCtrl {
     
     
 	private static Integer defaultYears = 3;
@@ -45,21 +59,102 @@ public class FinancialCtrl {
     
     
     //for this - add word BLANK to insert a blank row, add a field name, or add text (not containg __c) for just a Label in the Row
-    private static List<String> UIfieldNames = new List<String>{'Data_Source__c',  'Audited__c', 'Actual_Student_Count__c', 'Breakeven_Enrollment__c', 'Income Statement' , 'Federal_Revenue__c', 
-        'State_Revenue__c', 'Local_Revenue__c', 'Donations__c', 'Other_Revenue__c', 'Total_Revenue__c', 'BLANK', 
-        'Rent__c', 'Utilities__c', 'Salaries_Benefits__c', 'Management_Fee__c', 'Other_Opex__c', 'Total_Opex_Ex__c',
-        'Interest__c', 'Depreciation_Amortization__c', 'Total_Expense__c', 'BLANK', 'Nonrecurring_expense__c','BLANK', 
-        'Stated_Net_Income__c', 'Adjusted_Net_Income__c', 'EBITDA__c', 'EBITDAR__c', 'EBITDARM__c', 'Balance Sheet', 'Cash__c', 'Accounts_Receivable__c', 
-        'Other_Current_Assets__c', 'Current_Assets__c', 'Capital_Assets__c', 'Other_Non_Current_Assets__c', 'Total_Assets__c', 
-        'BLANK', 'Accounts_Payable__c', 'Other_Current_Liabilities__c', 'Current_Liabilities__c', 'Net_Pension_Liability__c', 'Other_Long_Term_Liabilities__c', 
-        'Total_Liabilities__c', 'BLANK', 'Net_Assets__c', 
-        'Growth', 'Student_Count_Growth__c','Revenue__c', 'Salary__c','Expense__c', 'EBITDAR_Growth__c', 'AP__c', 'Net_Asset__c', 
-        'Ratios', 'EBITDAR_Rent_Coverage__c', 'EBITDARM_Rent_Coverage__c', 'Rent_Revenue_Ratio__c', 'Salaries_Student__c', 
-        'Rent_Student__c', 'Revenue_Student__c', 'Opex_Student__c', 'Days_Cash_On_Hand__c', 'Current_Ratio__c', 'Audit Information', 
-        'Going_Concern__c', 'Internal_Control_Issues__c', 'Audit_Opinion__c', 'BLANK', 'Financial Analysis', 'Analysis_Summary__c', 'Asset_Management__c',
+    private static List<String> UIfieldNames = new List<String>{
+        'Data_Source__c', 
+        'Audited__c', 
+        'Actual_Student_Count__c', 
+        'Breakeven_Enrollment__c', 
+        
+        'Income Statement' , // section
+        'Federal_Revenue__c', 
+        'State_Revenue__c', 
+        'Local_Revenue__c', 
+        'Donations__c', 
+        'Other_Revenue__c', 
+        'Total_Revenue__c', 
+        'BLANK', 
+        'Rent__c', 
+        'Utilities__c', 
+        'Salaries_Benefits__c', 
+        'Management_Fee__c', 
+        'Other_Opex__c', 
+        'Total_Opex_Ex__c',
+        'Interest__c', 
+        'Depreciation_Amortization__c', 
+        'Income_Taxes__c', // added 20230111 - case 
+        'Total_Expense__c', 
+        'BLANK', 
+        'Nonrecurring_expense__c',
+        'BLANK', 
+        'Stated_Net_Income__c', 
+        'Non_Recurring_Non_Cash_Income__c', // added 20230111 - case
+        'Adjusted_Net_Income__c', 
+        'EBITDA__c', 
+        'EBITDAR__c', 
+        'EBITDARM__c', 
+        
+        'Other Financial Information', // new section added 20230111 - case
+        'Lease_Rent__c', // added 20230111 - case
+        'Other_Rent__c', // added 20230111 - case
+
+        'Balance Sheet', // section
+        'Cash__c', 
+        'Accounts_Receivable__c', 
+        'Other_Current_Assets__c', 
+        'Current_Assets__c', 
+        'Capital_Assets__c', 
+        'Other_Non_Current_Assets__c', 
+        'Total_Assets__c', 
+        'BLANK', 
+        'Accounts_Payable__c', 
+        'Other_Current_Liabilities__c', 
+        'Current_Liabilities__c', 
+        'Net_Pension_Liability__c', 
+        'Other_Long_Term_Liabilities__c', 
+        'Total_Liabilities__c', 
+        'BLANK', 
+        'Net_Assets__c', 
+        
+        'Growth', // section
+        'Student_Count_Growth__c',
+        'Revenue__c', 
+        'Salary__c',
+        'Expense__c', 
+        'EBITDAR_Growth__c', 
+        'AP__c', 
+        'Net_Asset__c', 
+        
+        'Ratios', // section
+        'EBITDAR_Rent_Coverage__c', 
+        'EBITDARM_Rent_Coverage__c', 
+        'Rent_Revenue_Ratio__c', 
+        'Salaries_Student__c', 
+        'Rent_Student__c', 
+        'Revenue_Student__c', 
+        'Opex_Student__c', 
+        'Days_Cash_On_Hand__c', 
+        'Current_Ratio__c', 
+
+        'Ratio Total Rent', // new section added 20230111 - case
+        'Adj_EBITDAR_Other_Rent__c', // added 20230111 - case
+        'EBITDAR_Other_Rent_Coverage__c', // added 20230111 - case
+        'EBITDARM_Other_Rent_Coverage__c', // added 20230111 - case
+        'Total_Rent_Revenue__c', // added 20230111 - case
+        'Total_Rent_Student__c', // added 20230111 - case
+        
+        'Audit Information', // section
+        'Going_Concern__c', 
+        'Internal_Control_Issues__c', 
+        'Audit_Opinion__c', 
+        'BLANK', 
+        
+        'Financial Analysis', // section
+        'Analysis_Summary__c', 
+        'Asset_Management__c',
         'Actual_to_Budget_Variance_Comments__c'
         
         };
+
     private static List<String> negativeVarianceFields = new List<String>{'Rent__c', 'Utilities__c', 'Salaries_Benefits__c', 'Management_Fee__c', 'Other_Opex__c', 'Total_Opex_Ex__c', 'Interest__c', 'Depreciation_Amortization__c', 'Total_Expense__c'};
     private static List<String> AddtlFieldNamesForQuery = new List<String>{'RecordTypeId','Fiscal_Year__c', 'Fiscal_Quarter__c', 'Month__c'};
         
@@ -387,25 +482,43 @@ public class FinancialCtrl {
                 query+=' AND (RecordTypeId=:qrt or RecordTypeId=:art) ';    
             }            
         }
-        if (auditstatus!='' && auditstatus!='All') {
+        // if (auditstatus!='' && auditstatus!='All') {
+        //     if (auditstatus=='Audited') {
+        //         query+=' AND Audited__c = True ';       
+        //     } else if (auditstatus=='Unaudited') {
+        //         query+=' AND Audited__c = False ';
+        //     }
+        // }
+        system.debug('@@@ auditstatus = ' + auditstatus);
+        if (auditstatus!='') {
             if (auditstatus=='Audited') {
-                query+=' AND Audited__c = True ';       
+                query+=' AND Audited__c = True ORDER BY CreatedDate DESC';       
             } else if (auditstatus=='Unaudited') {
-                query+=' AND Audited__c = False ';
+                query+=' AND Audited__c = False ORDER BY CreatedDate DESC';
+            } else if(auditstatus=='All') {
+                system.debug('@@@ condition for ALL is working');
+                query+=' ORDER BY CreatedDate DESC'; // AND Audited__c = False AND Audited__c = true
             }
-        }
-        query+=' ORDER BY CreatedDate DESC';
+        } else {query+=' ORDER BY CreatedDate DESC';}
+        //query+=' ORDER BY CreatedDate DESC';
         System.debug('***query: ' + query);
         return Database.query(query);
     }
     
     @AuraEnabled(cacheable=true)
     public static List<DataWrapper> getData(String isDefault, String acctId, String type, String auditstatus, String stDtfq, String endDtfq, String stDtfy, String endDtfy) {
+        system.debug('@@-');
         System.debug('getData: ' + acctId + ' - type: ' + type + ' - auditstatus: ' + auditstatus + ' - stDt: ' + stDtfq + ' - endDt: ' + endDtfq);
         DoDefaultLoad = Boolean.valueOf(isDefault);
         List<DataWrapper> dd = new List<DataWrapper>();
         List<Financial__c> objs = getFinObjs(acctId, type, auditstatus);
+
         System.debug('**** found Financial records for account: ' + objs);
+        // see what records we got
+        for(Financial__c obj : objs) {
+            System.debug('@@@ obj = ' + obj);
+        }
+
 		//create Object Map based on the quarter, month and year
         for (Financial__c f : objs) {
             if (f.recordtypeid==monthlyRecType()) {
@@ -429,21 +542,31 @@ public class FinancialCtrl {
                     // }
                 }
             } else {
-                fyFqObjsMap.put((f.Fiscal_Year__c!=null?f.Fiscal_Year__c:'')+(f.Fiscal_Quarter__c!=null?f.Fiscal_Quarter__c:''),f);
-            	System.debug('added object for: ' + f.Fiscal_Year__c+f.Fiscal_Quarter__c);
+                fyFqObjsMap.put((f.Fiscal_Year__c!=null?f.Fiscal_Year__c:'')+(f.Fiscal_Quarter__c!=null?f.Fiscal_Quarter__c:''),f); // <-- add id to have a unique key
+            	System.debug('added object for: ' + f.Fiscal_Year__c+f.Fiscal_Quarter__c); // now all 18 getting added
             }
         }
         if(type=='BudgetvActual' && !budgetActualMap.isEmpty()){
             CreateQtlyVariances();
         }
-        System.debug('fyFqObjsMap: ' +fyFqObjsMap);
-        System.debug('monthObjsMap: ' +monthObjsMap);
-        System.debug('budgetActualMap: ' +budgetActualMap.keySet());
+        // remove after testing
+        // System.debug('fyFqObjsMap: ' +fyFqObjsMap);
+        // for(String record : fyFqObjsMap.keySet()) {
+        //     system.debug('@@@! record = ' + record + '; value = ' + fyFqObjsMap.get(record)); // all 18 records visible here
+        // }
+        // System.debug('monthObjsMap: ' +monthObjsMap);
+        // System.debug('budgetActualMap: ' +budgetActualMap.keySet());
+        // remove after testing
         
         for (String s : UIfieldNames) {
             System.debug('fieldName: ' +s);
 				
-            //build record for each field
+            //build record for each field, where:
+            // s - field name
+            // stDtfq - startdatefq
+            // endDtfq - enddatefq
+            // stDtfy - startdatefy
+            // endDtfy - enddatefy
             DataWrapper d =  new DataWrapper(s, stDtfq, endDtfq, stDtfy, endDtfy, type);
             dd.add(d);
             System.debug('*** adding new data row: ' + d);
@@ -457,10 +580,12 @@ public class FinancialCtrl {
 
     @AuraEnabled
     public static List<Financial__c> getActualBudgetComments(String clientId, String quarters, String fiscalYear){
+        system.debug('@#$ quarters = ' + quarters);
         try {
             //get actual records for specified quarters
             List<String> qtrs = new List<String>();
             Object[] values = (Object[])System.JSON.deserializeUntyped(quarters);
+            system.debug('@#$ values = ' + values);
             if(values.size()>0){         
                 for (Object val : values) {
                     qtrs.add(string.valueof(val));
@@ -659,11 +784,24 @@ public class FinancialCtrl {
                     } else if(type== 'BudgetvActual'){
                         System.debug('***looking for budgetActualMap: ' + (Integer.valueOf(endDtfy)-1)+'-'+endDtfy+' Act.');
                         found = budgetActualMap.get(c);
+
+                        // this 
                     } else {
                         fiscalQUarter = this.getFQFromColumnName(c);
                     	fiscalYear = this.getFYFromColumnName(c);
                         //find matching Financial record for this FQ/FY
                         System.debug('***looking for fin obj: ' + fiscalYear+fiscalQUarter);
+
+                        // testing
+                        // String x = fiscalYear+fiscalQUarter;
+                        // for(String record : fyFqObjsMap.keySet()) {
+                        //     system.debug('@@@# record = ' + record); 
+                        //     if(record.Substring(0,record.length()-18) == x) {
+                        //         system.debug('@@@# = ' + fyFqObjsMap.get(record)); 
+                        //     }
+                        // }
+                        // testing
+                        
                         found = fyFqObjsMap.get(fiscalYear+fiscalQUarter);
                     }
                     
@@ -729,6 +867,7 @@ public class FinancialCtrl {
         }
         
         private STring getFQFromColumnName(STring c) {
+            // delete id
             if (!c.contains('Q')) {
                 //for just year columns there is no FQ
                 return '';
