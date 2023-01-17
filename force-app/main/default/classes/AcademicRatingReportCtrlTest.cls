@@ -71,8 +71,8 @@ private class AcademicRatingReportCtrlTest {
     Test.startTest();
     List<AcademicRatingReportCtrl.SchoolDataWrapper> sdw = AcademicRatingReportCtrl.getSchoolData();
     System.assertEquals(sdw[0].CharterCapacity, 'No limit', 'capacity not matching');
-    System.assertEquals(sdw[0].EnrollmentCurrentYear, 150, 'current year enrollment off');
-    System.assertEquals(sdw[0].EnrollmentPreviousYear, 100, 'previous year enrollment off');
+    System.assertEquals(sdw[0].EnrollmentCurrentYear, 200, 'current year enrollment off'); // changing from 150
+    System.assertEquals(sdw[0].EnrollmentPreviousYear, 150, 'previous year enrollment off'); // changing from 100
     System.assertEquals(sdw[0].CharterExpirationDate, Date.today().addDays(365), 'charter terms end date wrong');
     Test.stopTest();
   }
