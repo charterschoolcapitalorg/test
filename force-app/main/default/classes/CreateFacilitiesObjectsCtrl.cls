@@ -2,7 +2,7 @@
  * Charter School Capital
  * Name: CreateFacilitiesObjectsCtrl
  * Test Class: TestFacilitiesObjects
- * Description: 
+ * Description: plays role in the Property Overview page
  * Created Date: 
  * Created By: 
  *
@@ -174,7 +174,7 @@ public with sharing class CreateFacilitiesObjectsCtrl {
             Notes__c, Parcel_Number__c, Property__c, Property_Address__c,
             Property_Sold__c, Website__c, 
             //Total_Amount_Due_For_Tax_Year__c, 
-            Next_Due_Date__c, Final_Due_Date_for_Tax_Year__c, Balance_for_tax_year__c
+            Next_Due_Date_MIN__c, Final_Due_Date_for_Tax_Year__c, Balance_for_tax_year__c
     		FROM Parcel__c WHERE Property__c=:pId];
     	return ss;
     }

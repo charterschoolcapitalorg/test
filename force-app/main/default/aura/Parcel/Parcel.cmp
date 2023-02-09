@@ -28,7 +28,7 @@
             <ui:outputDate value="{!v.Parcel.Final_Due_Date_for_Tax_Year__c}" format="MM/dd/yyyy" />
         </lightning:layoutItem> 
         <lightning:layoutItem size="2" flexibility="auto" class="header-data">
-            <ui:outputDate value="{!v.Parcel.Next_Due_Date__c}" format="MM/dd/yyyy" />
+            <ui:outputDate value="{!v.Parcel.Next_Due_Date_MIN__c}" format="MM/dd/yyyy" />
         </lightning:layoutItem> 
         
     </lightning:layout>

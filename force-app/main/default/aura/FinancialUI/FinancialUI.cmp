@@ -36,7 +36,8 @@
     </aura:if>
     
     <aura:attribute name="typefilter" type="String" default="Quarterly/Annual"/>  
-    <aura:attribute name="auditfilter" type="String" default="All"/>
+    <!-- <aura:attribute name="auditfilter" type="String" default="All"/> -->
+    <aura:attribute name="datasourcefilter" type="String" default="Financials/Audits" />
     <aura:attribute name="acctfilter" type="String" />
     <aura:attribute name="accId" type="String" />
     <aura:attribute name="viewType" type="String" />
@@ -81,11 +82,24 @@
                 </lightning:layoutItem>
                 
                 <!--Audit Status picklist-->
-                <lightning:layoutItem class="" >
+                <!--changing to Data Source picklist-->
+                <!-- <lightning:layoutItem class="" >
                     <lightning:select disabled="{!v.typefilter=='BudgetvActual'}" label="Audit Status:&nbsp;" class="picklist" value="{!v.auditfilter}" aura:id="auditfilter" name="auditfilter" >
                         <option selected="true" value="All">All</option>
                         <option value="Audited">Audited</option>
                         <option value="Unaudited">Unaudited</option>
+                    </lightning:select>
+                    <br/>
+                </lightning:layoutItem> -->
+
+                <!--Data Source picklist-->
+                <lightning:layoutItem class="" >
+                    <lightning:select disabled="{!v.typefilter=='BudgetvActual'}" label="Data Source:&nbsp;" class="picklistlarge" value="{!v.datasourcefilter}" aura:id="datasourcefilter" name="datasourcefilter" >
+                        <option selected="true" value="Financials/Audits">Financials/Audits</option>
+                        <option value="Financials/Budgets">Financials/Budgets</option>    
+                        <option value="Audit">Audits</option>
+                        <option value="Budget">Budgets</option>
+                        <option value="Financial Statements">Financials</option>
                     </lightning:select>
                     <br/>
                 </lightning:layoutItem>

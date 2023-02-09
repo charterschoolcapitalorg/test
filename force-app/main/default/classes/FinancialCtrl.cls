@@ -81,21 +81,21 @@
         'Total_Opex_Ex__c',
         'Interest__c', 
         'Depreciation_Amortization__c', 
-        'Income_Taxes__c', // added 20230111 - case 
+        'Income_Taxes__c', // added 20230111 - case 2364
         'Total_Expense__c', 
         'BLANK', 
         'Nonrecurring_expense__c',
         'BLANK', 
         'Stated_Net_Income__c', 
-        'Non_Recurring_Non_Cash_Income__c', // added 20230111 - case
+        'Non_Recurring_Non_Cash_Income__c', // added 20230111 - case 2364
         'Adjusted_Net_Income__c', 
         'EBITDA__c', 
         'EBITDAR__c', 
         'EBITDARM__c', 
         
-        'Other Financial Information', // new section added 20230111 - case
-        'Lease_Rent__c', // added 20230111 - case
-        'Other_Rent__c', // added 20230111 - case
+        'Other Financial Information', // new section added 20230111 - case 2364
+        'Lease_Rent__c', // added 20230111 - case 2364
+        'Other_Rent__c', // added 20230111 - case 2364
 
         'Balance Sheet', // section
         'Cash__c', 
@@ -114,6 +114,7 @@
         'Total_Liabilities__c', 
         'BLANK', 
         'Net_Assets__c', 
+        'Total_Liabilities_Net_Assets__c',
         
         'Growth', // section
         'Student_Count_Growth__c',
@@ -135,12 +136,12 @@
         'Days_Cash_On_Hand__c', 
         'Current_Ratio__c', 
 
-        'Ratio Total Rent', // new section added 20230111 - case
-        'Adj_EBITDAR_Other_Rent__c', // added 20230111 - case
-        'EBITDAR_Other_Rent_Coverage__c', // added 20230111 - case
-        'EBITDARM_Other_Rent_Coverage__c', // added 20230111 - case
-        'Total_Rent_Revenue__c', // added 20230111 - case
-        'Total_Rent_Student__c', // added 20230111 - case
+        'Ratio Total Rent', // new section added 20230111 - case 2364
+        'Adj_EBITDAR_Other_Rent__c', // added 20230111 - case 2364
+        'EBITDAR_Other_Rent_Coverage__c', // added 20230111 - case 2364
+        'EBITDARM_Other_Rent_Coverage__c', // added 20230111 - case 2364
+        'Total_Rent_Revenue__c', // added 20230111 - case 2364
+        'Total_Rent_Student__c', // added 20230111 - case 2364
         
         'Audit Information', // section
         'Going_Concern__c', 
@@ -445,7 +446,7 @@
         }
     }
     
-    private static List<Financial__c> getFinObjs(String acctId, String type, String auditstatus) {
+    private static List<Financial__c> getFinObjs(String acctId, String type, String dataSource) {
         STring query = 'Select Account__c, ';
         for (String s : UIfieldNames) {
             if (s == 'Asset_Management__c' || s == 'Actual_to_Budget_Variance_Comments__c'){
@@ -482,36 +483,28 @@
                 query+=' AND (RecordTypeId=:qrt or RecordTypeId=:art) ';    
             }            
         }
-        // if (auditstatus!='' && auditstatus!='All') {
-        //     if (auditstatus=='Audited') {
-        //         query+=' AND Audited__c = True ';       
-        //     } else if (auditstatus=='Unaudited') {
-        //         query+=' AND Audited__c = False ';
-        //     }
-        // }
-        system.debug('@@@ auditstatus = ' + auditstatus);
-        if (auditstatus!='') {
-            if (auditstatus=='Audited') {
-                query+=' AND Audited__c = True ORDER BY CreatedDate DESC';       
-            } else if (auditstatus=='Unaudited') {
-                query+=' AND Audited__c = False ORDER BY CreatedDate DESC';
-            } else if(auditstatus=='All') {
-                system.debug('@@@ condition for ALL is working');
-                query+=' ORDER BY CreatedDate DESC'; // AND Audited__c = False AND Audited__c = true
+
+        system.debug('@@@ dataSource = ' + dataSource);
+        if (dataSource != '' || dataSource == null) {
+            if (dataSource == 'Audit' || dataSource == 'Budget' || dataSource == 'Financial Statements') {
+                query += ' AND Data_Source__c = :dataSource ORDER BY CreatedDate DESC';
+            } else if(dataSource == 'Financials/Audits') {
+                query += ' AND (Data_Source__c =\''+'Audit'+'\' or Data_Source__c =\''+'Financial Statements'+'\') ORDER BY CreatedDate DESC';
+            } else if(dataSource == 'Financials/Budgets') {
+                query += ' AND (Data_Source__c =\''+'Budget'+'\' or Data_Source__c =\''+'Financial Statements'+'\') ORDER BY CreatedDate DESC';
             }
-        } else {query+=' ORDER BY CreatedDate DESC';}
-        //query+=' ORDER BY CreatedDate DESC';
+        } else { query+=' ORDER BY CreatedDate DESC'; }
         System.debug('***query: ' + query);
         return Database.query(query);
     }
     
     @AuraEnabled(cacheable=true)
-    public static List<DataWrapper> getData(String isDefault, String acctId, String type, String auditstatus, String stDtfq, String endDtfq, String stDtfy, String endDtfy) {
+    public static List<DataWrapper> getData(String isDefault, String acctId, String type, String dataSource, String stDtfq, String endDtfq, String stDtfy, String endDtfy) {
         system.debug('@@-');
-        System.debug('getData: ' + acctId + ' - type: ' + type + ' - auditstatus: ' + auditstatus + ' - stDt: ' + stDtfq + ' - endDt: ' + endDtfq);
+        System.debug('getData: ' + acctId + ' - type: ' + type + ' - dataSource: ' + dataSource + ' - stDt: ' + stDtfq + ' - endDt: ' + endDtfq);
         DoDefaultLoad = Boolean.valueOf(isDefault);
         List<DataWrapper> dd = new List<DataWrapper>();
-        List<Financial__c> objs = getFinObjs(acctId, type, auditstatus);
+        List<Financial__c> objs = getFinObjs(acctId, type, dataSource);
 
         System.debug('**** found Financial records for account: ' + objs);
         // see what records we got
