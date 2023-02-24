@@ -7,5 +7,6 @@
 
     rescore : function(component, event, helper) {
         helper.rescore(component, event);
+        location.reload();
     },
 })

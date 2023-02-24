@@ -56,8 +56,19 @@ public with sharing class FundingEstimateCalculatorControllerTest {
 			controller.saveAndGenerateInternalSummary();
 			controller.PreviousOnStep3();
 
+            controller.ShowPopup();
+            controller.ClosePopup();
+
 		Test.StopTest();
 	}
+
+    // @IsTest
+	// public void popupTest() {
+    //     Test.StartTest();
+    //     FundingEstimateCalculatorController.ShowPopup();
+    //     FundingEstimateCalculatorController.ClosePopup();
+	// 	Test.StopTest();
+    // }
 
 	private static void createTestData() {
 		TestHelper.createCustomSettingToByPassTriggersAndRules('Account, RPA__c, Opportunity, Funding_Estimate_Receivable__c, Funding_Estimates__c, '+

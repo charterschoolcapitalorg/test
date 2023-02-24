@@ -39,11 +39,11 @@
 
             <aura:if isTrue="{!v.isBefore}">
                 <ui:message title="Warning" severity="warning" closable="false">
-                    You’re about to rescore this School’s pricing. This means that Student Count, Charter Term, and Intercept information on this Pricing Rate record will be refreshed to reflect current values found elsewhere in Salesforce. This will likely change the School Markup, Effective Rate (Scoring), and potentially the Final Effective Rate.
+                    You’re about to rescore this record. This means that Student Count and Charter Term information on this Pricing Rate record will be refreshed to reflect current values found elsewhere in Salesforce. This will likely change the Final Discount Rate.
                 </ui:message>
             </aura:if>
 
-            <aura:if isTrue="{! not( empty( v.childRates ) ) }">
+            <!-- <aura:if isTrue="{! not( empty( v.childRates ) ) }">
                 <div class="slds-section slds-is-open">
                     <h3 class="slds-section__title slds-theme_shade">
                         <span class="slds-truncate slds-p-horizontal_small" title="Section Title">School Rates</span>
@@ -60,7 +60,7 @@
                         </p>
                     </div>
                 </div>
-            </aura:if>
+            </aura:if> -->
             
         </aura:if>
 

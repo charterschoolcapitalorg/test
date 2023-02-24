@@ -1,10 +1,21 @@
+/**=====================================================================
+ * Charter School Capital
+ * Name: RescorePricingRateController
+ * Test Class: RescorePricingRateControllerTest
+ * Description: 
+ * Created Date: 2023, Jan 05
+ * Created By: Slava Krel
+ *
+ * Date Modified                Modified By                  Description of the update
+ * [MON DD, YYYY]             	[FirstName LastName]		 [Short description for changes]
+ =====================================================================*/
 public without sharing class RescorePricingRateController {
     
     private static final String CLASS_NAME = 'RescorePricingRateController';
 
     @AuraEnabled
 	public static List<Object> whatToRescore(Id pRateId) {
-        ExceptionLogger.flushable = true;
+        // ExceptionLogger.flushable = true;
         List<Object> respObjs = new List<Object>();
 
         try {
@@ -12,46 +23,17 @@ public without sharing class RescorePricingRateController {
             ResponseObject respObj = new ResponseObject('score', score);
             respObjs.add(respObj);
         } catch (Exception e) {
-            ResponseObject errObj = new ResponseObject('error', e);
-            respObjs.add(errObj);
-            ExceptionLogger.log(e, 'Pricing_Rate__c', CLASS_NAME, 'whatToRescore');
+            // ResponseObject errObj = new ResponseObject('error', e);
+            // respObjs.add(errObj);
+            // ExceptionLogger.log(e, 'Pricing_Rate__c', CLASS_NAME, 'whatToRescore');
         }
 
-        ExceptionLogger.flushLogCache();
+        // ExceptionLogger.flushLogCache();
         return respObjs;
     }
 
     @AuraEnabled
 	public static PricingRateScore rescoreRate(Id pRateId) { 
-
-        // Dan ============================================
-        // List<Object> respObjs = new List<Object>();
-
-        // System.debug('In here!!!');
-
-        // try {
-        //     PricingRateScore score = new PricingRateScore(pRateId);
-        //     score.rescore();
-        //     ResponseObject respObj = new ResponseObject('score', score);
-        //     respObjs.add(respObj);  
-        //     if (score.errors!=null) {
-        //         for (String recId : score.errors.keySet()) { 
-        //             String erStr = score.errors.get(recId);
-        //             ResponseObject errObj = new ResponseObject('error', recId, new DMLOperation.DMLOpException(erStr));
-        //             respObjs.add(errObj);  
-        //         }
-        //     }
-        // } catch (Exception e) {
-        //     ExceptionLogger.log(e, 'Pricing_Rate__c', CLASS_NAME, 'rescoreRate');
-        //     ResponseObject respObj = new ResponseObject('error', e);
-        //     respObjs.add(respObj); 
-        // }
-
-        // ExceptionLogger.flushLogCache();
-        // return respObjs;
-
-
-        // Slava ============================================
         System.debug('START: Apex rescore ctrl fires');
         PricingRateScore score = new PricingRateScore(pRateId);
         score.rescore();
@@ -64,36 +46,36 @@ public without sharing class RescorePricingRateController {
         List<Object> respObjs = new List<Object>();
 
         try {
-            List<FieldSetUtility.FieldDescription> cRateFlds = FieldSetUtility.getFieldSetFields('RescorePageChildRates', 'Pricing_Rate__c');
-            ResponseObject respObj = new ResponseObject('cRateFlds', cRateFlds);
-            respObjs.add(respObj);  
+            // List<FieldSetUtility.FieldDescription> cRateFlds = FieldSetUtility.getFieldSetFields('RescorePageChildRates', 'Pricing_Rate__c');
+            // ResponseObject respObj = new ResponseObject('cRateFlds', cRateFlds);
+            // respObjs.add(respObj);  
         } catch (Exception e) {
-            ExceptionLogger.log(e, 'Pricing_Rate__c', CLASS_NAME, 'getFieldSets');
-            ResponseObject respObj = new ResponseObject('error', e);
-            respObjs.add(respObj); 
+            // ExceptionLogger.log(e, 'Pricing_Rate__c', CLASS_NAME, 'getFieldSets');
+            // ResponseObject respObj = new ResponseObject('error', e);
+            // respObjs.add(respObj); 
         }
 
         try {
-            List<FieldSetUtility.FieldDescription> rateFields = FieldSetUtility.getFieldSetFields('RescorePageRateDetails', 'Pricing_Rate__c');
-            ResponseObject respObj = new ResponseObject('rateFields', rateFields);
-            respObjs.add(respObj);  
+            // List<FieldSetUtility.FieldDescription> rateFields = FieldSetUtility.getFieldSetFields('RescorePageRateDetails', 'Pricing_Rate__c');
+            // ResponseObject respObj = new ResponseObject('rateFields', rateFields);
+            // respObjs.add(respObj);  
         } catch (Exception e) {
-            ExceptionLogger.log(e, 'Pricing_Rate__c', CLASS_NAME, 'getFieldSets');
-            ResponseObject respObj = new ResponseObject('error', e);
-            respObjs.add(respObj); 
+            // ExceptionLogger.log(e, 'Pricing_Rate__c', CLASS_NAME, 'getFieldSets');
+            // ResponseObject respObj = new ResponseObject('error', e);
+            // respObjs.add(respObj); 
         }
 
         try {
-            List<FieldSetUtility.FieldDescription> mRateFields = FieldSetUtility.getFieldSetFields('RescorePageMRateDetails', 'Market_Rate__c');
-            ResponseObject respObj = new ResponseObject('mRateFields', mRateFields);
-            respObjs.add(respObj);  
+            // List<FieldSetUtility.FieldDescription> mRateFields = FieldSetUtility.getFieldSetFields('RescorePageMRateDetails', 'Market_Rate__c');
+            // ResponseObject respObj = new ResponseObject('mRateFields', mRateFields);
+            // respObjs.add(respObj);  
         } catch (Exception e) {
-            ExceptionLogger.log(e, 'Market_Rate__c', CLASS_NAME, 'getFieldSets');
-            ResponseObject respObj = new ResponseObject('error', e);
-            respObjs.add(respObj); 
+            // ExceptionLogger.log(e, 'Market_Rate__c', CLASS_NAME, 'getFieldSets');
+            // ResponseObject respObj = new ResponseObject('error', e);
+            // respObjs.add(respObj); 
         }
 
-        ExceptionLogger.flushLogCache();
+        // ExceptionLogger.flushLogCache();
         return respObjs;
 	}
 

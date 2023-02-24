@@ -81,7 +81,7 @@ public class TestObjectFactory {
 
     public static Pricing_Rate__c getPricingRate(Account school) {
 		return new Pricing_Rate__c(
-			School__c = school.Id
+			Account__c = school.Id
 		);
 	}
 

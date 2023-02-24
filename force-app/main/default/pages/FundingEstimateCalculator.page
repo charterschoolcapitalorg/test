@@ -10,12 +10,14 @@
 
  * April 21, 2014               Manisha Gupta(Appirio)        T-273425 : Update all labels to be Custom Labels
  * May 8, 2014                  Tony Montemorano(Appirio)     Removed prototype scripts, reused commented out mobile classes for buttons on step3
- * Sep 19, 2022                 Slava Krel (CSC)              Funding Estimate Data Mapping for School over Charter Holder
+ * Sep 19, 2022                 Slava Krel (CSC)              Funding Estimate Data Mapping for School over Charter Holder, changing UI
  =====================================================================*/
 -->
 <apex:page standardController="Funding_Estimates__c" extensions="FundingEstimateCalculatorController"
                         title="Funding Estimate Tool" id="page"
                         sidebar="false" showHeader="false" standardStyleSheets="false">
+                        <!-- lightningStylesheets="true"> -->
+
 <apex:form id="form">
 <apex:actionFunction name="nextOnStep1" action="{!nextOnStep1}" onComplete="navigate('step2','tab2'); onLoadStep2(); " reRender="panel2"/>
 <apex:actionFunction name="nextOnStep2" action="{!nextOnStep2}" onComplete="navigate('step3','tab3'); onLoadStep3();" reRender="panel3"/>
@@ -28,6 +30,8 @@
 <apex:actionFunction name="saveAndGoFERecord" action="{!saveAndGoFERecord}"/>
 
 
+
+
 <html lang="en">
   <head>
     <meta charset="utf-8"/>
@@ -35,23 +39,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content=""/>
     <meta name="author" content=""/>
-
     <title>{!$Label.FE_Title}</title>
-
     <!-- Bootstrap core CSS -->
     <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/bootstrap.min.css')}"/>
     <link href="https://fonts.googleapis.com/css?family=Lato:400,700,900" rel="stylesheet" type="text/css" />
-
     <!-- Production Stylesheet -->
     <apex:stylesheet value="{!URLFOR($Resource.FundingEstimateCalculator, 'css/main.css')}"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
 
+        .corner-ribbon{
+            width: 200px;
+            background: #EF9221;
+            position: absolute;
+            top: 25px;
+            left: -50px;
+            text-align: center;
+            line-height: 30px;
+            letter-spacing: 1px;
+            color: #f0f0f0;
+            transform: rotate(-45deg);
+            -webkit-transform: rotate(-45deg);
+        }
+        .corner-ribbon.sticky{
+            position: fixed;
+        }
+        .corner-ribbon.shadow{
+            box-shadow: 0 0 3px rgba(0,0,0,.3);
+        }
+        .corner-ribbon.top-left{
+            top: 25px;
+            left: -50px;
+            transform: rotate(-45deg);
+            -webkit-transform: rotate(-45deg);
+        }
+
+        .customPopup{
+            background-color: rgb(233, 233, 233);
+            margin-top: 2%;
+            margin-left: 25%;
+            /* border-width: 2px; */
+            /* border-style: solid; */
+            text-align: center;
+            /* padding:10px; */
+            width: 50%;
+            height: auto;
+            color: black;
+            /* border-radius: 20px; */
+            /* border-bottom-left-radius: 10px; */
+            /* border-top-right-radius: 10px; */
+            box-shadow: 0px 7px 29px 0px #000000;
+        }
+        .popupBackground{
+            /* background-color:black; */
+            /* background-color: transparent; */
+            /* opacity: 0.0 - 1.0; */
+            background: rgba(0,0,0,0.5);
+            filter: alpha(opacity = 20);
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9998;
+        }
+
+    </style>
   </head>
 
   <body>
+
+    <!-- ribbon -->
+    <div class="corner-ribbon top-left sticky red shadow" style="font-weight: bold; font-size:14px;">CSC</div>
+
   <apex:PageMessages />
   <div class="container">
         <div class="row">
-            <div class="col-xs-12 page-header">
+            <div class="col-xs-12 page-header-fun-est">
                 <div class="col-xs-12 col-md-6 left-header">
                     <h1>{!$Label.FE_Header}</h1>
                 </div>
@@ -144,9 +208,9 @@
         <div class="row">
             <div class="col-xs-12 carot form-horizontal">
                 <div class="control-group" style="float:right">
-                    <!-- <div class="form-inline">
+                    <div class="form-inline">
                         {!$Label.FE_P2_Instruction}
-                    </div>&nbsp; -->
+                    </div>&nbsp;
                     <div class="form-inline widget rounded">
                         <label for="txtTransactionFee">{!$Label.FE_P2_Transaction_Fee}</label>
                         <apex:inputText styleClass="rounded" id="txtTransactionFee" value="{!fundingEst.Transaction_Fee__c}" onKeyPress="disableEnter(this, event)this);"/>
@@ -156,7 +220,6 @@
             </div>
             <apex:repeat value="{!listFER_Step2}" var="oppWrapper">
             <div class="col-xs-12 table-responsive">
-
                 <table class="table">
                     <tr>
                         <th>
@@ -169,16 +232,55 @@
                         </th>
                         <th style="text-align:right">
                             <!-- Discount Rate -->
-                            <label for="txtDiscountRate"> &nbsp;&nbsp;{!$Label.FE_P2_Discount_Rate} </label>
-                            <apex:inputText styleClass="rounded" html-data-id="{!oppWrapper.oppSchoolName}{!oppWrapper.discountRateId}" value="{!oppWrapper.discountRate}" onKeyPress="disableEnter(this, event);"/>
+                            <!-- <label for="txtDiscountRate"> &nbsp;&nbsp;{!$Label.FE_P2_Discount_Rate} </label> -->
+                            <label for="txtDiscountRate"> Discount Rate </label>
+                            <apex:inputText styleClass="rounded" html-data-id="{!oppWrapper.oppSchoolName}{!oppWrapper.discountRateId}" value="{!oppWrapper.discountRateFinal}" onKeyPress="disableEnter(this, event);"/>
                             %&nbsp;&nbsp;&nbsp;
+                            <!-- Info button -->
+                            <apex:commandbutton action="{!ShowPopup}" rerender="Details" value="info"></apex:commandbutton>
+                            <!-- Details modal popup -->
+                            <apex:outputpanel id="Details">
+                                <apex:outputpanel layout="block" rendered="{!DisplayPopUp}" styleclass="popupBackground">
+                                    <apex:outputpanel layout="block" rendered="{!DisplayPopUp}" styleclass="customPopup">
+                                        <table>
+                                            <tr>
+                                                <th>
+                                                    <p style="font-size:14px;">Discount Rate Breakdown</p>
+                                                </th>
+                                            </tr>
+                                        </table>
+                                        <!-- <p style="color:green;">Opportunity record type: {!oppWrapper.recordType}, Pre-Year 0 Rate: {!oppWrapper.preYear0Funding}, Year 0 Rate: {!oppWrapper.year0Funding}, Intercept undefined</p> -->
+                                        <table>
+                                            <tr>
+                                                <td style="text-align:left">
+                                                    <p>5DF Funding Rate {!oppWrapper.fiveDayFundingRateCalc} %</p>
+                                                    <p>Pre-Year 0 Rate {!oppWrapper.preYear0FundingCalc} %</p>
+                                                    <p>Year 0 Rate {!oppWrapper.year0FundingCalc} %</p>
+                                                    <p>Intercept Rate {!oppWrapper.intercept} %</p>
+                                                </td>
+                                                <td style="text-align:left">
+                                                    <p>Pricing Discount Rate {!oppWrapper.targetEffectiveRate} %</p>
+                                                    <p>Total Adjustments {!oppWrapper.totalAdjustments} %</p>
+                                                    <p style="font-weight:bold;">Discount Rate {!oppWrapper.discountRateFinal} %</p>
+                                                </td>
+                                                <td style="vertical-align: bottom;">
+                                                    <apex:commandbutton action="{!ClosePopup}" rerender="Details" value="Close" ></apex:commandbutton>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        
+                                    </apex:outputpanel>
+                                </apex:outputpanel>
+                            </apex:outputpanel>
+                            <!-- Update Rates Button -->
+                            &nbsp;&nbsp;&nbsp;
                             <button class="btn btn-tertiary" id="{!oppWrapper.oppSchoolName}{!oppWrapper.discountRateId}" onClick="calculateDiscountOnRateChange(id);return false;">Update Rates</button>
                             
                             <!-- Target Eff Rate -->
-                            <label for="txtEffectiveRate"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Targeted Effective Rate </label>
+                            <!-- <label for="txtEffectiveRate"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Targeted Effective Rate </label>
                             <apex:inputText styleClass="rounded" html-data-id="{!oppWrapper.oppSchoolName}" value="{!oppWrapper.targetEffectiveRate}" onKeyPress="disableEnter(this, event);"/>
                             %&nbsp;&nbsp;&nbsp;
-                            <button class="btn btn-tertiary" id="{!oppWrapper.oppSchoolName}" onClick="calculateDiscountFromEffective(id);return false;">Calc. Rates</button>
+                            <button class="btn btn-tertiary" id="{!oppWrapper.oppSchoolName}" onClick="calculateDiscountFromEffective(id);return false;">Calc. Rates</button> -->
                         </th>
                     </tr>
                 </table>
@@ -312,6 +414,15 @@
                 </div>
                 <div class="widget buffer-top">
                     <table class="table form-table">
+                        <!-- Moving Transaction_Fee here from page 2. Client Pricing project-->
+                        <!-- <tr>
+                            <td class="col1">{!$Label.FE_P2_Transaction_Fee}</td>
+                            <td class="col2">
+                                $<apex:inputText value="{!fundingEst.Transaction_Fee__c}" styleClass="rounded optionalFE"
+                                    onKeyPress="disableEnter(this, event);"/>
+                            </td>
+                        </tr> -->
+
                         <tr>
                             <td class="col1">{!$Label.FE_P3_Program_Fees_Collected}</td>
                             <td class="col2">

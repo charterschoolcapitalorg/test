@@ -1,3 +1,14 @@
+/**=====================================================================
+ * Charter School Capital
+ * Name: PricingRateScore
+ * Test Class: PricingRateScoreTest
+ * Description: 
+ * Created Date: 2023, Jan 05
+ * Created By: Slava Krel
+ *
+ * Date Modified                Modified By                  Description of the update
+ * [MON DD, YYYY]             	[FirstName LastName]		 [Short description for changes]
+ =====================================================================*/
 public inherited sharing class PricingRateScore {
 
     @AuraEnabled
@@ -20,7 +31,7 @@ public inherited sharing class PricingRateScore {
             this.childRates = new List<Pricing_Rate__c>();
             this.isPortfolio = false;
             this.schoolIds = new Set<Id>();
-            this.schoolIds.add(this.rateScoring.School__c);
+            this.schoolIds.add(this.rateScoring.Account__c);
         }
         
         if (this.rateScoring.RecordType.DeveloperName == 'Portfolio') {
@@ -29,14 +40,14 @@ public inherited sharing class PricingRateScore {
             this.childRates = fetchPricingRateDetailsPortfolio(pRateId);
             this.schoolIds = new Set<Id>();
             for (Pricing_Rate__c cRate : this.childRates) {
-                this.schoolIds.add(cRate.School__c);
+                this.schoolIds.add(cRate.Account__c);
             }
         }
     }
 
 
     public void rescore() {
-
+        
         Pricing_Rate__c prToUpdate = new Pricing_Rate__c();
         this.rateScoring.Rescored__c = true;
         //prToUpdate = this.rateScoring;
@@ -49,8 +60,8 @@ public inherited sharing class PricingRateScore {
             setCharterTerm(this.rateScoring);
 
             // set current student count
-            if(string.isNotEmpty(this.rateScoring.School__c)) {
-                Account schSchool = schools.get(this.rateScoring.School__c);
+            if(string.isNotEmpty(this.rateScoring.Account__c)) {
+                Account schSchool = schools.get(this.rateScoring.Account__c);
                 setCurrentStudentCounts(this.rateScoring, schSchool.School_Attendance__r);
             }
 
@@ -63,7 +74,8 @@ public inherited sharing class PricingRateScore {
             Integer noRecordCount = 0;
 
             // convert 18 digit into 15 digit id
-            String fifteenDigitAcctId = String.valueOf(rateScoring.School__c).substring(0, 15);
+            system.debug('@@@ rateScoring.Account__c = ' + rateScoring.Account__c);
+            String fifteenDigitAcctId = String.valueOf(rateScoring.Account__c).substring(0, 15);
 
             // quering Schools on Charter/Business (not schools on pricing rate)
             List<Account> acctList = [
@@ -110,6 +122,7 @@ public inherited sharing class PricingRateScore {
 
             // set current student count
             // the value that essentially will be displayed 
+            // TODO: rename variable
             Decimal xToSet = 0;
             Decimal yToSet = 0;
             Decimal zToSet = 0;
@@ -147,8 +160,14 @@ public inherited sharing class PricingRateScore {
                     AND Fiscal_Year__c != null
                     ORDER BY Report_Date__c DESC];
 
-                if(saList != null) {
+                for(School_Attendance__c x : saList) {
+                    system.debug('@@@ x = ' + x);
+                }
+                
+
+                if(!saList.isEmpty()) {
                     studentCountCFY = studentCountCFY + saList[0].Total_Attendance__c;
+                    system.debug('@@@ studentCountCFY = ' + studentCountCFY);
                     
                     // building logic on report date
                     Integer curFY;
@@ -172,27 +191,7 @@ public inherited sharing class PricingRateScore {
                         }
                     }
 
-                    // i need to take the report date 
-
-                    // String actFY = saList[0].Fiscal_Year__c;
-                    // String curFYStrt = actFY.substringBefore('-');
-                    // String curFYEnd = actFY.substringAfter('-');
-                    // Integer currentFYStart = Integer.valueOf(curFYStrt); 
-                    // Integer currentFYEnd = Integer.valueOf(curFYEnd);
-                    // String lastFY = String.valueOf(currentFYStart-1)+'-'+String.valueOf(currentFYEnd-1);
-                    // String twoLastFY = String.valueOf(currentFYStart-2)+'-'+String.valueOf(currentFYEnd-2);
-    
-                    // for(School_Attendance__c sa : saList) {
-                    //     if(sa.Fiscal_Year__c == lastFY && sa.Total_Attendance__c != null && indexOneYearPrior == null) {
-                    //         indexOneYearPrior =+ 1;
-                    //         studentCount1FYPrior = studentCount1FYPrior + sa.Total_Attendance__c;
-                    //     }
-                    //     if(sa.Fiscal_Year__c == twoLastFY && sa.Total_Attendance__c != null && indexTwoYearPrior == null) {
-                    //         indexTwoYearPrior =+ 1;
-                    //         studentCount2FYPrior = studentCount2FYPrior + sa.Total_Attendance__c;
-                    //     }
-                    // }
-
+                    // check values
                     system.debug('===================================================');
                     system.debug('!!! record = ' + i);
                     system.debug('!!! acct.name = ' + acct.name);
@@ -205,7 +204,6 @@ public inherited sharing class PricingRateScore {
                     studentCount1FYPriorList.add(studentCount1FYPrior);
                     studentCount2FYPriorList.add(studentCount2FYPrior);
                 }
-                
             }
 
             if(!studentCountCFYList.isEmpty()) {
@@ -239,8 +237,8 @@ public inherited sharing class PricingRateScore {
     }
 
     private void setCharterTerm(Pricing_Rate__c pRate) {
-        if (this.schoolToTermMap.containsKey(pRate.School__c)) {
-            Charter_Term__c ct = this.schoolToTermMap.get(pRate.School__c);
+        if (this.schoolToTermMap.containsKey(pRate.Account__c)) {
+            Charter_Term__c ct = this.schoolToTermMap.get(pRate.Account__c);
             pRate.Charter_Term_Record__c = ct.Id;
 
             if (String.isEmpty(ct.Type__c)) {
@@ -317,61 +315,35 @@ public inherited sharing class PricingRateScore {
         }
     }
 
+    // two query methods below: one for list and one for a single record
     private static Pricing_Rate__c fetchPricingRateDetails(Id pRateId) {
-        return [
-                    SELECT Id, 
-                    Name, 
-                    Portfolio_Rate_Record__c, 
-                    School__c, 
-                    Final_Effective_Rate__c, 
-                    RecordTypeId, 
-                    RecordType.DeveloperName, 
-                    School__r.Name, 
-                    School__r.RecordTypeId, 
-                    School__r.RecordType.DeveloperName,
-                    School__r.WC_Client_Pricing_School__c,
-                    Charter_Terms_Record__c, 
-                    Market_Rate__c, 
-                    Market_Rate__r.One_Month_Index_Rate__c, 
-                    Market_Rate__r.Three_Month_Index_Rate__c, 
-                    Market_Rate__r.Six_Month_Index_Rate__c,
-                    Charter_Renewed__c,
-                    Student_Count_Current_FY__c
-                    FROM Pricing_Rate__c 
-                    WHERE Id =: pRateId
-                ];
+        String prRateQueryString = 'SELECT Id, Name, Portfolio_Rate_Record__c, Account__c, Final_Discount_Rate_Portfolio__c, RecordTypeId, RecordType.DeveloperName, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.DeveloperName,Account__r.WC_Client_Pricing_School__c,Charter_Terms_Record__c, Market_Rate__c, Market_Rate__r.One_Month_Index_Rate__c, Market_Rate__r.Three_Month_Index_Rate__c, Market_Rate__r.Six_Month_Index_Rate__c,Charter_Renewed__c,Student_Count_Current_FY__c FROM Pricing_Rate__c';
+        String whereString = ' WHERE Id =: pRateId';
+        prRateQueryString += whereString;
+        //system.debug('@@@ prRateQueryString = ' + prRateQueryString);
+        Pricing_Rate__c prRateRecord = Database.query(prRateQueryString);
+        return prRateRecord;
     }
 
     private static List<Pricing_Rate__c> fetchPricingRateDetailsPortfolio(Id pRateId) {
-        return [
-                    SELECT Id, 
-                    Name, 
-                    Portfolio_Rate_Record__c, 
-                    School__c, 
-                    Final_Effective_Rate__c, 
-                    RecordTypeId, 
-                    RecordType.DeveloperName, 
-                    School__r.Name, 
-                    School__r.RecordTypeId, 
-                    School__r.RecordType.DeveloperName,
-                    School__r.WC_Client_Pricing_School__c,
-                    Charter_Terms_Record__c, 
-                    Market_Rate__c, 
-                    Market_Rate__r.One_Month_Index_Rate__c, 
-                    Market_Rate__r.Three_Month_Index_Rate__c, 
-                    Market_Rate__r.Six_Month_Index_Rate__c,
-                    Charter_Renewed__c,
-                    Student_Count_Current_FY__c
-                    FROM Pricing_Rate__c 
-                    WHERE Portfolio_Rate_Record__c =: pRateId
-                ];
+        String prRateQueryString = 'SELECT Id, Name, Portfolio_Rate_Record__c, Account__c, Final_Discount_Rate_Portfolio__c, RecordTypeId, RecordType.DeveloperName, Account__r.Name, Account__r.RecordTypeId, Account__r.RecordType.DeveloperName,Account__r.WC_Client_Pricing_School__c,Charter_Terms_Record__c, Market_Rate__c, Market_Rate__r.One_Month_Index_Rate__c, Market_Rate__r.Three_Month_Index_Rate__c, Market_Rate__r.Six_Month_Index_Rate__c,Charter_Renewed__c,Student_Count_Current_FY__c FROM Pricing_Rate__c';
+        String whereString = ' WHERE Portfolio_Rate_Record__c =: pRateId';
+        prRateQueryString += whereString;
+        List<Pricing_Rate__c> prRateRecordList = Database.query(prRateQueryString);
+        return prRateRecordList;
     }
 
     private static List<Account> fetchSchoolInformation(Set<Id> schoolIds) { 
         return [
                     SELECT Id, FDA_County__c, 
                         (
-                            SELECT Id, School__c, Report_Date__c, Fiscal_Year__c, Is_Active__c, Total_Attendance__c, Total_Students__c
+                            SELECT Id, 
+                            School__c, 
+                            Report_Date__c, 
+                            Fiscal_Year__c, 
+                            Is_Active__c, 
+                            Total_Attendance__c, 
+                            Total_Students__c
                             FROM School_Attendance__r 
                             ORDER BY Report_Date__c DESC
                             LIMIT 10

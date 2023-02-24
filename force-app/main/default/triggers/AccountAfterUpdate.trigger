@@ -3,7 +3,7 @@
  * [08/02/2016]                [John Caughie]                [Disabled update of Action Items when paralegal is changed]
   =====================================================================*/
 
-trigger AccountAfterUpdate on Account (after update) {
+trigger AccountAfterUpdate on Account (after update, before update) {
     
     /*[04/03/14] - T-268092 - RA - This custom setting is used to conditionally control for which users/profile or the entire org
       the triggers, validation rules and workflow rules fire*/
@@ -160,5 +160,21 @@ trigger AccountAfterUpdate on Account (after update) {
                     }
                 }*/
             }
+    }
+
+    if (trigger.isBefore) { 
+        if (trigger.isUpdate) {
+            for(Account school : trigger.new) {
+                Pricing_Rate__c activePR;
+                try {
+                    activePR = [SELECT id, name, Final_Discount_Rate_Portfolio__c FROM Pricing_Rate__c WHERE Account__c = :school.id AND Stage__c = 'Active' order by lastmodifieddate desc LIMIT 1];
+                } catch(Exception e) {
+
+                }
+                if(activePR != null) {
+                    school.Pricing_Discount_Rate__c = activePR.Final_Discount_Rate_Portfolio__c; // old name Final_Effective_Rate__c
+                }
+            }
+        }
     }
 }

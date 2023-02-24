@@ -20,6 +20,8 @@ public class FundingEstimateCalculatorController {
 	public List<OppSchoolWrapper> listFER_Step2{get;set;}
 	public List<OppSchoolWrapper> listFER_Step3{get;set;}
 
+    public boolean DisplayPopup {get; set;} 
+
 	// constructor
 	public FundingEstimateCalculatorController(ApexPages.Standardcontroller sc){
 		totalGRV = 0.0;
@@ -35,11 +37,8 @@ public class FundingEstimateCalculatorController {
 											});
 			}
 			fundingEst = (Funding_Estimates__c)sc.getRecord();
-
-
 			oppId = fundingEst.Opportunity__c;
 		}
-
 
 		if(fundingEst.Id == null){
 			ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.Error, 'Funding Estimate Record does not exist.'));
@@ -50,22 +49,68 @@ public class FundingEstimateCalculatorController {
 				ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.Error, 'No funding estimate receivables exist for this funding estimate record'));
 			}
 		}
-
-
 	}
 
 	// get opportunity details
+    // Add Record Type???
 	public void getOpportunityDetail(){
-		opp = new Opportunity();
-		for(Opportunity o : [select id, Name, RPA__r.Id, RPA__c,  RPA__r.RPA_Face_Value_Estimate__c, RPA__r.Percent_Funded__c,
-								RPA__r.Program_Fee_Estimate__c, Account.Name, CloseDate, RPA__r.RPA_FV_Utilized__c, RPA__r.RPA_FV_Remaining_Estimate__c,
-								RPA__r.RPA_Program_Fee_Collected__c, RPA__r.Remaining_Fee_to_Collect_Estimate__c, RPA__r.Percent_Fee_Collected_Estimate__c,
-								Funded_Date__c, NET_Amount_Requested__c
-							 from Opportunity
-							 where id = : oppId limit 1]){
-			opp = o;
-		}
+        opp = [
+                SELECT 
+                    id, 
+                    Name, 
+                    RPA__r.Id, 
+                    RPA__c,  
+                    RPA__r.RPA_Face_Value_Estimate__c, 
+                    RPA__r.Percent_Funded__c,
+                    RPA__r.Program_Fee_Estimate__c, 
+                    Account.Name, 
+                    CloseDate, 
+                    RPA__r.RPA_FV_Utilized__c, 
+                    RPA__r.RPA_FV_Remaining_Estimate__c,
+                    RPA__r.RPA_Program_Fee_Collected__c, 
+                    RPA__r.Remaining_Fee_to_Collect_Estimate__c, 
+                    RPA__r.Percent_Fee_Collected_Estimate__c,
+                    Funded_Date__c, 
+                    NET_Amount_Requested__c
+                FROM Opportunity
+                WHERE id = : oppId 
+                LIMIT 1
+            ];
+		// opp = new Opportunity();
+		// for(Opportunity o : [SELECT id, Name, RPA__r.Id, RPA__c,  RPA__r.RPA_Face_Value_Estimate__c, RPA__r.Percent_Funded__c,
+		// 						RPA__r.Program_Fee_Estimate__c, Account.Name, CloseDate, RPA__r.RPA_FV_Utilized__c, RPA__r.RPA_FV_Remaining_Estimate__c,
+		// 						RPA__r.RPA_Program_Fee_Collected__c, RPA__r.Remaining_Fee_to_Collect_Estimate__c, RPA__r.Percent_Fee_Collected_Estimate__c,
+		// 						Funded_Date__c, NET_Amount_Requested__c
+		// 					 FROM Opportunity
+		// 					 WHERE id = : oppId 
+        //                      LIMIT 1]){
+		// 	opp = o;
+        //     system.debug('@@@ opp = ' + opp);
+		// }
 	}
+
+    // method to fetch existing FER records for funding estimate
+	// 2015.08.19 J Caughie - Added FV_Deduction__c to the SOQL query
+    public void getListExistingFundingEstimateReceivables(){
+        listFER = [SELECT id, Name, Purchase_Date__c, Maturity_Buffer__c, Initial_Purchase_Factor__c, Already_Purchased__c,
+                       Included_in_Estimate__c, School__c, FV_Amount__c , Discount_Amount__c, Maturity_Date__c,
+                       GRV_Amount__c, Expected_Pay_Date__c, Opp_School__r.Name, Opp_School__c, Upfront_Purchase_Price__c,
+                       Max_Deferred_Purchase_Price__c, Days_Outstanding__c, FV_Deductions__c, Opp_School__r.School__r.Charter_Termination__c , 
+                       Effective_Rate__c,                 //2017.02.09 J Caughie added Opp_School__r.School__r.Charter_Termination__c
+                       Funding_Estimate__r.Manual_FE__c, Discount_Rate__c, Funding_Estimate__r.Opportunity__r.Account.Donated_Discount_Rate__c,
+                       Opp_School__r.School__r.Pricing_Discount_Rate__c,
+                       Opp_School__r.School__r.Discount_Rate__c,
+                       Opp_School__r.School__r.Default_Maturity_Buffer__c,
+                       Opp_School__r.School__r.Default_Initial_Purchase_Factor__c,
+                       Opp_School__r.Opportunity__c,
+                       Opp_School__r.School__r.FDA_County__c,
+                       Opp_School__r.School__r.FDA_District__c
+                   FROM Funding_Estimate_Receivable__c
+                    WHERE Funding_Estimate__c = :fundingEst.Id
+                    AND Already_Purchased__c = false];
+    }
+
+
 
 	// method to be called on clicking of Next on Step 1
 	public void NextOnStep1(){
@@ -80,11 +125,17 @@ public class FundingEstimateCalculatorController {
 			for(Funding_Estimate_Receivable__c fer : listFER){
 				if(fer.Included_in_Estimate__c){
 					if(!mapOppSchoolIdWrapper.containsKey(fer.Opp_School__c)){
+                        // system.debug('@@@ fer.Opp_School__r.Opportunity__c = ' + fer.Opp_School__r.Opportunity__c);
+                        Opportunity feOpportunity = [SELECT Id, Name, Pre_Year_0_Funding__c, Year_0_Funding__c, RecordType.DeveloperName FROM Opportunity WHERE Id = :fer.Opp_School__r.Opportunity__c];
 						mapOppSchoolIdWrapper.put(fer.Opp_School__c, 
                             new OppSchoolWrapper(fer.School__c, 
                                                 fer.Opp_School__r.School__r.Charter_Termination__c, 
-                                                fer.Opp_School__r.School__r.Target_Effective_Rate__c,
-                                                fer.Opp_School__r.School__r.Discount_Rate__c));
+                                                fer.Opp_School__r.School__r.Pricing_Discount_Rate__c,
+                                                fer.Opp_School__r.School__r.Discount_Rate__c,
+                                                feOpportunity.Pre_Year_0_Funding__c, 
+                                                feOpportunity.Year_0_Funding__c, 
+                                                feOpportunity.RecordType.DeveloperName,
+                                                fer.Opp_School__r.School__r.FDA_County__c, fer.Opp_School__r.School__r.FDA_District__c));
 					}
 					oppWrapper = mapOppSchoolIdWrapper.get(fer.Opp_School__c);
 					oppWrapper.listFERForOppSchool.add(fer);
@@ -114,10 +165,6 @@ public class FundingEstimateCalculatorController {
                                             Target_Effective_Rate__c
 					  FROM Funding_Estimates__c
 					  WHERE Id = :fundingEst.Id];
-
-        system.debug('@@@ fundingEst.id = ' + fundingEst.id);
-        system.debug('@@@ fundingEst.Discount__c = ' + fundingEst.Discount__c);
-        system.debug('@@@ fundingEst.Target_Effective_Rate__c = ' + fundingEst.Target_Effective_Rate__c);
 
 		listFER_Step3 = new list<OppSchoolWrapper>();
 		map<Id, OppSchoolWrapper> mapOppSchoolIdWrapper = new map<Id, OppSchoolWrapper>();
@@ -233,23 +280,7 @@ public class FundingEstimateCalculatorController {
 
 	}
 
-	// method to fetch existing FER records for funding estimate
-	// 2015.08.19 J Caughie - Added FV_Deduction__c to the SOQL query
- 	public void getListExistingFundingEstimateReceivables(){
- 		listFER = [SELECT id, Name, Purchase_Date__c, Maturity_Buffer__c, Initial_Purchase_Factor__c, Already_Purchased__c,
-						Included_in_Estimate__c, School__c, FV_Amount__c , Discount_Amount__c, Maturity_Date__c,
-						GRV_Amount__c, Expected_Pay_Date__c, Opp_School__r.Name, Opp_School__c, Upfront_Purchase_Price__c,
-						Max_Deferred_Purchase_Price__c, Days_Outstanding__c, FV_Deductions__c, Opp_School__r.School__r.Charter_Termination__c , 
-                        Effective_Rate__c,                 //2017.02.09 J Caughie added Opp_School__r.School__r.Charter_Termination__c
-						Funding_Estimate__r.Manual_FE__c, Discount_Rate__c, Funding_Estimate__r.Opportunity__r.Account.Donated_Discount_Rate__c,
-                        Opp_School__r.School__r.Target_Effective_Rate__c,
-                        Opp_School__r.School__r.Discount_Rate__c,
-                        Opp_School__r.School__r.Default_Maturity_Buffer__c,
-                        Opp_School__r.School__r.Default_Initial_Purchase_Factor__c
-					FROM Funding_Estimate_Receivable__c
- 					WHERE Funding_Estimate__c = :fundingEst.Id
- 					AND Already_Purchased__c = false];
- 	}
+	
 
  	public pagereference saveAndGenerateInternalSummary(){
  		try{
@@ -283,6 +314,18 @@ public class FundingEstimateCalculatorController {
         public Decimal targetEffectiveRate {get;set;}
         public Decimal discountRate {get;set;}
         public Integer discountRateId {get;set;}
+        // adding opportunity info
+        // from record
+        public Boolean preYear0Funding {get;set;}
+        public Boolean year0Funding {get;set;}
+        public String recordType {get;set;}
+        // calculated
+        public Decimal fiveDayFundingRateCalc {get;set;}
+        public Decimal preYear0FundingCalc {get;set;}
+        public Decimal year0FundingCalc {get;set;}
+        public Decimal discountRateFinal {get;set;}
+        public Decimal intercept {get;set;}
+        public Decimal totalAdjustments {get;set;}
 
 		// constructor
 		// This will be used when creating list for step 3
@@ -294,16 +337,62 @@ public class FundingEstimateCalculatorController {
 
 		// constructor
 		// this will be used when creating list for step 2
-		public OppSchoolWrapper(String oppSchoolName, Date charterTermination, Decimal targetEffectiveRate, Decimal discountRate){
+		public OppSchoolWrapper(
+            String oppSchoolName, 
+            Date charterTermination, 
+            Decimal targetEffectiveRate, 
+            Decimal discountRate, 
+            Boolean preYear0Funding, 
+            Boolean year0Funding, 
+            String recordType,
+            String fdaCounty, 
+            String fdaDistrict){
+
 			this.OppSchoolName = oppSchoolName;
 			this.listFERForOppSchool = new list<Funding_Estimate_Receivable__c>();
 			this.grvAmount = 0;
 			this.amount = 0;
 			this.charterTermination = charterTermination;
-            this.targetEffectiveRate = targetEffectiveRate;
+            if(targetEffectiveRate == null) {
+                this.targetEffectiveRate = 0;
+            } else {
+                this.targetEffectiveRate = targetEffectiveRate;
+            }
+            
             this.discountRate = discountRate;
             //create id for discount rate and target eff rate
             this.discountRateId = Integer.valueof(Math.round((Math.random() * (900000) + 100000)));
+            // adding opportunity info
+            this.preYear0Funding = preYear0Funding;
+            this.year0Funding = year0Funding;
+            this.recordType = recordType;
+            if(recordType == 'X5DF') {
+                this.fiveDayFundingRateCalc = 1;
+            } else {
+                this.fiveDayFundingRateCalc = 0;
+            }
+            if(preYear0Funding == true) {
+                this.preYear0FundingCalc = 1.75;
+            } else {
+                this.preYear0FundingCalc = 0;
+            }
+            if(year0Funding == true) {
+                this.year0FundingCalc = 1;
+            } else {
+                this.year0FundingCalc = 0;
+            }
+            
+            if(fdaCounty != null || fdaDistrict != null) {
+                if(fdaCounty == 'No' || fdaDistrict == 'No') {
+                    this.intercept = 2;
+                } else {
+                    this.intercept = 0;
+                }
+            } else {
+                this.intercept = 0;
+            }
+            this.totalAdjustments = fiveDayFundingRateCalc + preYear0FundingCalc + year0FundingCalc + intercept;
+            this.discountRateFinal = this.targetEffectiveRate + fiveDayFundingRateCalc + preYear0FundingCalc + year0FundingCalc + intercept;
 
 		}
 	}
@@ -363,5 +452,13 @@ public class FundingEstimateCalculatorController {
 		return updatedFERids;
 
 	}
+
+    public void ShowPopup() {       
+        DisplayPopup = true;
+    }
+
+    public void ClosePopup() {       
+        DisplayPopup = false;
+    }
 
 }
