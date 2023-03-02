@@ -266,21 +266,18 @@ public without sharing class OpportunityHelper {
 
         if(allActionListsMap.size() > 0) {
             for(Opportunity opp: newOppMap.values()) {
-                if(opp.RecordTypeId != null 
-                    && oppRTMap.containsKey(opp.RecordTypeId) 
-                    && allActionListsMap.containsKey(oppRTMap.get(opp.RecordTypeId))) {
-                    
-                        for(CSC_Action_List__c origList : allActionListsMap.get(oppRTMap.get(opp.RecordTypeId))) {
-                            //Make a copy of Action List template and attach it to Opportunity based on record type
-                            CSC_Action_List__c newList = origList.clone(false, true, false, false);
-                            newList.Source_List__c = origList.Id;
-                            newList.Account__c = opp.AccountId;
-                            newList.Opportunity__c = opp.Id;
-                            newList.Status__c = 'New';
-                            newList.Template__c = false;
-                            actionListToItemMap.put(origList.Id, origList.CSC_Action_Items__r);
-                            actionListToBeInserted.add(newList);
-                        }
+                if(opp.RecordTypeId != null && oppRTMap.containsKey(opp.RecordTypeId) && allActionListsMap.containsKey(oppRTMap.get(opp.RecordTypeId))) {
+                    for(CSC_Action_List__c origList : allActionListsMap.get(oppRTMap.get(opp.RecordTypeId))) {
+                        //Make a copy of Action List template and attach it to Opportunity based on record type
+                        CSC_Action_List__c newList = origList.clone(false, true, false, false);
+                        newList.Source_List__c = origList.Id;
+                        newList.Account__c = opp.AccountId;
+                        newList.Opportunity__c = opp.Id;
+                        newList.Status__c = 'New';
+                        newList.Template__c = false;
+                        actionListToItemMap.put(origList.Id, origList.CSC_Action_Items__r);
+                        actionListToBeInserted.add(newList);
+                    }
                 }
             }
         }
@@ -289,9 +286,9 @@ public without sharing class OpportunityHelper {
         if(actionListToBeInserted.size() > 0) {
             Flags.SkipActionListOrderResequencing = true;
             try {
-                insert actionListToBeInserted;
+            insert actionListToBeInserted;
             } finally {
-                //Flags.SkipActionListOrderResequencing = false;
+            //Flags.SkipActionListOrderResequencing = false;
             }
         }
 
@@ -310,9 +307,9 @@ public without sharing class OpportunityHelper {
         if(actionItemsToBeInserted.size() > 0) {
             Flags.SkipActionItemOrderResequencing = true;
             try {
-                insert actionItemsToBeInserted;
+            insert actionItemsToBeInserted;
             } finally {
-                Flags.SkipActionItemOrderResequencing = false;
+            Flags.SkipActionItemOrderResequencing = false;
             }
         }
     }
@@ -408,35 +405,32 @@ public without sharing class OpportunityHelper {
     }
 
     private static Map<String,List<CSC_Action_List__c>> retrieveActionLists(){
-        Map<String,List<CSC_Action_List__c>> allActionListsMap = new Map<String,List<CSC_Action_List__c>>();
+      Map<String,List<CSC_Action_List__c>> allActionListsMap = new Map<String,List<CSC_Action_List__c>>();
 
-        for(CSC_Action_List__c cscActionListObj : [SELECT View__c, Template__c, Status__c, Source_List__c,
-            Sort_Order__c, RecordTypeId, Order__c, Order_Status__c, Opportunity__c,Opportunity_Record_Type__c,
-            Opportunity_Id__c, Num_Open_Items__c, Num_Items__c, Num_Completed_Items__c,
-            Name, Library_Type__c, Id, CH_Account_ID__c,
-            Action_List__c, Action_List_Name__c, Account__c, Account_Paralegal__c,
-            Account_Id__c, 
-            (SELECT Id, Action_Item_Mapping__c, Name, RecordTypeId, Order__c, Received_Date__c,Time_Frame_In_Business_Days__c,
-            Next_Action_Date__c, Review_Date__c, Status__c, Expiration_Date__c, Comments__c,Time_Frame_Expiration_Date__c,
-            CSC_Action_List__c, CSC_Action_List__r.Action_List_Name__c, Sort_Order__c, Web_Link__c, Related_Action_Item__c,
-            Contact__c, Action_Item_Name__c, View_Attach__c, Attach__c, Account__c, Edit__c,
-            Library_Type__c, Account_Id__c, UCC_Draft_Language__c, Num_Attachments__c,
-            Opportunity__c, Date_Requested__c, Order_Status__c, Opportunity_Id__c,
-            Assigned_To__c, My_Assigned_Item__c, View__c, Department__c, Date_Completed__c,
-            definition__c, Opportunity_Notifications__c, Dependencies__c, Delay_Alert_On__c, Business_Days_Due_Before_Close__c,
-            BD_Green_Level_Accelerated__c, BD_Green_Level_Standard__c, BD_Red_Level_Accelerated__c, BD_Red_Level_Standard__c, Milestone_Sort_Order__c 
-            FROM CSC_Action_Items__r)
-            FROM CSC_Action_List__c
-            WHERE Template__c = true]){
-
-                if(String.isNotBlank(cscActionListObj.Opportunity_Record_Type__c)) {
-                    if(!allActionListsMap.ContainsKey(cscActionListObj.Opportunity_Record_Type__c.toLowerCase())) {
-                        allActionListsMap.put(cscActionListObj.Opportunity_Record_Type__c.toLowerCase(), new List<CSC_Action_List__c>());
-                    }
-                    allActionListsMap.get(cscActionListObj.Opportunity_Record_Type__c.toLowerCase()).add(cscActionListObj);
-                }
-            }
-        return allActionListsMap;
+      for(CSC_Action_List__c cscActionListObj : [Select View__c, Template__c, Status__c, Source_List__c,
+                                                                                                          Sort_Order__c, RecordTypeId, Order__c, Order_Status__c, Opportunity__c,Opportunity_Record_Type__c,
+                                                                                                          Opportunity_Id__c, Num_Open_Items__c, Num_Items__c, Num_Completed_Items__c,
+                                                                                                          Name, Library_Type__c, Id, CH_Account_ID__c,
+                                                                                                          Action_List__c, Action_List_Name__c, Account__c, Account_Paralegal__c,
+                                                                                                          Account_Id__c, (Select Id, Action_Item_Mapping__c, Name, RecordTypeId, Order__c, Received_Date__c,Time_Frame_In_Business_Days__c,
+                                                                                                          Next_Action_Date__c, Review_Date__c, Status__c, Expiration_Date__c, Comments__c,Time_Frame_Expiration_Date__c,
+                                                                                                          CSC_Action_List__c, CSC_Action_List__r.Action_List_Name__c, Sort_Order__c, Web_Link__c, Related_Action_Item__c,
+                                                                                                          Contact__c, Action_Item_Name__c, View_Attach__c, Attach__c, Account__c, Edit__c,
+                                                                                                          Library_Type__c, Account_Id__c, UCC_Draft_Language__c, Num_Attachments__c,
+                                                                                                          Opportunity__c, Date_Requested__c, Order_Status__c, Opportunity_Id__c,
+                                                                                                          Assigned_To__c, My_Assigned_Item__c, View__c, Department__c, Date_Completed__c,
+                                                                                                          definition__c, Opportunity_Notifications__c, Dependencies__c, Delay_Alert_On__c, Business_Days_Due_Before_Close__c,
+                                                                                                          BD_Green_Level_Accelerated__c, BD_Green_Level_Standard__c, BD_Red_Level_Accelerated__c, BD_Red_Level_Standard__c, Milestone_Sort_Order__c From CSC_Action_Items__r)
+                                                                                               From CSC_Action_List__c
+                                                                                              where Template__c = true]){
+      if(String.isNotBlank(cscActionListObj.Opportunity_Record_Type__c)) {
+        if(!allActionListsMap.ContainsKey(cscActionListObj.Opportunity_Record_Type__c.toLowerCase())) {
+          allActionListsMap.put(cscActionListObj.Opportunity_Record_Type__c.toLowerCase(), new List<CSC_Action_List__c>());
+        }
+        allActionListsMap.get(cscActionListObj.Opportunity_Record_Type__c.toLowerCase()).add(cscActionListObj);
+      }
+        }
+      return allActionListsMap;
     }
 
     //2015.10.19 J Caughie - method to update opportunity with correct opportunity type before insert

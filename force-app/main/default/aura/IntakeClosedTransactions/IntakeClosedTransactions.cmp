@@ -32,7 +32,7 @@
                                 <aura:if isTrue="{!o.IsWon}">              
                                     <tr class="slds-text-title">
                                         <td class="slds-cell-wrap" style="font-size:small;">
-                                            <a onclick="{!c.FireOppEvent}" id="{!o.Id}" target="_blank" style="color:#3ABEB6;">
+                                            <a onclick="{!c.FireOppEvent}" id="{!o.Id}" target="_blank" style="color:#a8ad00;">
                                                 {!o.Client_Facing_Opportunity_Name__c}
                                             </a>
                                         </td>

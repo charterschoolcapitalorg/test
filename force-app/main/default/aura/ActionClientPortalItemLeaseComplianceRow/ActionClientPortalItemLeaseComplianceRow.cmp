@@ -7,6 +7,7 @@
     <aura:attribute name="selectedFiles" type="ContentDocument"/>
     <aura:attribute name="numFiles" type="Integer"/>
     <aura:attribute name="updateLC" type="Boolean" default="false"/>
+
     <aura:attribute name="selectedIds" type="String" default=""/>
     <aura:attribute name="selectedIdsArray" type="String[]"/>
     <aura:handler name="rowEvent" event="c:FileMappingEvent" action="{!c.setSelectedIds}"/>
@@ -16,6 +17,7 @@
     <aura:handler event="aura:waiting" action="{!c.showSpinner}"/>
     <aura:handler event="aura:doneWaiting" action="{!c.hideSpinner}"/>
     <aura:attribute name="Spinner" type="boolean" default="false"/>
+
 
     <aura:if isTrue="{!v.Spinner}">
         <div aura:id="spinnerId" class="slds-spinner_container">
@@ -44,6 +46,14 @@
                 <lightning:input variant="label-hidden" name="createleasecompliance" class="data-left" aura:id="mapleasecompliance" checked="false" type="checkbox" onchange="{!c.updateLC}"/>
             </lightning:layoutItem>
 
+            <!-- <lightning:layoutItem size="2" class="data-column-status slds-var-p-horizontal_small" aura:id="myRow">
+                <lightning:select class="label-hidden small-text" variant="label-hidden" aura:id="status" name="status" value="{!v.lc.RecordType.DeveloperName}">
+                    <option value="Pending">Pending</option>
+                    <option value="Current">Current</option>
+                    <option value="Expired">Expired</option>
+                </lightning:select>
+            </lightning:layoutItem> -->
+
             <aura:if isTrue="{!v.cpi.Copy_Files_to_AL_PCL__c}">
                 <lightning:layoutItem size="1" class="data-column slds-var-p-horizontal_small" aura:id="myRow">
                     <aura:if isTrue="{!v.numFiles}">
@@ -56,6 +66,20 @@
                     </aura:if>
                 </lightning:layoutItem>
             </aura:if>
+
+            <lightning:layoutItem size="1" class="data-column slds-var-p-horizontal_small checkboxspacing"  aura:id="myRow">
+                <lightning:input variant="label-hidden"  class="data-left" aura:id="includecomment" checked="true" type="checkbox"/>
+            </lightning:layoutItem>  
+
+            <lightning:layoutItem class="data-column slds-var-p-horizontal_small slds-grow" aura:id="myRow">
+                <lightning:textarea style="width:350px;" aura:id="includecsccomment" name="includecsccomment"  />
+            </lightning:layoutItem>
+
+            <!-- <aura:if isTrue="{!v.cpi.Is_Financial__c}">
+                <lightning:layoutItem size="1" class="data-column slds-p-horizontal_small"  aura:id="myRow">
+                    <lightning:input variant="label-hidden" name="createfinancial" class="data-left" aura:id="createfinancial" checked="true" type="checkbox"/>
+                </lightning:layoutItem>
+            </aura:if> -->
 
         </lightning:layout>
     </div>

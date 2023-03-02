@@ -68,8 +68,8 @@
             <lightning:card class="heading">
                 <aura:set attribute="title">
                     Facilities Milestone Report - <lightning:formattedDateTime value="{!v.today}"/> 
-                    - <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital--cscfull.sandbox.lightning.force.com/lightning/n/FacilitiesMilestoneReportToExcel">⤓ Download *.xls</a>
-                    - <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital--cscfull--c.sandbox.vf.force.com/apex/FacilitiesMilestonePipeline">Pipeline</a>
+                    - <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital.lightning.force.com/lightning/n/FacilitiesMilestoneReportToExcel">⤓ Download *.xls</a>
+                    - <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital.vf.force.com/apex/FacilitiesMilestonePipeline">Pipeline</a>
                     - <a style="font-size: 14px; text-align:right" target="_blank" href="https://charterschoolcapital.lightning.force.com/analytics/dashboard/0FK4u000000PBe3GAG">Charts</a>
                 </aura:set>
                 <aura:set attribute="actions">

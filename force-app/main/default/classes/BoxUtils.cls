@@ -58,7 +58,6 @@ public class BoxUtils {
 		req.setHeader('Accept', 'application/json');
 		String body = String.join(urlParams, '&');
 		req.setBody(body);
-        system.debug('@@@ body = ' + body);
 		OAuthResult result;
 		
 		if (!test.isrunningtest()) {

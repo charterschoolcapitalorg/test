@@ -27,21 +27,27 @@ global class CreateLeaseComplianceBatchable implements  Database.Batchable<SObje
         nl.Received_Date__c = null;
         nl.Start_Date__c = l.End_Date__c.adddays(1);
         nl.Lease_Compliance_Name__c = nl.Lease_Compliance_Name__c;
-        //copy over from template
+        
+        //nl.Expiration_Date__c = nl.Start_Date__c.adddays(Integer.valueof(t.Expire_Days__c));  
+        //nl.Client_Alert_Date__c = nl.Start_Date__c.adddays(Integer.valueof(t.Client_Alert_Days__c));  
+        //nl.FAM_Alert_Date__c = nl.Start_Date__c.adddays(Integer.valueof(t.FAM_Alert_Days__c));    
+        //nl.Due_Date__c = nl.Start_Date__c.adddays(Integer.valueof(t.Due_Days__c));    
+        
         nl.Due_Days__c = t.Due_Days__c;
         nl.Client_Alert_Days__c = t.Client_Alert_Days__c;
         nl.Expire_Days__c = t.Expire_Days__c;
         nl.FAM_Alert_Days__c = t.FAM_Alert_Days__c;
+        //nl.Client_Notification_Role__c = t.Client_Notification_Role__c;
+
         nl.Final_Alert_Active__c = t.Final_Alert_Active__c;
         nl.Second_Client_Alert_Active__c = t.Client_Second_Alert_Active__c;
         nl.Second_Client_Alert_Days__c = t.Client_Second_Alert_Days__c;
-        nl.Action_Item_Mapping__c = t.Action_Item_Mapping__c; 
+        nl.Action_Item_Mapping__c = t.Action_Item_Mapping__c; //copied over from template
 
+        
         nl.End_Date__c = getEndDate(nl,t).addDays(-1);
         nl.RecordTypeId = pending;
         
-        system.debug('*** nl = ' + nl);
-        system.debug('*** nl.Insurance_Broker__c = ' + nl.Insurance_Broker__c);
         return nl;
     }
     
@@ -59,7 +65,7 @@ global class CreateLeaseComplianceBatchable implements  Database.Batchable<SObje
         /*STring query = 'Select Id, Start_Date__c, lease__c, Lease_Compliance_Name__c, Created_Follow_Up_Record__c, Expiration_Date__c, end_date__c, Type__c, Period__c from Lease_Compliance__c where (Expiration_Date__c <= TODAY or (end_date__c <= TODAY AND Created_Follow_Up_Record__c = false)) and ' +
             ' (recordtypeid=:pending or recordtypeid=:current)';*/
         //2019.09.03 J Caughie - changed search to look for items based on Next_Record_Trigger_Date__c as the client alert for this may be before both the end and expiration date.
-        STring query = 'Select Id, Start_Date__c, lease__c, Lease_Compliance_Name__c, Created_Follow_Up_Record__c, Expiration_Date__c, end_date__c, Type__c, Period__c, Next_Record_Trigger_Date__c, Insurance_Broker__c from Lease_Compliance__c where ((Expiration_Date__c <= TODAY or Next_Record_Trigger_Date__c <= TODAY or end_date__c <= TODAY) AND Created_Follow_Up_Record__c = false) and ' +
+        STring query = 'Select Id, Start_Date__c, lease__c, Lease_Compliance_Name__c, Created_Follow_Up_Record__c, Expiration_Date__c, end_date__c, Type__c, Period__c, Next_Record_Trigger_Date__c from Lease_Compliance__c where ((Expiration_Date__c <= TODAY or Next_Record_Trigger_Date__c <= TODAY or end_date__c <= TODAY) AND Created_Follow_Up_Record__c = false) and ' +
             ' (recordtypeid=:pending or recordtypeid=:current)';
 
         System.debug('Executing query: ' + query);
@@ -98,7 +104,6 @@ global class CreateLeaseComplianceBatchable implements  Database.Batchable<SObje
                         //if (l.end_Date__c <= date.today().adddays(-1) && !l.Created_Follow_Up_Record__c) {                    //2019.09.03 J Caughie - changed as client alert may be before end date
                         if (l.Next_Record_Trigger_Date__c <= date.today().adddays(-1) && !l.Created_Follow_Up_Record__c) {
                         	System.debug('****creating new record ');
-                            system.debug('*** Insurance_Broker__c = ' + l.Insurance_Broker__c);
                             forinsert.add(newLC(l,t));
                             l.Created_Follow_Up_Record__c = true;
                             forUpdate.put(l.Id, l);
@@ -116,7 +121,6 @@ global class CreateLeaseComplianceBatchable implements  Database.Batchable<SObje
             }
             
             if (forinsert.size()>0) {
-                system.debug('*** forinsert = ' + forinsert);
                 insert forinsert;
             }
             if (forupdate.size()>0) {

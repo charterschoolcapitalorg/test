@@ -7,14 +7,14 @@
                     <lightning:formattedNumber value="{!v.text + 1}"/>
                 </td>
                 <td data-label="Close Date" class="slds-text-align_left" style="width:65px">
-                    <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.opp.CloseDate}" format="MMM-DD"/>
+                    <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.opp.CloseDate}" format="MM/DD/YY"/>
                 </td>
                 <td data-label="Diligence End" class="slds-text-align_left slds-truncate" style="width:60px;">
-                    <ui:outputDate aura:id="ddend" class="field" value="{!v.opportunity.opp.Due_Diligence_End_Date__c}" format="MMM-DD"/>
+                    <ui:outputDate aura:id="ddend" class="field" value="{!v.opportunity.opp.Due_Diligence_End_Date__c}" format="MM/DD/YY"/>
                     <!-- <p class="slds-truncate" style="width:60px;"><lightning:formattedText value="{!v.opportunity.opp.Due_Diligence_End_Date__c}"/></p> -->
                 </td>
                 <td data-label="Created" class="slds-text-align_left" style="width:70px">
-                    <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.createdDate}" format="MMM-DD"/>
+                    <ui:outputDate aura:id="expdate" class="field" value="{!v.opportunity.createdDate}" format="MM/DD/YY"/>
                 </td>
                 <td data-label="BD Until Close" class="slds-text-align_right" style="width:50px; text-align:center">
                     <lightning:formattedNumber value="{!v.opportunity.businessDaysToClose}" maximumFractionDigits="0" class="slds-truncate"/>

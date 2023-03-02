@@ -1,3 +1,15 @@
+/**=====================================================================
+ * Charter School Capital
+ * Name: DiligenceUtils
+ * Test Class: DiligenceUtilsTest
+ * Description: Property tax status
+ * Created Date: ?
+ * Created By: Slava Krel 
+ *
+ * Date Modified                Modified By                  Description of the update
+ * [MON DD, YYYY]             	[FirstName LastName]		 [Short description for changes]
+ *  12/27/2022                  Slava Krel                   Mapping Update Property Tax field for PT automation
+ =====================================================================*/
 public class DiligenceUtils {
 	
 	public static businesshours bh = [select id from businesshours where isdefault= true];
@@ -923,6 +935,9 @@ public class DiligenceUtils {
                 ii.Processing_Order__c = i.Processing_Order__c;
                 ii.Due_Date__c = actionItem.CP_Item_Due_Date__c;
                 ii.Is_Visible_To_Community__c = i.Visible_At_Creation__c;
+                system.debug('!!! visible = ' + ii.Is_Visible_To_Community__c);
+                ii.Update_Property_Tax__c = i.Update_Property_Tax__c; // adding for property tax automation
+                system.debug('!!! update PT = ' + ii.Update_Property_Tax__c);
                 ii.Comments__c = i.Description__c;
                 ii.Is_Pre_Qual__c = i.Is_Pre_Qual__c;
                 ii.Is_Opening_Call__c = i.Is_Opening_Call__c;
@@ -1054,8 +1069,9 @@ public class DiligenceUtils {
                     Update_PCL__c,
                     Visible_At_Creation__c,
                     Visible_to__c,
-										Automatically_make_visible_in_Portal__c,
-										days_prior_to_due_date_to_make_visible__c,
+                    Automatically_make_visible_in_Portal__c,
+                    days_prior_to_due_date_to_make_visible__c,
+                    Update_Property_Tax__c, // adding for property tax automation
                     Parent_Intake_Item_Template_del__c,
                     Parent_Intake_Item_Template_del__r.Id,
                     Parent_Intake_Item_Template_del__r.Name,
@@ -1082,8 +1098,8 @@ public class DiligenceUtils {
                     Parent_Intake_Item_Template_del__r.Update_PCL__c,
                     Parent_Intake_Item_Template_del__r.Visible_At_Creation__c,
                     Parent_Intake_Item_Template_del__r.Visible_to__c,
-										Parent_Intake_Item_Template_del__r.Automatically_make_visible_in_Portal__c,
-										Parent_Intake_Item_Template_del__r.days_prior_to_due_date_to_make_visible__c,
+                    Parent_Intake_Item_Template_del__r.Automatically_make_visible_in_Portal__c,
+                    Parent_Intake_Item_Template_del__r.days_prior_to_due_date_to_make_visible__c,
                     (SELECT Id FROM Intake_Item_Templates_del__r)
                 FROM Intake_Item_Template__c
                 WHERE Is_Ongoing__c = true

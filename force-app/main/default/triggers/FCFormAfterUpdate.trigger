@@ -4,16 +4,23 @@ trigger FCFormAfterUpdate on FC_Form__c (before update, after update) {
  Set<Id> summaryFormIds = new Set<Id>();
  Set<Id> oppIds = new Set<Id>();
  List<Task> tasks = new List<Task>();
-  
+ 
+ System.debug('***** fc form after update: ' + trigger.new);
+ 
  //update Annual Estimated Budget field
  if (trigger.isbefore &&trigger.isbefore) {
 	 for(FC_Form__c f : trigger.new) {
+	 	System.debug('***** Annual_Estimated_Budget__c: ' + f.Annual_Estimated_Budget__c);
+	 	System.debug('***** trigger.oldMap.get(f.Id)Annual_Estimated_Budget__c: ' + trigger.oldMap.get(f.Id).Annual_Estimated_Budget__c);
 	 	if (f.EWS_Budgeted_Surplus_Deficit__c!=trigger.oldMap.get(f.Id).EWS_Budgeted_Surplus_Deficit__c
 	 		|| f.EWS_Fiscal_YEar__c!=trigger.oldMap.get(f.Id).EWS_Fiscal_YEar__c
 	 		|| f.EWS_Budgeted_Revenue__c!=trigger.oldMap.get(f.Id).EWS_Budgeted_Revenue__c
 	 		) {
+	 			System.debug('***** updatuing Annual Estimated Budget');
 	 			String bsd = String.format(f.EWS_Budgeted_Surplus_Deficit__c.format(), new String[]{'0','number','###,###,##0.00'});
+				System.debug('**** bsd: ' + bsd);
 				String bud = String.format(f.EWS_Budgeted_Revenue__c.format(), new String[]{'0','number','###,###,##0.00'});
+				System.debug('**** bud: ' + bud);
 				Decimal exp = f.EWS_Budgeted_Revenue__c - f.EWS_Budgeted_Surplus_Deficit__c; 
 				String expStr = String.format(exp.format(), new String[]{'0','number','###,###,##0.00'});
 										
@@ -68,6 +75,7 @@ List<CSC_Action_Item__c> aItems = [Select Id, Department__c, Action_Item_Name__c
 List<CSC_Action_Item__c> aItemsForUpdate = new List<CSC_Action_Item__c>();
  
 if (summaryFormIds.size()>0) {
+ 	System.debug('***** summaryFOrIds: ' + summaryFormIds);
  	Map<Id, FC_Form__c> summaryforms = new Map<Id, FC_Form__c>([Select Id, Status__c,Summary_FC_Form__c, Opportunity__r.IsWon,
  	(Select Id, Status__c, TYpe__c from FC_Approvals__r)
  	 from FC_FOrm__c where id IN: summaryFormIds]);
@@ -79,7 +87,9 @@ if (summaryFormIds.size()>0) {
  	 	} else {
  	 	    summform = summaryforms.get(form.Summary_FC_Form__c);
  	 	}
- 	 			 		
+ 	 	
+		System.debug('****got summary form: ' + summform);
+		 		
 		/*if (summform!=null && summform.status__c=='Rejected') {
 			SObject sobj = (SObject)form;
 			sobj.adderror('FC Forms are locked when rejected and cannot be altered.');
@@ -107,7 +117,9 @@ if (summaryFormIds.size()>0) {
 
  
 for(FC_FOrm__c fa : trigger.new) {
-	
+ 	System.debug('*****formsSubmittedForDeptHEadReview: ' + FCFOrmUtils.formsSubmittedForDeptHEadReview);
+ 	System.debug('***** working on form fa.Id: ' + fa.Id);
+	System.debug('***** trigger status: ' + trigger.operationType); 	
  	if (FCFOrmUtils.formsSubmittedForDeptHEadReview.size()==0) {
  		//static check so we dont execute twice
  		if (!FCFOrmUtils.formsSubmittedForDeptHEadReview.contains(fa.Id)) {
@@ -153,6 +165,7 @@ for(FC_FOrm__c fa : trigger.new) {
 		    	
 		 	if (fa.recordtypeid!=FcFormUtils.SummaryFcRecType && fa.Submitted_For_Review__c 
 		 		&& !trigger.oldmap.get(fa.Id).Submitted_For_Review__c) {
+		 			System.debug('****form: ' + fa.Id + ' submitted for review');
 		 			
 		 		Id formIdForApproval;
 		 		if (fa.recordtypeid==FcFormUtils.FacilitiesFcRecType) {
@@ -177,6 +190,7 @@ for(FC_FOrm__c fa : trigger.new) {
 		 			Status__c='Pending', 
 		            	Type__c='Dept Head Review');
 		            fas.add(f);	
+		            System.debug('****adding formsSubmittedForDeptHEadReview ' + fa.Id);
 		            FCFOrmUtils.formsSubmittedForDeptHEadReview.add(fa.Id);
 		 		} else if (fa.recordtypeid==FcFormUtils.ServicingFcRecType) {
 		 			//Servicing doesnt have a Dept Head Approval
@@ -186,6 +200,7 @@ for(FC_FOrm__c fa : trigger.new) {
 		 			FC_Form_2__c=fa.Id, Status__c='Pending', 
 		            	Type__c='Dept Head Review');
 		            fas.add(f);
+		            System.debug('****adding formsSubmittedForDeptHEadReview ' + fa.Id);
 		            FCFOrmUtils.formsSubmittedForDeptHEadReview.add(fa.Id);
 		 		}
 		 		
@@ -197,9 +212,11 @@ for(FC_FOrm__c fa : trigger.new) {
 		 				otherforms.add(d);
 		 			}
 		 		}
+		 		System.debug('****otherforms: ' + otherforms);
 		 		boolean allSubmitForReview = true;
 		 		
 		 		for (FC_FOrm__c d2 : otherforms) {
+		 			System.debug('****form Submitted_For_Review__c: ' + d2.Submitted_For_Review__c);
 		 			if (d2.reviewer__c!=null) userIDs.add(d2.reviewer__c);
 		 			if (!d2.Submitted_For_Review__c && d2.Id!=fa.Id  && d2.recordtypeid!=FcFormUtils.SummaryFcRecType) {
 		 				allSubmitForReview = false;
@@ -276,6 +293,7 @@ for(FC_FOrm__c fa : trigger.new) {
 		 		}
 		 		 
 		 		//when last form is marked as for review, send out the email to the reviewers
+		 		System.debug('****allSubmitForReview: ' + allSubmitForReview);
 		 		if (allSubmitForReview) {
 		 			//send emails
 		 			List<Id> lUserIds = new List<Id>();
@@ -290,6 +308,7 @@ for(FC_FOrm__c fa : trigger.new) {
 		 			 if (summaryForm!=null) {
 		 			 	//update Facilities Form directly
 		 			 	if(Trigger.isBefore && fa.RecordTypeId == FCFormUtils.FacilitiesFcRecType){
+		 			 		System.debug('Skipping the update');
 		 			 		fa.Status__c = 'Waiting for Department Head Approval';
 		 			 	} else {
 		 			 		summaryForm.status__c = 'Waiting for Department Head Approval';
@@ -299,6 +318,7 @@ for(FC_FOrm__c fa : trigger.new) {
 		 			 	//forUpdate.add(summaryForm);
 		 			 }
  		 			tasks.add(new Task(WhatId = fa.Summary_FC_Form__c, Subject = 'Email: Submitted for Dept Head Review', ActivityDate = Date.today(), Status = 'Completed', Priority = 'Normal', Description = 'FC Form submitted to Dept Head Review, email sent.', Type = 'Email'));
+	    			System.debug('Tasks submitted for approval: ' + tasks);
 		 		}
 		 	
 	 		  }
@@ -309,6 +329,7 @@ for(FC_FOrm__c fa : trigger.new) {
  if (aItemsForUpdate.size()>0) update aItemsForUpdate;
  if (forUpdate.size()>0)  update forUpdate;    
  if (fas.size()>0) insert fas;
+ System.debug('Tasks: ' + tasks);
  if (tasks.size()>0) insert tasks;
  	    
 }

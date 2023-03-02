@@ -11,7 +11,7 @@
  * [Apr 10, 2020]               [John Caughie]              [Added feature to identify donation receivables]
  * [Sep 15. 2022]               [Slava Krel]                [Funding Estimate Data Mapping for School over Charter Holder]
  =====================================================================*/
-public class FundingEstimateCalculatorController {
+ public class FundingEstimateCalculatorController {
 	private string oppId;
 	public Funding_Estimates__c fundingEst{get;set;}
 	public double totalGRV{get;set;}
@@ -76,17 +76,6 @@ public class FundingEstimateCalculatorController {
                 WHERE id = : oppId 
                 LIMIT 1
             ];
-		// opp = new Opportunity();
-		// for(Opportunity o : [SELECT id, Name, RPA__r.Id, RPA__c,  RPA__r.RPA_Face_Value_Estimate__c, RPA__r.Percent_Funded__c,
-		// 						RPA__r.Program_Fee_Estimate__c, Account.Name, CloseDate, RPA__r.RPA_FV_Utilized__c, RPA__r.RPA_FV_Remaining_Estimate__c,
-		// 						RPA__r.RPA_Program_Fee_Collected__c, RPA__r.Remaining_Fee_to_Collect_Estimate__c, RPA__r.Percent_Fee_Collected_Estimate__c,
-		// 						Funded_Date__c, NET_Amount_Requested__c
-		// 					 FROM Opportunity
-		// 					 WHERE id = : oppId 
-        //                      LIMIT 1]){
-		// 	opp = o;
-        //     system.debug('@@@ opp = ' + opp);
-		// }
 	}
 
     // method to fetch existing FER records for funding estimate
@@ -131,6 +120,7 @@ public class FundingEstimateCalculatorController {
                             new OppSchoolWrapper(fer.School__c, 
                                                 fer.Opp_School__r.School__r.Charter_Termination__c, 
                                                 fer.Opp_School__r.School__r.Pricing_Discount_Rate__c,
+                                                // TODO: remove, Discount_Rate__c on account is not used
                                                 fer.Opp_School__r.School__r.Discount_Rate__c,
                                                 feOpportunity.Pre_Year_0_Funding__c, 
                                                 feOpportunity.Year_0_Funding__c, 
@@ -157,21 +147,21 @@ public class FundingEstimateCalculatorController {
 	// method to be called on clicking of Next on step 2
 	public void NextOnStep2(){
 		saveDataOnStep2();
+
+        // TODO: everything below can be deleted, check with the team
 		fundingEst = [SELECT id, Opportunity__c, Discount__c, Transaction_Fee_Collected__c,
-											Program_Fees_Collected__c, Unpaid_Balance_Receivables_Collected__c,
-											Description_of_Unpaid_Balance_Receivable__c, Application_Fee_Credit__c,
-											Penalty_Interest__c, Blocked_Account_Fee_Collected__c, Bond_or_Other_Payment__c,
-											Refund_Reimbursements__c, Transaction_Fee__c, Net_to_School__c, Total_Upfront_Purchase_Price__c, 
-                                            Target_Effective_Rate__c
+                            Program_Fees_Collected__c, Unpaid_Balance_Receivables_Collected__c,
+                            Description_of_Unpaid_Balance_Receivable__c, Application_Fee_Credit__c,
+                            Penalty_Interest__c, Blocked_Account_Fee_Collected__c, Bond_or_Other_Payment__c,
+                            Refund_Reimbursements__c, Transaction_Fee__c, Net_to_School__c, Total_Upfront_Purchase_Price__c, 
+                            Target_Effective_Rate__c
 					  FROM Funding_Estimates__c
 					  WHERE Id = :fundingEst.Id];
 
 		listFER_Step3 = new list<OppSchoolWrapper>();
 		map<Id, OppSchoolWrapper> mapOppSchoolIdWrapper = new map<Id, OppSchoolWrapper>();
 		OppSchoolWrapper wrapper;
-		for(Funding_Estimate_Receivable__c fer : [Select School__c, Upfront_Purchase_Price__c, Opp_School__c, Opp_School__r.School__r.Charter_Termination__c,			                 //2017.02.09 J Caughie added Opp_School__r.School__r.Charter_Termination__c
-													Discount_Rate__c
-													from Funding_Estimate_Receivable__c where Id in : listFER and included_In_Estimate__c = true]){
+		for(Funding_Estimate_Receivable__c fer : [SELECT School__c, Upfront_Purchase_Price__c, Opp_School__c, Opp_School__r.School__r.Charter_Termination__c,Discount_Rate__c FROM Funding_Estimate_Receivable__c WHERE Id in : listFER and included_In_Estimate__c = true]){
 			if(!mapOppSchoolIdWrapper.containsKey(fer.Opp_School__c)){
 				mapOppSchoolIdWrapper.put(fer.Opp_School__c, new OppSchoolWrapper(fer.School__c, 0, fer.Opp_School__r.School__r.Charter_Termination__c));
 			}
@@ -210,6 +200,7 @@ public class FundingEstimateCalculatorController {
 		//identify donation receivables
 		Set<Id> donatedDiscountFERs = new Set<Id>();
 		donatedDiscountFERs = identifyFurthestPurchaseFER(listFER_Step2);
+        system.debug('@@@ donatedDiscountFERs = ' + donatedDiscountFERs);
 
 		for(OppSchoolWrapper oppWrapper : listFER_Step2){
 			for(Funding_Estimate_Receivable__c fer : oppWrapper.listFERForOppSchool){
@@ -218,8 +209,10 @@ public class FundingEstimateCalculatorController {
 				fer.Upfront_Purchase_Price_Workflow__c = fer.Discount_Amount__c - fer.FV_Amount__c + 1;
 				Decimal discountDonatedRate = 0.0;
 				//if not a manual FE calculate if donation receivable
+                system.debug('@@@ fer.Funding_Estimate__r.Manual_FE__c = ' + fer.Funding_Estimate__r.Manual_FE__c);
 				if(fer.Funding_Estimate__r.Manual_FE__c != true){
 					if(donatedDiscountFERs.contains(fer.Id)){
+                        system.debug('@@@ contains id');
 						if(fer.Funding_Estimate__r.Opportunity__r.Account.Donated_Discount_Rate__c == 0 || fer.Funding_Estimate__r.Opportunity__r.Account.Donated_Discount_Rate__c == null){
 							discountDonatedRate = 100.0;
 						} else {
@@ -230,20 +223,13 @@ public class FundingEstimateCalculatorController {
 					} else {
 						fer.Donated_Discount_Receivable__c = false;
 					}
+                    system.debug('@@@ fer.Donated_Discount_Receivable__c = ' + fer.Donated_Discount_Receivable__c + '; fer.Donated_Discount_Rate__c = ' + fer.Donated_Discount_Rate__c);
 				}
 				listFERToUpdate.add(fer);
 			}
-			//listFERToUpdate.addAll(oppWrapper.listFERForOppSchool);
 		}
-
-		//calculate which receivables get 
-
-		/*try{*/
-			update fundingEst;
-			if(!listFERToUpdate.isEmpty()) update listFERToUpdate;
-		/*}Catch(exception ex){
-			system.debug('Exception while updating records === ' + ex.getMessage());
-		}*/
+        update fundingEst;
+        if(!listFERToUpdate.isEmpty()) update listFERToUpdate;
 	}
 
 	// method to save and navigate to Opp record on clicking of save and close from Step 3
@@ -411,6 +397,7 @@ public class FundingEstimateCalculatorController {
 				}
 			}
 		}
+        system.debug('@@@ originalFERids = ' + originalFERids);
 	
 		//query for FERs again to get the needed fields and filter not needed out, ie opp or receivable don't qualify
 		updatableFERs = [SELECT Id, Name, Donated_Discount_Receivable__c, Source_Payout_Date_Record__r.Receivable_Representative_Date__c,
@@ -424,7 +411,8 @@ public class FundingEstimateCalculatorController {
 							AND Source_Payout_Date_Record__r.Receivable_Representative_Date__c <= 2020-12-31) OR Source_Payout_Date_Record__r.Discount_Donation_Receivable__c = true)
 							ORDER BY Opp_School__c asc, Source_Payout_Date_Record__r.Calculation__r.Receivable_Type__r.Name, Source_Payout_Date_Record__r.Receivable_Representative_Date__c desc];
 	
-		//loop through new FERs - discover last based on school and receivable rep date	- return list of ids	
+		system.debug('@@@ updatableFERs = ' + updatableFERs);
+        //loop through new FERs - discover last based on school and receivable rep date	- return list of ids	
 		Date lastRepresentativeDate;
 		Id schoolId;
 		String recTypeName;

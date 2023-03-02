@@ -1,9 +1,20 @@
-trigger MarketRateEvents on Market_Rate__c (after insert, after update) {
+/**=====================================================================
+ * Charter School Capital
+ * Name: MarketRateEvents
+ * Test Class: MarketRateTriggerHandlerTest
+ * Description: 
+ * Created Date: 2023, Feb 05
+ * Created By: Slava Krel
+ *
+ * Date Modified                Modified By                  Description of the update
+ * [MON DD, YYYY]             	[FirstName LastName]		 [Short description for changes]
+ =====================================================================*/
 
-    if (Trigger.isInsert) {
-        MarketRateTriggerHandler.determineIfActivatingRate(Trigger.new);
-    }
-    if (Trigger.isUpdate) {
-        MarketRateTriggerHandler.determineIfActivatingRate(Trigger.new, Trigger.oldMap);
+trigger MarketRateEvents on Market_Rate__c (before update) {
+    if (trigger.isBefore) { 
+        if (trigger.isUpdate) {
+            MarketRateTriggerHandler handler = new MarketRateTriggerHandler(trigger.oldMap, trigger.newMap, trigger.old, trigger.new);
+            handler.beforeUpdate();
+        }
     }
 }

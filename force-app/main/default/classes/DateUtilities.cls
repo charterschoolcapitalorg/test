@@ -26,7 +26,7 @@ public class DateUtilities {
         Integer standardHours = standardDailyHours();
         Integer days;
         Long millis = BusinessHours.diff((String)currentBusinessHours.Id, startTime, endTime);
-        //System.debug('mills: ' + millis);
+        System.debug('mills: ' + millis);
         days = (Integer)(millis / ((Long)standardHours * 60 * 60 * 1000));
         return days;
     }
@@ -59,6 +59,7 @@ public class DateUtilities {
     private static Integer standardDailyHours(){
         Integer hours = 0;
         hours = currentBusinessHours.MondayEndTime.hour() - currentBusinessHours.MondayStartTime.hour();
+        System.debug('hours: ' + hours);
         return hours;
     }
     

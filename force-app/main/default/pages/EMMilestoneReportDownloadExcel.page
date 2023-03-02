@@ -28,79 +28,79 @@
     <!-- milestone table -->
     <apex:dataTable value="{!oppsToExport}" var="opp" border="1px solid black">
         <!-- Close Date -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Close Date</apex:facet>
             <apex:outputText value="{0,date,MM/dd/yyyy}"><apex:param value="{!opp.opp.CloseDate}" /></apex:outputText>
         </apex:column>
         <!-- Created -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Created</apex:facet>
             <apex:outputText value="{0,date,MM/dd/yyyy}"><apex:param value="{!opp.opp.createddate}" /></apex:outputText>
         </apex:column>
         <!-- BD Close -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">BD Close</apex:facet>
             <apex:outputText value="{!opp.businessDaysToClose}"/>
         </apex:column>
         <!-- Opportunity Name -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Opportunity Name</apex:facet>
             <apex:outputText value="{!opp.opp.Name}"/>
         </apex:column>
         <!-- Num of Opp Schools -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Num of Opp Schools</apex:facet>
             <apex:outputText value="{!opp.opp.Num_of_Opp_Schools__c}"/>
         </apex:column>
         <!-- Referral Source -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Referral Source</apex:facet>
             <apex:outputText value="{!opp.opp.Referral_Source__c}"/>
         </apex:column>
         <!-- Pipeline Stage -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Pipeline Stage</apex:facet>
             <apex:outputText value="{!opp.opp.Pipeline_Stage__c}"/>
         </apex:column>
         <!-- State -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">State</apex:facet>
             <apex:outputText value="{!opp.opp.STATE__c}"/>
         </apex:column>
         <!-- Estimated Project Value -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Estimated Project Value</apex:facet>
             <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.opp.Estimate_EM_Project_Value__c}" /></apex:outputText>
         </apex:column>
         <!-- Fee Structure Type -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Fee Structure Type</apex:facet>
             <apex:outputText value="{!opp.opp.Fee_Structure_Type__c}"/>
         </apex:column>
 
         <!-- preQualInfo -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Collect Pre-Qual Info</apex:facet>
             <apex:outputText value="{!opp.preQualInfo}"/>
         </apex:column>
         <!-- pitchDeck -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Present EM Pitch Deck</apex:facet>
             <apex:outputText value="{!opp.pitchDeck}"/>
         </apex:column>
         <!-- approveContracting -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Approve Contracting</apex:facet>
             <apex:outputText value="{!opp.approveContracting}"/>
         </apex:column>
         <!-- signedContract -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Receive Signed Contract</apex:facet>
             <apex:outputText value="{!opp.signedContract}"/>
         </apex:column>
 
         <!-- Owner Last Name -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Owner Last Name</apex:facet>
             <apex:outputText value="{!opp.opp.Owner.LastName}"/>
         </apex:column>
@@ -111,47 +111,47 @@
         <!-- pipeline table -->
     <apex:dataTable value="{!oppPipeline}" var="opp" border="1px solid black">
         <!-- Created -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Created Count</apex:facet>
             <apex:outputText value="{!opp.createdOppCount}"/>
         </apex:column>
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Created Dollar</apex:facet>
             <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.createdOppAmount}" /></apex:outputText>
         </apex:column>
         <!-- Sourced -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Sourced Count</apex:facet>
             <apex:outputText value="{!opp.sourcedOppCount}"/>
         </apex:column>
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Sourced Dollar</apex:facet>
             <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.sourcedOppAmount}" /></apex:outputText>
         </apex:column>
         <!-- Proposed -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Proposed Count</apex:facet>
             <apex:outputText value="{!opp.proposedOppCount}"/>
         </apex:column>
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Proposed Dollar</apex:facet>
             <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.proposedOppAmount}" /></apex:outputText>
         </apex:column>
         <!-- Converted -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Converted Count</apex:facet>
             <apex:outputText value="{!opp.convertedOppCount}"/>
         </apex:column>
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Converted Dollar</apex:facet>
             <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.convertedOppAmount}" /></apex:outputText>
         </apex:column>
         <!-- Won -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Won Count</apex:facet>
             <apex:outputText value="{!opp.wonOppCount}"/>
         </apex:column>
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Won Dollar</apex:facet>
             <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.wonOppAmount}" /></apex:outputText>
         </apex:column>

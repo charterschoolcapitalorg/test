@@ -86,14 +86,14 @@
                     <table class="mySubrowHeader">
                         <thead>
                         <tr class="slds-text-title_caps">
-                            <th scope="col" style="background-color:#3ABEB6;" class="tableHeader">
+                            <th scope="col" style="background-color:#77c5d5;" class="tableHeader">
                                 <div class="header-column-one slds-truncate" title="Opportunity Name">Project Name</div>
                             </th>
-                            <th scope="col" style="background-color:#3ABEB6;" class="tableHeader">
+                            <th scope="col" style="background-color:#77c5d5;" class="tableHeader">
                                 <div class="header-column-two slds-truncate" title="Opportunity Link">Funded Date</div>
                             </th>
                             
-                            <th scope="col" style="background-color:#3ABEB6;" class="tableHeader">
+                            <th scope="col" style="background-color:#77c5d5;" class="tableHeader">
                                     <div class="header-column-two slds-truncate" title="Documents">Funded Amount</div>
                             </th>
                             

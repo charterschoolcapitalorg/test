@@ -22,6 +22,9 @@ public with sharing class FC_MasterComponent_Ctrl {
         }
 
         warning = 'WARNING:  The following fields will be updated - ' + warning ;
+
+        System.debug('record Id ' + recordId);
+        System.debug('record type ' + recordTypeId);
         return warning;
     }
 
@@ -47,16 +50,24 @@ public with sharing class FC_MasterComponent_Ctrl {
         }
 
         warning = 'WARNING:  The following fields will be updated - ' + warning ;
+
+        System.debug('record Id ' + recordId);
+        System.debug('record type ' + recordTypeId);
         return warning;
     }
 
     @AuraEnabled
     public static void refreshData(String recordId){
+        System.debug('data record Id ' + recordId);
         Id recordTypeId = (Id)recordId;
+        System.debug('record type ' + recordTypeId.getSobjectType());
+        System.debug('record type ' + Schema.FC_Details__c.SObjectType);
 
         if(recordTypeId.getSobjectType() == Schema.FC_Details__c.SObjectType) {
+            System.debug('it\'s a Detail__c');
             refreshDetailsData(recordId);
         } else if(recordTypeId.getSobjectType() == Schema.FC_Form__c.SObjectType) {
+            System.debug('it\'s a Form__c');
             refreshFormData(recordId);
         }
 
@@ -64,16 +75,21 @@ public with sharing class FC_MasterComponent_Ctrl {
     
     @AuraEnabled
     public static void refreshComments(String recordId){
+        System.debug('comments record Id ' + recordId);
         Id recordTypeId = (Id)recordId;
+        System.debug('record type ' + recordTypeId);
 
         if(recordTypeId.getSobjectType() == Schema.FC_Details__c.SObjectType) {
+            System.debug('it\'s a Detail__c');
             refreshDetailsComments(recordId);
         } else if(recordTypeId.getSobjectType() == Schema.FC_Form__c.SObjectType) {
+            System.debug('it\'s a Form__c');
             refreshFormComments(recordId);
         }        
     }
 
     private static void refreshFormData(String recordId){
+        System.debug('**** Refresh form data ****');
         List<FC_Form__c> forms = new List<FC_Form__c>();
         forms.add([SELECT Id, opportunity__c, RecordTypeId, Total_Fund_Receiv_FV_Amount__c, Current_Attendance__c FROM FC_Form__c WHERE Id=:recordId]);
 
@@ -81,10 +97,11 @@ public with sharing class FC_MasterComponent_Ctrl {
             FCFormUtils.populateHeaderFieldsFromSFData(forms);
         } catch (Exception e){
             throw new AuraHandledException('Error updating records.');
-        }
+        } 
     }
 
     private static void refreshDetailsData(String recordId){
+        System.debug('**** Refresh detail data ****');
         List<FC_Details__c> details = new List<FC_Details__c>();
         FC_Details__c record = [SELECT Id, 
                             FC_Form__c, 
@@ -100,14 +117,17 @@ public with sharing class FC_MasterComponent_Ctrl {
                             FROM FC_Details__c 
                             WHERE Id=:recordId];
         
+        system.debug('*** record = ' + record);
         record.Current_Attendance__c = '';
         record.Receivables_Description__c = '';
         record.Lease_Term__c = '';
         record.Grades_Served__c = '';
 
         update record;
+        system.debug('*** record = ' + record);
 
         details.add(record);
+        system.debug('*** details = ' + details);
 
         try{ 
             FCFormUtils.populateDetailFieldsFromSFData(details);

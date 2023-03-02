@@ -4,9 +4,4 @@
     <availableInTouch>true</availableInTouch>
     <confirmationTokenRequired>false</confirmationTokenRequired>
     <label>Opportunity Grid</label>
-    <packageVersions>
-        <majorNumber>5</majorNumber>
-        <minorNumber>4</minorNumber>
-        <namespace>GBLite</namespace>
-    </packageVersions>
 </ApexPage>

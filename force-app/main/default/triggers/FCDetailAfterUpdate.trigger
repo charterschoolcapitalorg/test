@@ -25,6 +25,9 @@ trigger FCDetailAfterUpdate on FC_Details__c (after update) {
 	 		if (form!=null) {
 	 			FC_Form__c summform = summaryforms.get(form.Summary_FC_Form__c);
 		 		
+		 		System.debug('****got fc form: ' + form);
+		 		System.debug('****got summary form: ' + summform);
+		 		
 		 		//2019.03.05 J Caughie - added filter for won opps and conditional error message
 		 		if (summform!=null && (summform.status__c=='Rejected' || summform.Opportunity__r.IsWon) && !FeatureManagement.checkPermission('Bypass_Validation')) {
 		 			SObject sobj = (SObject)fa;

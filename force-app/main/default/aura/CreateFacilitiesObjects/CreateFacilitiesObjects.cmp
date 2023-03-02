@@ -82,7 +82,7 @@
                 {!v.Property.Net_Rentable_Area__c}
             </lightning:layoutItem>
             <lightning:layoutItem size="5" class="propertyDetail">
-                <b>Adjusted Cap Rate: </b> 
+                <b>Current Cap Rate: </b> 
                 <lightning:formattedNumber value="{!v.Property.Adjusted_Cap_Rate__c/100}" style="percent"/>
             </lightning:layoutItem>
             <lightning:layoutItem size="5" class="propertyDetail"><b>Gross Land Area: </b>

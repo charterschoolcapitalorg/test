@@ -1,6 +1,6 @@
 ({
 	doInit: function(component, event, helper) {
-		console.log('calling doinit...');
+		// console.log('calling doinit...');
         let action = component.get("c.getFacilitiesMilestone");
         action.setCallback(this, function(response) {
             let state = response.getState();

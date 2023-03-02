@@ -126,7 +126,7 @@
             </div-->
                                             <div class="slds-size_1-of-2 slds-max-small-size_1-of-1">
                                                 <a onclick="{!c.FireOppEvent}" id="{!v.ii.Opportunity__c}" >
-                                                    <p style="color:#3ABEB6">View Transaction</p>
+                                                    <p style="color:#a8ad00">View Transaction</p>
                                                 </a>  
                                             </div>
                                         </div>
@@ -206,7 +206,7 @@
                                                         <tr class="slds-wrap">
                                                             <th class="slds-wrap" scope="col" style="font-size:small;">
                                                                 
-                                                                <a href="{!'/sfc/servlet.shepherd/document/download/'+f.Id}" target="_blank" style="color:#3ABEB6;" class="wrapText">{!f.Title}  </a>
+                                                                <a href="{!'/sfc/servlet.shepherd/document/download/'+f.Id}" target="_blank" style="color:#a8ad00;" class="wrapText">{!f.Title}  </a>
                                                                 &nbsp;&nbsp;(&nbsp;<lightning:formattedDateTime value="{!f.CreatedDate}" month="short" day="2-digit"/>&nbsp;)
                                                             </th>
                                                         </tr>
@@ -242,7 +242,7 @@
                     <tr class="slds-text-title_caps">
                         <th scope="col" style="font-size:small;">
                             
-                            <a href="{!'/sfc/servlet.shepherd/document/download/'+f.Id}" target="_blank" style="color:#3ABEB6;">{!f.Title}  </a>
+                            <a href="{!'/sfc/servlet.shepherd/document/download/'+f.Id}" target="_blank" style="color:#a8ad00;">{!f.Title}  </a>
                             &nbsp;&nbsp;(&nbsp;<lightning:formattedDateTime value="{!f.CreatedDate}" month="short" day="2-digit"/>&nbsp;)
                         </th>
                     </tr>

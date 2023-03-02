@@ -28,8 +28,8 @@ public with sharing class OpportunityAddActionLists {
 
     // Opportunity oppRecord = Database.query(opportunityQuery);
     Opportunity oppRecord = [SELECT id, name, recordtypeid,
-                                    AccountId
-                                    FROM Opportunity WHERE ID = :oppID];
+    AccountId
+    FROM Opportunity WHERE ID = :oppID];
     oppMap.put(oppID, oppRecord);
 
     OpportunityHelper.addOppsManually(oppMap);

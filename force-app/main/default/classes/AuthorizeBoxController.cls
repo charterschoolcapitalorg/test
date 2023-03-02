@@ -84,7 +84,7 @@ public with sharing class AuthorizeBoxController {
     public PageReference redirectOnCallback() {
         if (this.isCallback) {
             String code = ApexPages.currentPage().getParameters().get('code');
-            system.debug('@@@ here ');
+            
             BOxUtils.OAuthResult result = BOxUtils.GetBoxTokens(code, this.getPageUrl(), false);
             
             
