@@ -317,7 +317,7 @@
                             <td><apex:outputText value="{0, number, $###,###}" styleClass="grv">
                                 <apex:param value="{!fer.GRV_Amount__c}"></apex:param></apex:outputText>
                             </td>
-                            <td class="col4"><apex:inputText styleClass="rounded IPF" value="{!fer.Opp_School__r.School__r.Default_Initial_Purchase_Factor__c}"
+                            <td class="col4"><apex:inputText styleClass="rounded IPF" value="{!fer.Initial_Purchase_Factor__c}"
                                         onChange="calculateIPFV(this);" onKeyPress="disableEnter(this, event);"/> %</td>
                             <td class="discRate"><apex:inputText styleClass="rounded discountRatePercent" html-data-id="{!oppWrapper.oppSchoolName}" value="{!fer.Discount_Rate__c}"
                                         onChange="calculateDiscountRow(this);" onKeyPress="disableEnter(this, event);"/> %</td>
@@ -335,7 +335,7 @@
                                 </apex:outputText>
                             </td>
                             <td class="daysOutstanding" style="text-align:center">{!fer.Days_Outstanding__c} <span style="display:{!IF(fer.Days_Outstanding__c != NULL, '','none')}">days</span></td>
-                            <td class="col3"><apex:inputText styleClass="rounded changeFlag maturityBuffer" value="{!fer.Opp_School__r.School__r.Default_Maturity_Buffer__c}" onChange="calculateDiscountOnChange(this);"
+                            <td class="col3"><apex:inputText styleClass="rounded changeFlag maturityBuffer" value="{!fer.Maturity_Buffer__c}" onChange="calculateDiscountOnChange(this);"
                                                                 onKeyPress="disableEnter(this, event);"/> days</td>
                             <td class="effectiveRate" style="font-weight: bold; text-align:center"><apex:outputText value="{0,number,##.##}">
                                             <Apex:param value="{!fer.Effective_Rate__c}"    /></apex:outputText>%

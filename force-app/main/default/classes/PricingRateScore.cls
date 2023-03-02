@@ -1,7 +1,7 @@
 /**=====================================================================
  * Charter School Capital
  * Name: PricingRateScore
- * Test Class: PricingRateScoreTest
+ * Test Class: PricingRateScoreTests
  * Description: 
  * Created Date: 2023, Jan 05
  * Created By: Slava Krel
@@ -46,6 +46,7 @@ public inherited sharing class PricingRateScore {
     }
 
 
+    // TODO: redo student count for both school and portfolio
     public void rescore() {
         
         Pricing_Rate__c prToUpdate = new Pricing_Rate__c();
@@ -62,7 +63,8 @@ public inherited sharing class PricingRateScore {
             // set current student count
             if(string.isNotEmpty(this.rateScoring.Account__c)) {
                 Account schSchool = schools.get(this.rateScoring.Account__c);
-                setCurrentStudentCounts(this.rateScoring, schSchool.School_Attendance__r);
+                List<School_Attendance__c> studCnts = [SELECT id, name, Fiscal_Year__c, Total_Attendance__c, Report_Date__c FROM School_Attendance__c WHERE School__c = :schSchool.id AND Total_Attendance__c != null AND Fiscal_Year__c != null ORDER BY Report_Date__c DESC];
+                setCurrentStudentCounts(this.rateScoring, studCnts);
             }
 
         // portfolio rescore
@@ -286,6 +288,7 @@ public inherited sharing class PricingRateScore {
             if (sc.Fiscal_Year__c==lastFY && (lstYrAttend==null || lstYrAttend.Report_Date__c <sc.Report_Date__c)) {
                 lstYrAttend = sc;
             }
+            
             if (sc.Fiscal_Year__c==twoLastFY && (twoYrAttend==null || twoYrAttend.Report_Date__c <sc.Report_Date__c)) {
                 twoYrAttend = sc;
             }

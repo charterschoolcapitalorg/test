@@ -36,157 +36,157 @@
 <apex:page controller="FacilitiesMilestoneReportCtrl" contentType="application/vnd.ms-excel#Facilities_Milestone_Report_Export.xls" cache="true">
     <apex:dataTable value="{!oppsToExport}" var="opp" border="1px solid black">
         <!-- Close Date -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Close Date</apex:facet>
             <apex:outputText value="{0,date,MM/dd/yyyy}"><apex:param value="{!opp.opp.CloseDate}" /></apex:outputText>
         </apex:column>
 
         <!-- Diligence End -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Diligence End</apex:facet>
             <apex:outputText value="{0,date,MM/dd/yyyy}"><apex:param value="{!opp.opp.Due_Diligence_End_Date__c}" /></apex:outputText>
         </apex:column>
 
         <!-- Created -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Created</apex:facet>
             <apex:outputText value="{0,date,MM/dd/yyyy}"><apex:param value="{!opp.opp.createddate}" /></apex:outputText>
         </apex:column>
 
         <!-- BD Close -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">BD Close</apex:facet>
             <apex:outputText value="{!opp.businessDaysToClose}"/>
         </apex:column>
 
         <!-- Opportunity Name -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Opportunity Name</apex:facet>
             <apex:outputText value="{!opp.opp.Name}"/>
         </apex:column>
 
         <!-- Opportunity Channel -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Opportunity Channel</apex:facet>
             <apex:outputText value="{!opp.opp.Facilities_Channel__c}"/>
         </apex:column>
 
         <!-- Pipeline Stage -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Pipeline Stage</apex:facet>
             <apex:outputText value="{!opp.opp.Pipeline_Stage__c}"/>
         </apex:column>
 
         <!-- State -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">State</apex:facet>
             <apex:outputText value="{!opp.opp.STATE__c}"/>
         </apex:column>
 
         <!-- Estimated Cost -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Estimated Cost</apex:facet>
             <apex:outputText value="{0, number,$ ###,###,##0.00}"><apex:param value="{!opp.opp.Estimated_Project_Cost__c}" /></apex:outputText>
         </apex:column>
 
         <!-- Cap Rate -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Cap Rate</apex:facet>
             <apex:outputText value="{!opp.opp.Lease_Cap_Rate__c}"/>
         </apex:column>
 
         <!-- Enrollment Count -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Enrollment Count</apex:facet>
             <apex:outputText value="{!opp.currEnrollment}"/>
         </apex:column>
 
         <!-- Deal Review -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Deal Review</apex:facet>
             <apex:outputText value="{!opp.dealApproved}"/>
         </apex:column>
 
         <!-- Pre FC -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Pre FC</apex:facet>
             <apex:outputText value="{!opp.preFC}"/>
         </apex:column>
 
         <!-- LOI Sent -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">LOI Sent</apex:facet>
             <apex:outputText value="{!opp.loiSent}"/>
         </apex:column>
 
         <!-- LOI Signed -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">LOI Signed</apex:facet>
             <apex:outputText value="{!opp.loiSigned}"/>
         </apex:column>
 
         <!-- MOU Sent -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">MOU Sent</apex:facet>
             <apex:outputText value="{!opp.mouSent}"/>
         </apex:column>
 
         <!-- MOU Signed -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">MOU Signed</apex:facet>
             <apex:outputText value="{!opp.mouSigned}"/>
         </apex:column>
 
         <!-- PSA Signed -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">PSA Signed</apex:facet>
             <apex:outputText value="{!opp.psaSigned}"/>
         </apex:column>
 
         <!-- Lease Signed -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Lease Signed</apex:facet>
             <apex:outputText value="{!opp.leaseSigned}"/>
         </apex:column>
 
         <!-- Final FC -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Final FC</apex:facet>
             <apex:outputText value="{!opp.finalFC}"/>
         </apex:column>
 
         <!-- Diligence Waived -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Diligence Waived</apex:facet>
             <apex:outputText value="{!opp.diligenceWaived}"/>
         </apex:column>
 
         <!-- Funded -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Funded</apex:facet>
             <apex:outputText value="{!opp.funded}"/>
         </apex:column>
 
         <!-- Owner Last Name -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Owner Last Name</apex:facet>
             <apex:outputText value="{!opp.opp.Owner.LastName}"/>
         </apex:column>
 
         <!-- Deal Specialist Last Name -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Deal Specialist Last Name</apex:facet>
             <apex:outputText value="{!opp.opp.Deal_Specialist__r.LastName}"/>
         </apex:column>
 
         <!-- Last Update -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Last Update</apex:facet>
             <apex:outputText value="{!opp.oppLatestUpdate}"/>
         </apex:column>
 
         <!-- Overview -->
-        <apex:column>
+        <apex:column >
             <apex:facet name="header">Overview</apex:facet>
             <apex:outputText value="{!opp.oppOverview}"/>
         </apex:column>

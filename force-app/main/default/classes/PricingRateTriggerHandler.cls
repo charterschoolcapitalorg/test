@@ -10,7 +10,7 @@
  * [MON DD, YYYY]             	[FirstName LastName]		 [Short description for changes]
  =====================================================================*/
 
-public with sharing class PricingRateTriggerHandler {
+ public with sharing class PricingRateTriggerHandler {
 
     // Add/remove if needed
     public Map<Id, Pricing_Rate__c> newMap;
@@ -41,11 +41,10 @@ public with sharing class PricingRateTriggerHandler {
         Id schoolAcctRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('School').getRecordTypeId();
         // find active market rate
         Market_Rate__c activeMR = [SELECT id FROM Market_Rate__c WHERE Current_Monthly_Rate__c = true];
+        Map<Account, Pricing_Rate__c> acctPrRate = new Map<Account, Pricing_Rate__c>();
 
         for(Pricing_Rate__c prRate : trigNew) {
             Pricing_Rate__c oldPricRate = oldMap.get(prRate.id);
-
-            system.debug('@@@ new stage = ' + prRate.stage__c + '; old stage = ' + oldPricRate.stage__c + '; new account = ' + prRate.Account__c + '; old account = ' + oldPricRate.Account__c);
             
             // show error when changing active record
             if(!test.isRunningTest() && prRate.stage__c == 'Active' && oldPricRate.stage__c == 'Active' && 
@@ -77,9 +76,7 @@ public with sharing class PricingRateTriggerHandler {
                         prRate.Activation_Date__c = Date.today();
                         // update account
                         Account school = [SELECT id, name FROM Account WHERE id = :prRate.Account__c];
-                        school.Current_Pricing_Rate__c = prRate.id;
-                        school.Pricing_Discount_Rate__c = prRate.Final_Discount_Rate__c;
-                        update school;
+                        acctPrRate.put(school, prRate);
 
                     } else if(prRate.RecordTypeId == portfolioRecordTypeId) {
                         system.debug('PORTFOLIO');
@@ -156,11 +153,10 @@ public with sharing class PricingRateTriggerHandler {
                                     // rescore school PRs
                                     PricingRateScore score = new PricingRateScore(pricRate.id);
                                     score.rescore();
+
                                     // update account
-                                    sch.Current_Pricing_Rate__c = pricRate.id;
-                                    schoolsToUpdate.add(sch);
+                                    acctPrRate.put(sch, pricRate);
                                 }
-                                update schoolsToUpdate;
 
                             // if Rescored__c == false
                             } else {
@@ -181,8 +177,8 @@ public with sharing class PricingRateTriggerHandler {
                                         }
                                         insert prRateClone;
 
-                                        sch.Current_Pricing_Rate__c = prRateClone.id;
-                                        update sch;
+                                        // update account
+                                        acctPrRate.put(sch, prRateClone);
 
                                     } else {
                                         // create Active records
@@ -194,8 +190,7 @@ public with sharing class PricingRateTriggerHandler {
                                         score.rescore();
 
                                         // update account
-                                        sch.Current_Pricing_Rate__c = pricRate.id;
-                                        update sch;
+                                        acctPrRate.put(sch, pricRate);
                                     }
                                 }
                             }
@@ -205,8 +200,21 @@ public with sharing class PricingRateTriggerHandler {
             } else {
                 prRate.addError('Record does not have account associated.');
             }
-            
-            
+        }
+        system.debug('@@@ schools to update = ' + acctPrRate);
+        List<Account> listSchoolsToUpdate = new List<Account>();
+        for(Account schToUpdate : acctPrRate.keySet()){
+            Id prId = acctPrRate.get(schToUpdate).id;
+            Decimal fdr = acctPrRate.get(schToUpdate).Final_Discount_Rate_Portfolio__c;
+            if(prId != null && fdr != null) {
+                schToUpdate.Current_Pricing_Rate__c = prId;
+                schToUpdate.Pricing_Discount_Rate__c = fdr;
+                listSchoolsToUpdate.add(schToUpdate);
+            }
+                
+        }
+        if(!listSchoolsToUpdate.isEmpty()) {
+            update listSchoolsToUpdate;
         }
     }
 
