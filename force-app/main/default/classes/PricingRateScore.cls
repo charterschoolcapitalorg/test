@@ -1,7 +1,7 @@
 /**=====================================================================
  * Charter School Capital
  * Name: PricingRateScore
- * Test Class: PricingRateScoreTests
+ * Test Class: PricingRateScoreTest
  * Description: 
  * Created Date: 2023, Jan 05
  * Created By: Slava Krel

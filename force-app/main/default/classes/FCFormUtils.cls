@@ -2,13 +2,14 @@
 Organization: Charter School Capital
 Class: FCFormUtils
 Created: ??? 
-Test class: TestFC
+Test class: TestFC, FCApprovalControllerTest, FC_MasterComponent_Ctrl_Test
 
 Change by 
 Slava K 20220616 - Reporting_Year__c field added for sorting
 Slava K 20220705 - Refactoring
 Slava K 20221201 - UCC Search rename
 Slava K 20221201 - removing system.debug
+Slava K 20230320 - FC Form Data Mapping with Account Snapshots - case-00002404
 */
 
 public  class FCFormUtils {
@@ -1041,7 +1042,7 @@ public  class FCFormUtils {
             School__c IN:schoolOppIdMap.keyset() and Active__c=True ORDER BY CreatedDate DESC];
         
         //get Account Strategy/Updates from CHarter Holder Account
-        List<Account_Snapshot__c> acctSnaps = [Select Id, recordtypeid, Account_Strategy__c, Account_Updates__c, CreatedDate, CreatedBy.Name from 
+        List<Account_Snapshot__c> acctSnaps = [Select Id, recordtypeid, Account_Strategy__c, Account_Updates__c, Department__c, CreatedDate, CreatedBy.Name from 
             Account_Snapshot__c where account__c 
             IN:chAcctIds ORDER BY CreatedDate DESC];
         
@@ -1065,13 +1066,13 @@ public  class FCFormUtils {
                 f.charter_holder__c = o.Account.Name;
 
                 for (Account_Snapshot__c s : acctSnaps) {
-                    if (s.recordtypeid==AcctStrategy) {
+                    if (s.recordtypeid==AcctStrategy && (s.Department__c == 'Client Services' || s.Department__c == 'Intervention')) {
                         f.Account_Strategy__c = s.CreatedDate.format('M/d/yyyy') + ' - ' + s.CreatedBy.Name + '\n\n' + s.Account_Strategy__c;
                         break;
                     }
                 }
                 for (Account_Snapshot__c s : acctSnaps) {
-                    if (s.recordtypeid==AcctUpdates) {
+                    if (s.recordtypeid==AcctUpdates && (s.Department__c == 'Client Services' || s.Department__c == 'Intervention')) {
                         f.Client_Update__c = s.CreatedDate.format('M/d/yyyy') + ' - ' + s.CreatedBy.Name + '\n\n' + s.Account_Updates__c;
                         break;
                     }

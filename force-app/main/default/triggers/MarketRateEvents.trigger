@@ -2,7 +2,7 @@
  * Charter School Capital
  * Name: MarketRateEvents
  * Test Class: MarketRateTriggerHandlerTest
- * Description: 
+ * Description: Client Pricing project. Market Rate activation that is forcing Pricing Rate cloning and Account update
  * Created Date: 2023, Feb 05
  * Created By: Slava Krel
  *

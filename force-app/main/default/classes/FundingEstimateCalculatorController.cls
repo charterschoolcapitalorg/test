@@ -120,7 +120,6 @@
                             new OppSchoolWrapper(fer.School__c, 
                                                 fer.Opp_School__r.School__r.Charter_Termination__c, 
                                                 fer.Opp_School__r.School__r.Pricing_Discount_Rate__c,
-                                                // TODO: remove, Discount_Rate__c on account is not used
                                                 fer.Opp_School__r.School__r.Discount_Rate__c,
                                                 feOpportunity.Pre_Year_0_Funding__c, 
                                                 feOpportunity.Year_0_Funding__c, 

@@ -2,7 +2,7 @@
  * Charter School Capital
  * Name: PricingRateTriggerHandler
  * Test Class: PricingRateTriggerHandlerTest
- * Description: 
+ * Description: Pricing Rate activation. Fires from the PricingRateTrigger. This is not a part of MR activation
  * Created Date: 2023, Jan 05
  * Created By: Slava Krel
  *
@@ -40,7 +40,7 @@
         Id schoolRecordTypeId = Schema.SObjectType.Pricing_Rate__c.getRecordTypeInfosByDeveloperName().get('School').getRecordTypeId();
         Id schoolAcctRecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('School').getRecordTypeId();
         // find active market rate
-        Market_Rate__c activeMR = [SELECT id FROM Market_Rate__c WHERE Current_Monthly_Rate__c = true];
+        // Market_Rate__c activeMR = [SELECT id FROM Market_Rate__c WHERE Current_Monthly_Rate__c = true];
         Map<Account, Pricing_Rate__c> acctPrRate = new Map<Account, Pricing_Rate__c>();
 
         for(Pricing_Rate__c prRate : trigNew) {
@@ -68,6 +68,7 @@
                 String fifteenDigitAcctId = String.valueOf(prRate.Account__c).substring(0, 15);
 
                 if(prRate.stage__c != oldPricRate.stage__c && prRate.stage__c == 'Active' && oldPricRate.stage__c == 'Draft') {
+                    Market_Rate__c activeMR = [SELECT id FROM Market_Rate__c WHERE Current_Monthly_Rate__c = true];
                     if(prRate.RecordTypeId == schoolRecordTypeId) {
                         system.debug('SCHOOL');
                         // deactivate active record
@@ -203,15 +204,25 @@
         }
         system.debug('@@@ schools to update = ' + acctPrRate);
         List<Account> listSchoolsToUpdate = new List<Account>();
-        for(Account schToUpdate : acctPrRate.keySet()){
+        for(Account schToUpdate : acctPrRate.keySet()){ // Map<Account, Pricing_Rate__c>
             Id prId = acctPrRate.get(schToUpdate).id;
-            Decimal fdr = acctPrRate.get(schToUpdate).Final_Discount_Rate_Portfolio__c;
-            if(prId != null && fdr != null) {
+            Decimal fdrpo = acctPrRate.get(schToUpdate).Final_Discount_Rate_Portfolio__c; // for portfolio overwrite
+            Decimal fdrs = acctPrRate.get(schToUpdate).Final_Discount_Rate__c; // for school
+            system.debug('fdrpo = ' + fdrpo);
+            system.debug('fdrs = ' + fdrs);
+            Boolean portfolioDiscount = false;
+            if(prId != null) {
                 schToUpdate.Current_Pricing_Rate__c = prId;
-                schToUpdate.Pricing_Discount_Rate__c = fdr;
-                listSchoolsToUpdate.add(schToUpdate);
-            }
-                
+                if(fdrpo != null) {
+                    portfolioDiscount = true;
+                    schToUpdate.Pricing_Discount_Rate__c = fdrpo;
+                    listSchoolsToUpdate.add(schToUpdate);
+                }
+                if(fdrs != null && portfolioDiscount == false) {
+                    schToUpdate.Pricing_Discount_Rate__c = fdrs;
+                    listSchoolsToUpdate.add(schToUpdate);
+                }
+            }                
         }
         if(!listSchoolsToUpdate.isEmpty()) {
             update listSchoolsToUpdate;

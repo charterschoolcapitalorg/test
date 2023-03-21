@@ -2,7 +2,7 @@
  * Charter School Capital
  * Name: MarketRateTriggerHandler
  * Test Class: MarketRateTriggerHandlerTest
- * Description: 
+ * Description: See MarketRateEvents trigger. Fires when Market rate gets activated.
  * Created Date: 2023, Feb 05
  * Created By: Slava Krel
  *
@@ -45,10 +45,22 @@
 
         List<Pricing_Rate__c> upsertPricRateList = new List<Pricing_Rate__c>();
         Map<Account, Pricing_Rate__c> schoolsWithNewPr = new Map<Account, Pricing_Rate__c>();
+        Map<Pricing_Rate__c, Pricing_Rate__c> prSchoolsWithNewPr = new Map<Pricing_Rate__c, Pricing_Rate__c>();
         List<Account> schoolsToUpdate = new List<Account>();
-        Market_Rate__c mrToDeactivate = new Market_Rate__c();
+        List<Pricing_Rate__c> prSchoolsUpdate = new List<Pricing_Rate__c>();
         Map<Pricing_Rate__c, Account> pricRateSchoolToRescore = new Map<Pricing_Rate__c, Account>();
         Map<Pricing_Rate__c, Account> pricRatePortfolioToRescore = new Map<Pricing_Rate__c, Account>();
+        Map<Account, List<Account>> acctAccts = new Map<Account, List<Account>>();
+        Map<Id, Account> part = new Map<Id, Account>();
+        Map<Account, Account> partOfPortfolio = new Map<Account, Account>();
+        Map<Id, Account> notPart = new Map<Id, Account>();
+        Map<Account, Pricing_Rate__c> acctIdandActivePR = new Map<Account, Pricing_Rate__c>();
+        Map<Pricing_Rate__c, Id> activePRandAcctId = new Map<Pricing_Rate__c, Id>();
+        Set<Id> doneAcct = new Set<Id>();
+        Set<Id> donePrRate = new Set<Id>();
+
+        Map<Id, Account> acctMap = new Map<Id, Account>([SELECT Id, Name, Nick_Name__c, Current_Pricing_Rate__c, Top_Level_Parent_Account_Id__c, WC_Client_Pricing_School__c, Pricing_Discount_Rate__c FROM Account WHERE WC_Client_Pricing_School__c = true]);
+        Map<Id, Account> allAccounts = new Map<Id, Account>([SELECT Id, Name, Nick_Name__c, Current_Pricing_Rate__c, Top_Level_Parent_Account_Id__c, ParentId, RecordTypeId, WC_Client_Pricing_School__c FROM Account WHERE RecordTypeId = :chRecordTypeId OR RecordTypeId = :businessRecordTypeId]); 
 
         for(Market_Rate__c marRate : trigNew) {
             Market_Rate__c oldMarlRate = oldMap.get(marRate.id);
@@ -56,63 +68,36 @@
 
                 // confirm MR active only one
                 List<Market_Rate__c> activeMarRateList = [SELECT id, RecordTypeId FROM Market_Rate__c WHERE Current_Monthly_Rate__c = true AND id != :marRate.id];
-                if(activeMarRateList?.size() == 1) {
+                if(activeMarRateList?.size() == 1 || activeMarRateList?.size() == 0) {
+                    // deactivate the active MR
+                    if(activeMarRateList?.size() == 1) {
+                        for(Market_Rate__c mrToDeactivate : activeMarRateList) {
+                            mrToDeactivate.Deactivation_Date__c = Date.today();
+                            mrToDeactivate.Current_Monthly_Rate__c = false;
+                            mrToDeactivate.Stage__c = 'Deactivated';
+                            mrToDeactivate.RecordTypeId = marRateRecordTypeId;
+                            update mrToDeactivate;
+                        }
+                    }
                     
+                    // activate current MR record
                     marRate.Activation_Date__c = Date.today();
                     marRate.Current_Monthly_Rate__c = true;
                     marRate.RecordTypeId = marRateLockedRecordTypeId;
-
-                    activeMarRateList[0].Deactivation_Date__c = Date.today();
-                    activeMarRateList[0].Current_Monthly_Rate__c = false;
-                    activeMarRateList[0].Stage__c = 'Deactivated';
-                    activeMarRateList[0].RecordTypeId = marRateRecordTypeId;
-                    mrToDeactivate = activeMarRateList[0];
-                    
-                    // I - Account
-                    // account hierarchy based on the Top_Level_Parent_Account_Id__c field
-                    Map<Account, List<Account>> acctAccts = new Map<Account, List<Account>>();
-                    // account PART and NotPART of a POTFOLIO accordingly
-                    Map<Id, Account> part = new Map<Id, Account>();
-                    Map<Id, Account> notPart = new Map<Id, Account>();
-                    // these schools ARE NOT part of portfolio
-                    Map<Account, List<Pricing_Rate__c>> acctNotPartWithPR = new Map<Account, List<Pricing_Rate__c>>(); 
-                    // these schools ARE part of portfolio
-                    Map<Account, List<Pricing_Rate__c>> acctPartWithPR = new Map<Account, List<Pricing_Rate__c>>();
-                    // accounts (notPart schools) with active PRs
-                    Map<Account, Pricing_Rate__c> acctIdandActivePR = new Map<Account, Pricing_Rate__c>();
-                    // II - PR - School related
-                    // Pricing rate SCHOOL
-                    Map<Id, Pricing_Rate__c> schoolMap = new Map<Id, Pricing_Rate__c>();
-                    // active PR and related school
-                    Map<Pricing_Rate__c, Id> activePRandAcctId = new Map<Pricing_Rate__c, Id>();
-                    // III - PR - Portfolio related
-                    // Pricing rate PORTFOLIO
-                    Map<Id, Pricing_Rate__c> porfolioMap = new Map<Id, Pricing_Rate__c>();
-
-                    Map<Id, Account> acctMap = new Map<Id, Account>([SELECT Id, Name, Nick_Name__c, Current_Pricing_Rate__c, Top_Level_Parent_Account_Id__c FROM Account WHERE WC_Client_Pricing_School__c = true]);
-                    Map<Id, Account> allAccounts = new Map<Id, Account>([SELECT Id, Name, Nick_Name__c, Current_Pricing_Rate__c, Top_Level_Parent_Account_Id__c, ParentId, RecordTypeId FROM Account WHERE RecordTypeId = :chRecordTypeId OR RecordTypeId = :businessRecordTypeId]);
-
-                    List<Pricing_Rate__c> prRateList = [SELECT id, recordtypeid, Portfolio_Rate_Record__c, Account__c, Account__r.Top_Level_Parent_Account_Id__c, Deactivation_Date__c, Final_Discount_Rate__c, Stage__c FROM Pricing_Rate__c];
+            
+                    List<Pricing_Rate__c> prRateList = getPricingRates();
 
                     for(Pricing_Rate__c prRate : prRateList) {
-                        if(prRate.recordtypeid == portfolioRecordTypeId) {
-                            porfolioMap.put(prRate.id, prRate);
-
-                        } else if(prRate.recordtypeid == schoolRecordTypeId) {
-                            schoolMap.put(prRate.id, prRate);
-                            if(prRate.Account__c != null && prRate.Stage__c == 'Active') {
-                                activePRandAcctId.put(prRate, prRate.Account__c);
-                            }
-                        }
+                        if(prRate.recordtypeid == schoolRecordTypeId && prRate.Account__c != null && prRate.Stage__c == 'Active') activePRandAcctId.put(prRate, prRate.Account__c);
                     }
 
                     // build Map<Account, List<Account>>
-                    for(Id a : acctMap.keySet()){
-                        Id eighteenDigit = acctMap.get(a).Top_Level_Parent_Account_Id__c;
+                    for(Id accnt : acctMap.keySet()){
+                        Id eighteenDigit = acctMap.get(accnt).Top_Level_Parent_Account_Id__c;
                         if(acctAccts.containsKey(allAccounts.get(eighteenDigit))) {
-                            acctAccts.get(allAccounts.get(eighteenDigit)).add(acctMap.get(a));
+                            acctAccts.get(allAccounts.get(eighteenDigit)).add(acctMap.get(accnt));
                         } else {
-                            acctAccts.put(allAccounts.get(eighteenDigit), new List<Account>{acctMap.get(a)});
+                            acctAccts.put(allAccounts.get(eighteenDigit), new List<Account>{acctMap.get(accnt)});
                         }
                     }
 
@@ -120,8 +105,22 @@
                     for(Account item : acctAccts.keySet()) {
                         if(acctAccts.get(item) != null) {
                             if(acctAccts.get(item)?.size() > 1) {
+                                List<Account> subItemList = new List<Account>();
                                 for(Account subItem : acctAccts.get(item)) {
-                                    part.put(subItem.id, subItem);
+                                    if(subItem.WC_Client_Pricing_School__c == true) {
+                                        subItemList.add(subItem);
+                                    }
+                                }
+                                if(!subItemList.isEmpty() && subItemList != null) {
+                                    if(subItemList.size() == 1) {
+                                        notPart.put(subItemList[0].id, subItemList[0]);
+                                    }
+                                    // build a Map<Account, Account> where keySet is a school
+                                    if(subItemList.size() > 1) {
+                                        for(Account acctInPortf : subItemList) {
+                                            partOfPortfolio.put(acctInPortf, item); // Map<Account, Account>
+                                        }
+                                    }
                                 }
                             }
                             if(acctAccts.get(item)?.size() == 1) {
@@ -132,232 +131,206 @@
                         }
                     }
 
-                    // Map<Account, Pricing_Rate__c> acctIdandActivePR where PR is active if exist 
                     for(Pricing_Rate__c ap : activePRandAcctId.keySet()) {
                         if(notPart.containsKey(activePRandAcctId.get(ap))) {
                             acctIdandActivePR.put(notPart.get(activePRandAcctId.get(ap)), ap);
                         }
                     }
 
-                    // START THE CORE LOGIC
-                    // create, clone, deactivate PRs
                     for(Id schoolId : acctMap.keySet()) {
                         Account school = acctMap.get(schoolId);
                         Pricing_Rate__c pricRate;
+
                         // not part of portfolio
                         if(acctIdandActivePR.containsKey(school)) { // Map<Account, Pricing_Rate__c>
                             Pricing_Rate__c deactivatePR = acctIdandActivePR.get(school);
                             deactivatePR.Stage__c = 'Deactivated';
                             deactivatePR.Deactivation_Date__c = Date.today();
                             upsertPricRateList.add(deactivatePR);
-                            pricRate = clonePricingRateNotPortfolio(deactivatePR, marRate, school);
+
+                            String nick = getNick(school);
+                            pricRate = clonePricingRate(deactivatePR, marRate, 'School', schoolRecordTypeId, school, nick);
                             upsertPricRateList.add(pricRate);
-                            schoolsWithNewPr.put(school, pricRate);
-                        } else {
-                            pricRate = createPricingRateNotPortfolio(marRate, school);
-                            upsertPricRateList.add(pricRate);
-                            pricRateSchoolToRescore.put(pricRate, school); // these we need to rescore and activate after
                             schoolsWithNewPr.put(school, pricRate);
                         }
 
-                        // part of portfolio
-                        if(acctPartWithPR.containsKey(school)) {
+                        // part of portfolio partOfPortfolio Map<Account, Account>
+                        if(partOfPortfolio.containsKey(school)) {
+                            if(!doneAcct.contains(school.id)) {
+                                Id eighteenDigit = school.Top_Level_Parent_Account_Id__c; 
+                                Pricing_Rate__c portfPr;
 
+                                for(Pricing_Rate__c portfPrItem : prRateList) {
+                                    if(portfPrItem.Account__c == eighteenDigit && portfPrItem.Stage__c == 'Active') {
+                                        portfPr = portfPrItem;
+                                    }
+                                }
+                                
+                                if(portfPr != null) {
+                                    if(!donePrRate.contains(portfPr.id)) {
+                                        // portfolio
+                                        // deactivate
+                                        portfPr.Stage__c = 'Deactivated';
+                                        portfPr.Deactivation_Date__c = Date.today();
+                                        update portfPr;
+                                        donePrRate.add(portfPr.id);
+                                        // find related account
+                                        Account topAccount = allAccounts.get(portfPr.Account__c);
+                                        String nick = getNick(topAccount);
+                                        // clone
+                                        pricRate = clonePricingRate(portfPr, marRate, 'Portfolio', portfolioRecordTypeId, topAccount, nick);
+                                        insert pricRate;
+                                        donePrRate.add(pricRate.id);
+    
+                                        // schools
+                                        List<Pricing_Rate__c> subSchoolList = new List<Pricing_Rate__c>();
+                                        for(Pricing_Rate__c subSchool : prRateList) {
+                                            if(subSchool.Portfolio_Rate_Record__c == portfPr.id && subSchool.Stage__c == 'Active') {
+                                                subSchoolList.add(subSchool);
+                                            }
+                                        }
+                                        if(!subSchoolList.isEmpty()) {
+                                            for(Pricing_Rate__c schPrUnderPortf : subSchoolList) {
+                                                Account subSchool = acctMap.get(schPrUnderPortf.Account__c);
+                                                if(subSchool != null) {                                                        
+                                                    schPrUnderPortf.Stage__c = 'Deactivated';
+                                                    schPrUnderPortf.Deactivation_Date__c = Date.today();
+                                                    upsertPricRateList.add(schPrUnderPortf);
+
+                                                    String nickSub = getNick(subSchool);
+                                                    Pricing_Rate__c subPricRate;
+                                                    subPricRate = clonePricingRate(schPrUnderPortf, marRate, 'School', schoolRecordTypeId, subSchool, nickSub);
+
+                                                    subPricRate.Portfolio_Rate_Record__c = pricRate.id;
+                                                    upsertPricRateList.add(subPricRate);
+                                                    schoolsWithNewPr.put(subSchool, subPricRate);
+                                                    doneAcct.add(subSchool.id);
+                                                } 
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-
                 } else {
-                    marRate.addError('There is more than one or no active Market Rate record in the system. Contact you System Administrator.');
+                    marRate.addError('There is more than one active Market Rate record in the system.');
                 }
             }    
         }
 
-        // create records, rescore, activate, update account
+        // PART II
+        // upsert PRs and update schools
         if(!upsertPricRateList.isEmpty()) {
             upsert upsertPricRateList;
 
-            // rescoring and activation here
-            Map<Id, Charter_Term__c> charterTermsMap = new Map<Id, Charter_Term__c>();
-            List<Pricing_Rate__c> rescore = new List<Pricing_Rate__c>();
-            List<Pricing_Rate__c> prRatesToActivate = new List<Pricing_Rate__c>();
-            List<School_Attendance__c> allSchAtt = [SELECT id, name, Fiscal_Year__c, Total_Attendance__c, Report_Date__c FROM School_Attendance__c WHERE Total_Attendance__c != null AND Fiscal_Year__c != null ORDER BY Report_Date__c DESC];
-            for (Charter_Term__c chTerm : [SELECT Id, School__c, Type__c FROM Charter_Term__c WHERE Status__c = 'Active']) {
-                charterTermsMap.put(chTerm.School__c, chTerm);
-            }
-
-
-
-            
-            // school
-            if(!pricRateSchoolToRescore.isEmpty()) {
-                // do rescore and activate
-
-                // build a Map<Account, List<School_Attendance__c>> for studCnts
-                Map<Id, Account> acctMapSchoolToRescore = new Map<Id, Account>(pricRateSchoolToRescore.values());
-                Map<Account, List<School_Attendance__c>> acctSAMap = new Map<Account, List<School_Attendance__c>>();
-                for(School_Attendance__c schAtt : allSchAtt){
-                    if(acctSAMap.containsKey(acctMapSchoolToRescore.get(schAtt.School__c))){
-                        acctSAMap.get(acctMapSchoolToRescore.get(schAtt.School__c)).add(schAtt);
-                    } else {
-                        acctSAMap.put(acctMapSchoolToRescore.get(schAtt.School__c), new List<School_Attendance__c>{schAtt});
-                    }
-                }
-
-                for(Pricing_Rate__c rateScoring : pricRateSchoolToRescore.keySet()) {
-                    rateScoring.Rescored__c = true;
-                    Account school = pricRateSchoolToRescore.get(rateScoring);
-                    // set charter terms
-                    if (charterTermsMap.containsKey(rateScoring.Account__c)) {
-                        rateScoring.Charter_Term_Record__c = charterTermsMap.get(rateScoring.Account__c).Id;
-                        rateScoring.Charter_Renewed__c = getCharterRenewed(charterTermsMap.get(rateScoring.Account__c).Type__c);
-
-                        // set student count
-                        List<School_Attendance__c> studCnts = acctSAMap.get(school);
-                        if(!studCnts.isEmpty()) {
-                            School_Attendance__c mstRcntAttend = studCnts[0];
-                            School_Attendance__c lstYrAttend;
-                            School_Attendance__c twoYrAttend;
-                            if (mstRcntAttend.Fiscal_Year__c != null) {
-                                rateScoring.Student_Count_Record__c = mstRcntAttend.Id;
-                                rateScoring.Student_Count_Current_FY__c = mstRcntAttend.Total_Attendance__c; 
-                                String lastFY = getFYValue('lastFY', mstRcntAttend.Fiscal_Year__c);
-                                String twoLastFY = getFYValue('twoLastFY', mstRcntAttend.Fiscal_Year__c);
-                                for (School_Attendance__c sc : studCnts) {
-                                    if (sc.Fiscal_Year__c==lastFY && (lstYrAttend==null || lstYrAttend.Report_Date__c <sc.Report_Date__c)) {
-                                        lstYrAttend = sc;
-                                    }
-                                    if (sc.Fiscal_Year__c==twoLastFY && (twoYrAttend==null || twoYrAttend.Report_Date__c <sc.Report_Date__c)) {
-                                        twoYrAttend = sc;
-                                    }
-                                }
-                                if (lstYrAttend!=null) {rateScoring.Student_Count_1_FY_Prior__c = lstYrAttend.Total_Attendance__c;}
-                                if (twoYrAttend!=null) {rateScoring.Student_Count_2_FY_Prior__c = twoYrAttend.Total_Attendance__c;}
-                            }
-                        }
-                    }
-                    rescore.add(rateScoring);
-                }
-                if(!rescore.isEmpty()) {
-                    update rescore;
-                    for(Pricing_Rate__c prRecord : rescore){
-                        prRecord.Activation_Date__c = Date.today();
-                        prRecord.Stage__c = 'Active';
-                        prRatesToActivate.add(prRecord);
-                    }
-                    update prRatesToActivate;
-                }
-            }
-
-            // portfolio 
-            if(!pricRatePortfolioToRescore.isEmpty()) {
-                // do rescore
-                // do activate
-            }
-
-            
-
-            // update account
-            for(Account schUpd : schoolsWithNewPr.keySet()) {
-                Id prId = schoolsWithNewPr.get(schUpd).id;
-                Decimal fdr = schoolsWithNewPr.get(schUpd).Final_Discount_Rate_Portfolio__c;
-                if(prId != null && fdr != null) {
-                    schUpd.Current_Pricing_Rate__c = prId;
-                    schUpd.Pricing_Discount_Rate__c = fdr;
-                    schoolsToUpdate.add(schUpd);
-                }                
-            }
+            schoolsToUpdate = updateSchools(schoolsWithNewPr);
             update schoolsToUpdate;
         }
-        update mrToDeactivate;
     }
 
-    public static String getFYValue(String year, String actFY) {
-        String fyValue;
-        String curFYStrt = actFY.substringBefore('-');
-        String curFYEnd = actFY.substringAfter('-');
-        Integer currentFYStart = Integer.valueOf(curFYStrt); 
-        Integer currentFYEnd = Integer.valueOf(curFYEnd);
-        if(year == 'lastFY') {
-            fyValue = String.valueOf(currentFYStart-1)+'-'+String.valueOf(currentFYEnd-1);
+    public static String getNick(Account acctRecord) {
+        String nickString;
+        if(acctRecord.Nick_Name__c != null) {
+            nickString = acctRecord.Nick_Name__c;
+        } else {
+            nickString = acctRecord.Name;
         }
-        if(year == 'twoLastFY') {
-            fyValue = String.valueOf(currentFYStart-2)+'-'+String.valueOf(currentFYEnd-2);
+        return nickString;
+    }
+
+    public static List<Pricing_Rate__c> getPricingRates() {
+        List<Pricing_Rate__c> allPricingRates = [
+            SELECT 
+                id, 
+                name,
+                recordtypeid, 
+                RecordType.DeveloperName,
+                Portfolio_Rate_Record__c, 
+                Account__c, 
+                Account__r.Top_Level_Parent_Account_Id__c, 
+                Deactivation_Date__c, 
+                Final_Discount_Rate__c, 
+                Stage__c, 
+                Student_Count_Record__c, 
+                Student_Count_Current_FY__c, 
+                Student_Count_1_FY_Prior__c, 
+                Student_Count_2_FY_Prior__c,
+                Discount_Rate_FC_Override__c,
+                Discount_Rate_FA_Override__c,
+                Final_Discount_Rate_Portfolio__c,
+                Charter_Renewed__c,
+                Fiscal_Year__c,
+                Cloned_From__c,
+                Charter_Term_Record__c,
+                FC_Override_Comments__c,
+                Financial_Analyst_Comments__c,
+                Portfolio_Pricing_Comments__c,
+                FC_Override__c,
+                FA_Override__c,
+                Portfolio_Override__c
+            FROM Pricing_Rate__c]; 
+        return allPricingRates;
+    }
+
+    public static List<Account> updateSchools(Map<Account, Pricing_Rate__c> schoolsWithNewPr) {
+        List<Account> schoolList = new List<Account>();
+
+        // make a set of pr ids
+        Set<Id> newPrIds = new Set<Id>();
+        for(Account schl : schoolsWithNewPr.keySet()) {
+            newPrIds.add(schoolsWithNewPr.get(schl).id);
         }
-        return fyValue;
+
+        Map<Id, Pricing_Rate__c> newPRs = new Map<Id, Pricing_Rate__c>([SELECT Id, Name, Final_Discount_Rate__c, Final_Discount_Rate_Portfolio__c, Portfolio_Rate_Record__c, Portfolio_Override__c FROM Pricing_Rate__c WHERE Id IN :newPrIds]);
+
+        for(Account schUpd : schoolsWithNewPr.keySet()) {
+            Id prId = schoolsWithNewPr.get(schUpd).id;
+            Pricing_Rate__c newPricRate = newPRs.get(prId);
+            Decimal fdrs = newPricRate.Final_Discount_Rate__c; 
+            system.debug('@@@ school = ' + schUpd);
+            system.debug('@@@ pricing rate = ' + newPricRate);
+            system.debug('@@@ fdrs = ' + fdrs);
+            if(prId != null) {
+                schUpd.Current_Pricing_Rate__c = prId;
+                if(fdrs != null) {
+                    schUpd.Pricing_Discount_Rate__c = fdrs;
+                }
+                schoolList.add(schUpd);
+            }
+        }
+        return schoolList;
     }
 
-    public static String getCharterRenewed(String type) {
-        String charterRenewed;
-        if (type == 'Initial' || type == 'Extension') {charterRenewed = 'No';}
-        if (type == 'Renewal') {charterRenewed = 'Yes';}
-        return charterRenewed;
-    }
-
-    public static Pricing_Rate__c createPricingRateNotPortfolio(Market_Rate__c marRate, Account school) {
-        Pricing_Rate__c prRateCreate = new Pricing_Rate__c(
-            Market_Rate__c = marRate.id,
-            Reporting_Date__c = Date.today(),
-            Reporting_Month__c = PricingRateTriggerHandler.reportingMonth(),
-            Account__c = school.id,
-            Pricing_Name__c = school.Nick_Name__c + ' - ' + 'School Pricing ' + PricingRateTriggerHandler.today()
-        );
-        return prRateCreate;
-    }
-
-    public static Pricing_Rate__c clonePricingRateNotPortfolio(Pricing_Rate__c prRate, Market_Rate__c marRate, Account school) {
+    public static Pricing_Rate__c clonePricingRate(Pricing_Rate__c prRate, Market_Rate__c marRate, String index, Id recordtype, Account acct, String nickName) {
         Pricing_Rate__c prRateCreate = new Pricing_Rate__c(
             Market_Rate__c = marRate.id,
             Stage__c = 'Active',
-            Final_Discount_Rate_Portfolio__c = prRate.Final_Discount_Rate__c, // old name Final_Effective_Rate__c
+            Discount_Rate_FC_Override__c = prRate.Discount_Rate_FC_Override__c,
+            Discount_Rate_FA_Override__c = prRate.Discount_Rate_FA_Override__c,
+            Final_Discount_Rate_Portfolio__c = prRate.Final_Discount_Rate_Portfolio__c,
             Reporting_Date__c = Date.today(),
             Reporting_Month__c = PricingRateTriggerHandler.reportingMonth(),
-            Account__c = school.id,
-            Pricing_Name__c = school.Nick_Name__c + ' - ' + 'School Pricing ' + PricingRateTriggerHandler.today(),
+            Account__c = prRate.Account__c,
+            Pricing_Name__c = nickName + ' - ' + index + ' Pricing ' + PricingRateTriggerHandler.today(),
             Activation_Date__c = Date.today(),
             Student_Count_Record__c = prRate.Student_Count_Record__c,
             Student_Count_Current_FY__c = prRate.Student_Count_Current_FY__c,
             Student_Count_1_FY_Prior__c = prRate.Student_Count_1_FY_Prior__c,
-            Student_Count_2_FY_Prior__c = prRate.Student_Count_2_FY_Prior__c
+            Student_Count_2_FY_Prior__c = prRate.Student_Count_2_FY_Prior__c,
+            RecordTypeId = recordtype,
+            Charter_Renewed__c = prRate.Charter_Renewed__c,
+            Fiscal_Year__c = prRate.Fiscal_Year__c,
+            Cloned_From__c = prRate.id,
+            Charter_Term_Record__c = prRate.Charter_Term_Record__c,
+            FC_Override_Comments__c = prRate.FC_Override_Comments__c,
+            Financial_Analyst_Comments__c = prRate.Financial_Analyst_Comments__c,
+            Portfolio_Pricing_Comments__c = prRate.Portfolio_Pricing_Comments__c,
+            FC_Override__c = prRate.FC_Override__c,
+            FA_Override__c = prRate.FA_Override__c,
+            Portfolio_Override__c = prRate.Portfolio_Override__c
         );
         return prRateCreate;
     }
+
 }
-
-
-
-
-
-
-
-// ALL FROM DAN
-// public with sharing class MarketRateTriggerHandler {
-    
-//     public static Boolean triggerActive = true;
-
-//     public static void determineIfActivatingRate(List<Market_Rate__c> triggerRates) {
-//         if (!triggerActive) return;
-//         for (Market_Rate__c newRate : triggerRates) {
-//             if (newRate.Current_Monthly_Rate__c) {
-//                 launchPricingRateDuplicationBatch();
-//                 break;
-//             }
-//         }
-//     }
-
-//     public static void determineIfActivatingRate(List<Market_Rate__c> triggerRates, Map<Id, Market_Rate__c> oldRates) {
-//         if (!triggerActive) return;
-//         for (Market_Rate__c updRate : triggerRates) {
-//             Market_Rate__c oldRate = oldRates.get(updRate.Id);
-//             if (updRate.Current_Monthly_Rate__c && !oldRate.Current_Monthly_Rate__c) {
-//                 launchPricingRateDuplicationBatch();
-//                 break;
-//             }
-//         }
-//     }
-
-//     private static void launchPricingRateDuplicationBatch() {
-//         if (!triggerActive) return;
-//         CloneAllActivePricingRatesBatch b = new CloneAllActivePricingRatesBatch();
-//         Database.executeBatch(b);
-//     }
-// }

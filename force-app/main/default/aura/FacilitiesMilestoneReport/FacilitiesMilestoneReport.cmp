@@ -108,14 +108,14 @@
                                     items in the PCL, PCL should be updated to ensure milestone reporting is accurate. 
                                     Default format of the report shows opportunities organized by Close Date.</p>
                                 <br/>
-                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The picture below shows some of the key features:</p>
+                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The picture below shows the key features:</p>
                                 <br/>
                                 <img src="{!$Resource.FacilitiesMilestoneReportHelpImage}"/>
-                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(1) - Button Deck. Use to search for the opportunity Close Date, User, and State. Select Start date and/or End date, click Search. </p>
-                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2) - Total Values Table. Displays total number of Completed records and the total Estimated Project Cost for them. Appling filters does NOT change these numbers.</p>
-                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(3) - Ultimate Totals. Total Estimated Project Cost and Total number of opportunities pulled into the Facilities Milestone Report. Appling filters does NOT change these numbers.</p>
-                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(4) - Report Columns. Sortable. Hover over the column header for 3 seconds to view help text related to symbols.</p>
-                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(5) - Download Link. Click this link to download the Facilities Milestone Report as *.xls</p>
+                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 - Button Deck. Use to search for the opportunity Close Date, User, and State. Select Start date and/or End date, click Search. </p>
+                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 - Total Values Table. Displays total number of Completed records and the total Estimated Project Cost for them. Appling filters does NOT change these numbers.</p>
+                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3 - Ultimate Totals. Total Estimated Project Cost and Total number of opportunities pulled into the Facilities Milestone Report. Appling filters does NOT change these numbers.</p>
+                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4 - Report Columns. Sortable. Hover over the column header for 3 seconds to view help text related to symbols.</p>
+                                <p style="font-size:medium">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5 - Download Link. Click this link to download the Facilities Milestone Report as *.xls</p>
                                 <br/>
                                 <h1 class="slds-text-heading--medium" style="font-weight:100; text-align:center">Symbols</h1>
                                 <p style="font-size:medium">
